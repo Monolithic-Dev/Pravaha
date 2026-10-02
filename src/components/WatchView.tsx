@@ -18,9 +18,11 @@ type Props = {
   searchable: boolean;
   segments: SegmentRow[];
   pack: StudyPack | null;
+  // Title, speaker and status, rendered under the player in the same column (not below the whole grid).
+  children?: React.ReactNode;
 };
 
-export function WatchView({ lectureId, publicId, title, durationS, startAt, searchable, segments, pack }: Props) {
+export function WatchView({ lectureId, publicId, title, durationS, startAt, searchable, segments, pack, children }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [time, setTime] = useState(startAt);
   const [filter, setFilter] = useState("");
@@ -75,6 +77,7 @@ export function WatchView({ lectureId, publicId, title, durationS, startAt, sear
             </span>
           </div>
         )}
+        {children}
       </div>
 
       {segments.length > 0 && (

@@ -60,24 +60,25 @@ export default async function WatchPage({ params, searchParams }: Props) {
         searchable={lecture.status === "ready"}
         segments={segments}
         pack={pack}
-      />
-      <header className="mt-5">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{lecture.title}</h1>
-        <p className="mt-1 text-muted">
-          {lecture.speaker ?? "Unknown speaker"}
-          {lecture.durationS ? <span className="tabular"> · {formatTime(lecture.durationS)}</span> : null}
-        </p>
-      </header>
-      {lecture.status === "processing" && (
-        <p className="mt-4 rounded-xl border border-border bg-surface p-4 text-sm">
-          Transcribing — search, chapters and subtitles are on their way. The video already plays.
-        </p>
-      )}
-      {lecture.status === "transcript_failed" && (
-        <p className="mt-4 rounded-xl border border-border bg-surface p-4 text-sm">
-          We couldn&apos;t transcribe this session, so it isn&apos;t searchable. The video still plays.
-        </p>
-      )}
+      >
+        <header className="mt-5">
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{lecture.title}</h1>
+          <p className="mt-1 text-muted">
+            {lecture.speaker ?? "Unknown speaker"}
+            {lecture.durationS ? <span className="tabular"> · {formatTime(lecture.durationS)}</span> : null}
+          </p>
+        </header>
+        {lecture.status === "processing" && (
+          <p className="mt-4 rounded-xl border border-border bg-surface p-4 text-sm">
+            Transcribing — search, chapters and subtitles are on their way. The video already plays.
+          </p>
+        )}
+        {lecture.status === "transcript_failed" && (
+          <p className="mt-4 rounded-xl border border-border bg-surface p-4 text-sm">
+            We couldn&apos;t transcribe this session, so it isn&apos;t searchable. The video still plays.
+          </p>
+        )}
+      </WatchView>
     </article>
   );
 }
