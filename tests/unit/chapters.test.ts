@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseChaptersVtt } from "@/lib/chapters";
+import { chaptersFromSegments, parseChaptersVtt } from "@/lib/chapters";
 
 describe("parseChaptersVtt", () => {
   it("parses cues with and without hours, CRLF and cue ids", () => {
@@ -28,5 +28,19 @@ describe("parseChaptersVtt", () => {
 
   it("returns nothing for junk", () => {
     expect(parseChaptersVtt("<html>404</html>")).toEqual([]);
+  });
+});
+
+describe("chaptersFromSegments", () => {
+  it("groups consecutive segments by chapter title", () => {
+    const seg = (startS: number, chapterTitle: string | null) => ({ startS, endS: startS + 10, chapterTitle });
+    expect(chaptersFromSegments([seg(0, "Intro"), seg(10, "Intro"), seg(20, "Momentum"), seg(30, null), seg(40, "Momentum")])).toEqual([
+      { startS: 0, endS: 20, title: "Intro" },
+      { startS: 20, endS: 50, title: "Momentum" },
+    ]);
+  });
+
+  it("is empty when the session has no chapters", () => {
+    expect(chaptersFromSegments([{ startS: 0, endS: 5, chapterTitle: null }])).toEqual([]);
   });
 });
