@@ -4,7 +4,8 @@ import { createHash } from "node:crypto";
 import { query } from "@/lib/db";
 import { env } from "@/lib/env";
 
-export const ASK_PER_IP_PER_HOUR = 20;
+// 60, not 20: several judges or students behind one network (a venue, a campus NAT) share an IP.
+export const ASK_PER_IP_PER_HOUR = 60;
 export const ASK_GLOBAL_PER_DAY = 500;
 
 // Shared Postgres counter: correct across serverless instances, unlike an in-memory limiter.
