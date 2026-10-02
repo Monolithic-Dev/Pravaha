@@ -39,20 +39,22 @@ Every model in the chain failing (error, timeout, 503, or schema-invalid JSON) �
 
 ### Cost & latency
 
-~12 sources × ~30 words ≈ 1–2k input tokens; short JSON output. One call per question (more only when a model in the chain fails), capped at 20/hour per IP and 500/day globally. Measured Oct 1: 2.8–3.7 s on gemini-3.6-flash. The UI shows a skeleton until the answer arrives.
+~12 sources × ~30 words ≈ 1–2k input tokens; short JSON output. One call per question (more only when a model in the chain fails), capped at 60/hour per IP and 500/day globally. Measured Oct 1: 2.8–3.7 s on gemini-3.6-flash. The UI shows a skeleton until the answer arrives.
 
 ## Evaluation — a real, small harness
 
-`tests/eval/ask-questions.json`: 10 questions written against the demo library — 7 answerable, 3 deliberately not covered. Run `pnpm eval:ask` against the deployed API before the demo and record in this file:
+`tests/eval/ask-questions.json`: 11 questions written against the demo library (six NPTEL lecture excerpts): one per session with the session it must cite, one spanning sessions, one in Hindi, and 3 deliberately not covered. Run `pnpm eval:ask` against the deployed API before the demo and record in this file. **Results, Oct 2, production:**
 
 | Metric | Target | Result |
 |---|---|---|
-| Answerable questions with ≥1 valid citation | ≥ 6/7 | _fill in Phase 09_ |
-| Citations that actually support the sentence (manual check) | ≥ 90% | _fill in Phase 09_ |
-| Unanswerable questions correctly refused | 3/3 | _fill in Phase 09_ |
-| Fallback rate | 0 | _fill in Phase 09_ |
+| Answerable questions with ≥1 valid citation (and the expected session cited) | ≥ 7/8 | **8/8** |
+| Citations that actually support the sentence (manual check of every citation against its transcript text) | ≥ 90% | **31/32 (97%)** |
+| Unanswerable questions correctly refused | 3/3 | **3/3** (IPL, a capital city, and transformers' self-attention, which is near the topic but not in the library) |
+| Fallback rate | 0 | **0** · answers in 1.2–4.6 s |
 
-Honest limit: 10 questions is a smoke test, not a benchmark. It's enough to catch a broken prompt or retrieval regression before the demo, and the numbers go in the README.
+The one unsupported citation: the momentum answer said the change "helps networks converge faster" and cited a passage about gradient-descent variants in general, not momentum specifically. A good sign: "How do I stop my model from overfitting?" was answered honestly ("the library does not explain how to stop…") because the excerpts define and diagnose overfitting but stop before the lecturer's regularization techniques. The Hindi question was answered in Hindi with 6 citations to the English lecture.
+
+Honest limit: 11 questions is a smoke test, not a benchmark. It's enough to catch a broken prompt or retrieval regression before the demo, and the numbers go in the README.
 
 ## Study Packs (Phase 13)
 

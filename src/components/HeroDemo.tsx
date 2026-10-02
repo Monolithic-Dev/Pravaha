@@ -7,13 +7,14 @@ export type DemoClip = { title: string; speaker: string | null; thumb: string };
 // A looping, self-playing picture of one Ask: the question types itself, retrieval reports in, the answer
 // streams with numbered citations, and the cited clips rise in. Decorative (the real Ask bar is right
 // beside it), so it is hidden from assistive tech; with reduced motion it shows the finished state, still.
-const QUESTION = "How do I stop my model from overfitting?";
+// What the demo library's lectures actually say (Learning Rate Decay; From AdaGrad to RMSProp).
+const QUESTION = "What happens if the learning rate is too high?";
 const ANSWER: (string | number)[] = [
-  "Hold out a validation set and watch its loss",
+  "The weights jump by large amounts and never settle into a minimum",
   1,
-  ", stop training early once that loss starts rising",
+  ", so the rate is decayed as training goes on",
   2,
-  ", and add regularization so the weights stay small",
+  ", or adapted per weight by optimizers like RMSProp",
   3,
   ".",
 ];

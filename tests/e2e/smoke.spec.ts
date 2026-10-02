@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 // Smoke test against the DEPLOYED app (docs/TESTING.md). Set these to content your demo library covers.
 const PHRASE = process.env.SMOKE_PHRASE ?? "gradient descent";
-const QUESTION = process.env.SMOKE_QUESTION ?? "How do I stop my model from overfitting?";
+const QUESTION = process.env.SMOKE_QUESTION ?? "What happens if the learning rate is too high?";
 
 test("home renders the Ask bar and library", async ({ page }) => {
   await page.goto("/");

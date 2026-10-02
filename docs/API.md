@@ -57,7 +57,7 @@ JSON in, JSON out. Errors: `{ "error": { "code": string, "message": string } }`.
 - **Errors:** `400`
 
 ### `POST /api/ask`
-- **Auth:** public, **rate-limited:** 20/hour per IP-hash, 500/day global → `429` with `Retry-After`
+- **Auth:** public, **rate-limited:** 60/hour per IP-hash, 500/day global → `429` with `Retry-After`
 - **Request:** `{ "question": string(3–300), "lectureId"?: uuid }`
 - **Response:**
   ```json

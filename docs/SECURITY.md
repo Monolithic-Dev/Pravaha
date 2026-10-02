@@ -51,7 +51,7 @@ Covered in `AI_EVALUATION.md`: no tools, schema-only output, citations limited t
 
 ## Abuse & Cost Controls
 
-- `/api/ask`: 20/hour per IP hash, 500/day global (Postgres `ask_requests`), `429` + `Retry-After`. A Gemini billing budget alert is set during setup.
+- `/api/ask`: 60/hour per IP hash (several people behind one campus or venue network share an IP), 500/day global (Postgres `ask_requests`), `429` + `Retry-After`. A Gemini billing budget alert is set during setup.
 - Moments: bounded to ≤ 60 s clips at 720 p — a learner can't request a full-length derived video.
 - Cloudinary usage checked daily during the build.
 
