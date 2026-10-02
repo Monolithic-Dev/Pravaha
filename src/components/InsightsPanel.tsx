@@ -20,13 +20,18 @@ export function InsightsPanel() {
   if (failed) return <p className="mt-4 text-muted">Insights are unavailable right now.</p>;
   if (!data) return <div className="mt-4 skeleton h-64 rounded-2xl" aria-label="Loading insights…" />;
 
-  const { totals, gaps, topQuestions, topMoments } = data;
+  const { totals, gaps, topQuestions, topMoments, feedback } = data;
+  const ratings = feedback ? feedback.helpful + feedback.unhelpful : 0;
   return (
     <div className="mt-4 space-y-6">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Questions asked" value={String(totals.questions)} />
         <Stat label="Answered from your library" value={`${Math.round(totals.answeredRate * 100)}%`} />
         <Stat label="Moments shared" value={String(totals.shares)} />
+        <Stat
+          label={ratings ? `Answers rated helpful (${ratings} ratings)` : "Answers rated helpful"}
+          value={ratings ? `${Math.round((feedback!.helpful / ratings) * 100)}%` : "—"}
+        />
       </div>
 
       <Card

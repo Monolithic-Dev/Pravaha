@@ -97,4 +97,10 @@ Every endpoint maps to an FR in `PRD.md`; there is no endpoint without one.
 - Response adds `reel: { url, durationS, clips } | null`, the Answer Reel (Phase 12)
 - Every Ask is logged to `ask_log` after the response (`after()`), with no identity
 - Response adds `followUps: string[]` (≤ 3, `answered` only): suggested next questions, cleaned by `cleanFollowUps()` (trimmed, ≤ 120 chars, de-duplicated against each other and the question). They are links to a new Ask, never citations
+- Response adds `answerId: string | null` (`answered` only): the answer is stored exactly as shown (`answers` table) and can be shared at `/a/{answerId}`, which renders it without re-running the model. `null` if it couldn't be stored; the answer is still returned
 - **Streaming:** with `Accept: application/x-ndjson` the same Ask is streamed as newline-delimited JSON events: `{ "type": "retrieved", "moments", "sessions": [title…] }` → `{ "type": "writing" }` (only when the model is called) → `{ "type": "result", …the JSON body above }`, or `{ "type": "error" }` if retrieval fails. Validation is unchanged: the answer is sent only once it is complete and its citations are checked. Without that header the response is the plain JSON body (eval script, API clients). Rate limiting and `400`/`415`/`429` happen before the stream starts
+
+### `POST /api/answers/:id/feedback`
+- **Request:** `{ "helpful": boolean }`. Public, anonymous: no identity or IP is stored; the browser remembers its vote per answer
+- **Response:** `204`; `404` for an unknown answer; `400` for an invalid body
+- Insights reports the share of answers rated helpful over the last 30 days

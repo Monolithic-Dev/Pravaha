@@ -14,7 +14,7 @@ export function SearchBar({ defaultValue = "", autoFocus = false }: { defaultVal
         minLength={2}
         maxLength={300}
         required
-        placeholder="Ask anything from the library…"
+        placeholder="Ask a question…"
         className="h-14 w-full rounded-2xl border border-border bg-surface pr-36 pl-5 text-base shadow-sm transition-shadow placeholder:text-muted focus:border-accent focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent)_15%,transparent)] focus:outline-none sm:pr-40"
       />
       <kbd aria-hidden className="pointer-events-none absolute top-1/2 right-24 hidden -translate-y-1/2 rounded-md border border-border bg-bg px-1.5 py-0.5 font-sans text-xs text-muted sm:block">

@@ -76,3 +76,7 @@ Rights confirmation is required before upload (`rights_confirmed_at`), sessions 
 - **Learner privacy in Insights:** `ask_log` keeps question text only (no IP, no user); `moment_events` keeps segment id + kind. Insights are organizer-only (`401` otherwise).
 - **`/api/events`** is public but only counts events against existing segments (`404` otherwise) and stores no identity. Worst-case abuse is inflated share counts, not data exposure.
 - **Study Pack prompt injection:** same containment as Ask: schema-only output, and every reference validated against the session's real segment ids.
+
+## HTTP Security Headers
+
+Every response carries (`next.config.ts`): `Strict-Transport-Security` (2 years, subdomains, preload), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: DENY` plus `Content-Security-Policy: frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'` (no clickjacking, no base-tag or plugin injection), and a `Permissions-Policy` that turns off camera, microphone, geolocation, payment and USB. `X-Powered-By` is removed. A full script-source CSP is deliberately not set yet: the Cloudinary Video Player loads scripts, styles and HLS segments from several hosts, so that policy needs testing against every player feature first.

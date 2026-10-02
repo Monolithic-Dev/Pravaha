@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { AskAnswer } from "@/components/AskAnswer";
 import { MomentButton } from "@/components/MomentButton";
 import { ResultCard } from "@/components/ResultCard";
+import { SaveButton } from "@/components/SaveButton";
 import { SearchBar } from "@/components/SearchBar";
 import { findSegments } from "@/lib/search";
 
@@ -35,7 +36,7 @@ export default async function SearchPage({ searchParams }: Props) {
             {hits.map((hit, i) => (
               <li key={hit.segmentId} className="rise" style={{ animationDelay: `${Math.min(i, 10) * 40}ms` }}>
                 <ResultCard hit={hit}>
-                  <div className="mt-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     <MomentButton
                       lectureId={hit.lectureId}
                       publicId={hit.publicId}
@@ -45,6 +46,18 @@ export default async function SearchPage({ searchParams }: Props) {
                       durationS={hit.durationS}
                       words={hit.words}
                       segmentId={hit.segmentId}
+                    />
+                    <SaveButton
+                      moment={{
+                        segmentId: hit.segmentId,
+                        lectureId: hit.lectureId,
+                        publicId: hit.publicId,
+                        title: hit.title,
+                        speaker: hit.speaker,
+                        startS: hit.startS,
+                        endS: hit.endS,
+                        text: hit.text,
+                      }}
                     />
                   </div>
                 </ResultCard>

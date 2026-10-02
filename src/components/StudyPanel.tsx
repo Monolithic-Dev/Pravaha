@@ -17,7 +17,7 @@ export function StudyPanel({ pack, publicId, onSeek }: Props) {
 
       {pack.summary.length > 0 && (
         <section>
-          <h3 className="text-sm font-semibold tracking-wide text-muted uppercase">In short</h3>
+          <h2 className="text-sm font-semibold tracking-wide text-muted uppercase">In short</h2>
           <ul className="mt-2 space-y-1.5 text-sm">
             {pack.summary.map((s) => (
               <li key={s} className="flex gap-2">
@@ -31,7 +31,7 @@ export function StudyPanel({ pack, publicId, onSeek }: Props) {
 
       {pack.concepts.length > 0 && (
         <section>
-          <h3 className="text-sm font-semibold tracking-wide text-muted uppercase">Key concepts</h3>
+          <h2 className="text-sm font-semibold tracking-wide text-muted uppercase">Key concepts</h2>
           <div className="mt-2 flex flex-wrap gap-2">
             {pack.concepts.map((c) => (
               <button
@@ -78,7 +78,7 @@ function Quiz({ quiz, onSeek }: { quiz: StudyPack["quiz"]; onSeek: (seconds: num
   return (
     <section>
       <div className="flex items-baseline justify-between">
-        <h3 className="text-sm font-semibold tracking-wide text-muted uppercase">Check yourself</h3>
+        <h2 className="text-sm font-semibold tracking-wide text-muted uppercase">Check yourself</h2>
         {answered > 0 && (
           <span className="tabular text-sm text-muted" aria-live="polite">
             {correct}/{answered} correct

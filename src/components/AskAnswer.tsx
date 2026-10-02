@@ -6,12 +6,14 @@ import { useEffect, useState } from "react";
 
 import { MomentButton } from "@/components/MomentButton";
 import { Snippet } from "@/components/ResultCard";
+import { SaveButton } from "@/components/SaveButton";
 import { formatTime } from "@/lib/format";
 import type { SnippetPart } from "@/lib/highlight";
 import type { TimedWord } from "@/lib/segments";
 import { clipUrl, thumbUrl } from "@/lib/media";
+import { recordQuestion } from "@/lib/saved";
 
-type Citation = {
+export type Citation = {
   n: number;
   segmentId: number;
   lectureId: string;
@@ -29,9 +31,9 @@ type Citation = {
 
 type Reel = { url: string; durationS: number; clips: number } | null;
 
-type AskResponse =
-  | { status: "answered"; answer: string; citations: Citation[]; reel: Reel; followUps?: string[] }
-  | { status: "not_found" | "fallback"; answer: null; citations: Citation[]; reel?: Reel; followUps?: string[] };
+export type AskResponse =
+  | { status: "answered"; answer: string; citations: Citation[]; reel: Reel; followUps?: string[]; answerId?: string | null }
+  | { status: "not_found" | "fallback"; answer: null; citations: Citation[]; reel?: Reel; followUps?: string[]; answerId?: string | null };
 
 type Progress = { retrieved?: { moments: number; sessions: string[] }; writing?: boolean };
 
@@ -76,6 +78,7 @@ export function AskAnswer({ question }: { question: string }) {
             setState((s) => (s.kind === "loading" ? { kind: "loading", progress: { ...s.progress, writing: true } } : s));
           } else if (event.type === "result") {
             setState({ kind: "done", data: event as AskResponse });
+            recordQuestion(question, (event as AskResponse).answerId ?? null);
           } else if (event.type === "error") {
             setState({ kind: "error", message: UNAVAILABLE });
           }
@@ -95,7 +98,7 @@ export function AskAnswer({ question }: { question: string }) {
 
       {state.kind === "loading" && <Steps progress={state.progress} />}
       {state.kind === "error" && <p className="mt-3 text-muted">{state.message}</p>}
-      {state.kind === "done" && <AnswerBody data={state.data} />}
+      {state.kind === "done" && <AnswerBody data={state.data} question={question} />}
     </section>
   );
 }
@@ -123,10 +126,21 @@ function Steps({ progress }: { progress: Progress }) {
         )}
         {retrieved && retrieved.moments > 0 && <Step done={false} active={!!writing} label="Writing an answer only from those moments…" />}
       </ol>
-      <div className="mt-5 space-y-2.5">
+      {/* Shaped like the answer that replaces it (text, Answer Reel, clip cards), so the page below doesn't jump. */}
+      <div className="mt-5 space-y-2.5" aria-hidden>
         <div className="skeleton h-4 w-11/12" />
         <div className="skeleton h-4 w-10/12" />
         <div className="skeleton h-4 w-7/12" />
+      </div>
+      <div className="skeleton mt-6 h-20 rounded-2xl" aria-hidden />
+      <div className="mt-5 grid gap-3 md:grid-cols-2" aria-hidden>
+        {[0, 1].map((i) => (
+          <div key={i} className="rounded-2xl border border-border p-3">
+            <div className="skeleton aspect-video rounded-xl" />
+            <div className="skeleton mt-3 h-4 w-2/3" />
+            <div className="skeleton mt-2 h-3 w-1/3" />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -152,10 +166,11 @@ function Step({ done, active = !done, label }: { done: boolean; active?: boolean
   );
 }
 
-function AnswerBody({ data }: { data: AskResponse }) {
+export function AnswerBody({ data, question }: { data: AskResponse; question: string }) {
   return (
     <>
       {data.status === "answered" && <AnswerText text={data.answer} citations={data.citations} />}
+      {data.status === "answered" && <AnswerActions data={data} question={question} />}
       {data.status === "not_found" && (
         <div className="rise mt-3">
           <p className="text-lg">That isn&apos;t covered in this library yet.</p>
@@ -175,6 +190,146 @@ function AnswerBody({ data }: { data: AskResponse }) {
       )}
       {data.followUps && data.followUps.length > 0 && <FollowUps questions={data.followUps} />}
     </>
+  );
+}
+
+const VOTE_KEY = (id: string) => `pravaha-vote-${id}`;
+
+// Perplexity-style action bar under an answer: what it was built from, then Share, Copy and 👍/👎.
+function AnswerActions({ data, question }: { data: Extract<AskResponse, { status: "answered" }>; question: string }) {
+  const [copied, setCopied] = useState<"link" | "text" | null>(null);
+  const [vote, setVote] = useState<"up" | "down" | null>(null);
+  const answerId = data.answerId ?? null;
+  const sessions = new Set(data.citations.map((c) => c.lectureId)).size;
+
+  useEffect(() => {
+    if (!answerId) return;
+    let saved: string | null = null;
+    try {
+      saved = localStorage.getItem(VOTE_KEY(answerId));
+    } catch {}
+    if (saved !== "up" && saved !== "down") return;
+    const remembered = saved;
+    const frame = requestAnimationFrame(() => setVote(remembered));
+    return () => cancelAnimationFrame(frame);
+  }, [answerId]);
+
+  function flash(kind: "link" | "text") {
+    setCopied(kind);
+    setTimeout(() => setCopied(null), 1800);
+  }
+
+  async function share() {
+    if (!answerId) return;
+    const url = `${location.origin}/a/${answerId}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: question, text: "Answered from lecture recordings on Pravaha", url });
+        return;
+      } catch (e) {
+        if ((e as Error)?.name === "AbortError") return;
+      }
+    }
+    await navigator.clipboard?.writeText(url).then(() => flash("link"), () => {});
+  }
+
+  async function copy() {
+    const sources = data.citations
+      .map((c) => `[${c.n}] ${c.title}${c.speaker ? ` — ${c.speaker}` : ""}, ${formatTime(c.startS)}: ${location.origin}/watch/${c.lectureId}?t=${Math.floor(c.startS)}`)
+      .join("\n");
+    await navigator.clipboard?.writeText(`${question}\n\n${data.answer}\n\nSources:\n${sources}`).then(() => flash("text"), () => {});
+  }
+
+  async function rate(helpful: boolean) {
+    if (!answerId || vote) return;
+    const next = helpful ? "up" : "down";
+    setVote(next);
+    try {
+      localStorage.setItem(VOTE_KEY(answerId), next);
+    } catch {}
+    await fetch(`/api/answers/${answerId}/feedback`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ helpful }),
+    }).catch(() => {});
+  }
+
+  const btn = "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-muted hover:bg-bg hover:text-fg";
+  return (
+    <div className="rise mt-4 flex flex-wrap items-center gap-x-1 gap-y-2 border-y border-border py-2" style={{ animationDelay: "200ms" }}>
+      <a href="#cite-1" className="mr-auto flex items-center gap-2 rounded-lg py-1 pr-2 text-sm text-muted hover:text-fg">
+        <span className="flex -space-x-2" aria-hidden>
+          {data.citations.slice(0, 3).map((c) => (
+            <Image
+              key={c.segmentId}
+              src={thumbUrl(c.publicId, c.startS)}
+              alt=""
+              width={48}
+              height={48}
+              unoptimized
+              className="size-6 rounded-full border-2 border-surface object-cover"
+            />
+          ))}
+        </span>
+        {data.citations.length} moment{data.citations.length === 1 ? "" : "s"} · {sessions} session{sessions === 1 ? "" : "s"}
+      </a>
+      {answerId && (
+        <button type="button" onClick={share} className={btn}>
+          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v13" />
+          </svg>
+          {copied === "link" ? "Link copied" : "Share"}
+        </button>
+      )}
+      <button type="button" onClick={copy} className={btn}>
+        <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden>
+          <rect x="8" y="8" width="12" height="12" rx="2" />
+          <path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3" />
+        </svg>
+        {copied === "text" ? "Copied" : "Copy"}
+      </button>
+      {answerId && (
+        <span className="flex items-center" role="group" aria-label="Was this answer helpful?">
+          <button
+            type="button"
+            onClick={() => rate(true)}
+            aria-pressed={vote === "up"}
+            aria-label="Helpful"
+            disabled={!!vote}
+            className={`${btn} disabled:cursor-default ${vote === "up" ? "text-accent" : ""}`}
+          >
+            <Thumb filled={vote === "up"} />
+          </button>
+          <button
+            type="button"
+            onClick={() => rate(false)}
+            aria-pressed={vote === "down"}
+            aria-label="Not helpful"
+            disabled={!!vote}
+            className={`${btn} disabled:cursor-default ${vote === "down" ? "text-failed" : ""}`}
+          >
+            <Thumb filled={vote === "down"} down />
+          </button>
+          {vote && <span className="rise pl-1 text-xs text-muted">Thanks for the feedback</span>}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function Thumb({ filled, down = false }: { filled: boolean; down?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={`size-4 ${down ? "rotate-180" : ""}`}
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M7 10v11H4V10zM7 10l4-8a3 3 0 013 3v4h5a2 2 0 012 2.3l-1.4 8A2 2 0 0117.6 21H7" />
+    </svg>
   );
 }
 
@@ -338,6 +493,18 @@ function CitationCard({ c }: { c: Citation }) {
           durationS={c.durationS}
           words={c.words}
           segmentId={c.segmentId}
+        />
+        <SaveButton
+          moment={{
+            segmentId: c.segmentId,
+            lectureId: c.lectureId,
+            publicId: c.publicId,
+            title: c.title,
+            speaker: c.speaker,
+            startS: c.startS,
+            endS: c.endS,
+            text: c.text,
+          }}
         />
       </div>
     </article>

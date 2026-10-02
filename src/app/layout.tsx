@@ -5,14 +5,14 @@ import Link from "next/link";
 import { LogoMark } from "@/components/Logo";
 import { SearchShortcut } from "@/components/SearchShortcut";
 import { THEME_INIT_SCRIPT, ThemeToggle } from "@/components/ThemeToggle";
+import { publicBaseUrl } from "@/lib/site";
 
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-// Absolute base for Open Graph URLs (/m/…, /watch/…). Read directly rather than via env(), which
-// requires every server secret and so can't run at build time.
-const appUrl = process.env.APP_URL && URL.canParse(process.env.APP_URL) ? process.env.APP_URL : "http://localhost:3000";
+// Absolute base for Open Graph URLs (/m/…, /watch/…, /a/…).
+const appUrl = publicBaseUrl();
 
 const description =
   "Turn recorded lectures and talks into knowledge you can search, ask and share — every answer is a clip of the moment it was said.";
@@ -51,6 +51,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="flex items-center gap-1 text-sm">
               <Link href="/#library" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
                 Library
+              </Link>
+              <Link href="/saved" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
+                Saved
               </Link>
               <Link href="/studio" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
                 Studio
