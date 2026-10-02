@@ -124,6 +124,24 @@ components:
     Insights:
       type: object
       properties:
+        daily:
+          type: array
+          description: "Questions per day, last 14 days (India time), oldest first"
+          items:
+            type: object
+            properties:
+              day: { type: string, format: date }
+              answered: { type: integer }
+              unanswered: { type: integer }
+        topSessions:
+          type: array
+          description: "Sessions cited by answers in the last 30 days, most first (published only in the demo Studio)"
+          items:
+            type: object
+            properties:
+              lectureId: { type: string, format: uuid }
+              title: { type: string }
+              answers: { type: integer }
         totals:
           type: object
           properties:

@@ -31,11 +31,17 @@ export type Insights = {
   topQuestions: { question: string; times: number; answered: number }[];
   topMoments: { segmentId: number; lectureId: string; title: string; startS: number; text: string; opens: number; shares: number }[];
   totals: { questions: number; answeredRate: number; shares: number };
+  // Questions per day (India time), oldest first, for the last DAILY_DAYS days including today.
+  daily: { day: string; answered: number; unanswered: number }[];
+  // The sessions answers drew on most: which recordings are doing the teaching.
+  topSessions: { lectureId: string; title: string; answers: number }[];
   // 👍/👎 on answers (src/lib/answers.ts); null if the answers table isn't there yet.
   feedback: { helpful: number; unhelpful: number } | null;
 };
 
 const WINDOW = `now() - interval '30 days'`;
+export const DAILY_DAYS = 14;
+const TODAY_IST = `(now() AT TIME ZONE 'Asia/Kolkata')::date`;
 
 // The public demo Studio shows real aggregates, but learner-typed text is shown only if it reads like a
 // question: no links, e-mail addresses or long digit runs (phone numbers).
@@ -50,11 +56,11 @@ export function forDemo(insights: Insights): Insights {
 }
 
 // Questions are grouped case- and whitespace-insensitively, so "What is dropout?" and "what is  dropout" count together.
-// `publishedOnly` (the public demo Studio): Moments only from published sessions, so an unlisted session's
-// title and words never show up there.
+// `publishedOnly` (the public demo Studio): Moments and sessions only from published sessions, so an unlisted
+// session's title and words never show up there.
 export async function getInsights({ publishedOnly = false } = {}): Promise<Insights> {
   const momentScope = publishedOnly ? `AND l.status = 'ready' AND l.visibility = 'public'` : "";
-  const [gaps, topQuestions, topMoments, totals] = await Promise.all([
+  const [gaps, topQuestions, topMoments, totals, daily, topSessions] = await Promise.all([
     query<{ question: string; times: string; last_asked: Date }>(
       `SELECT min(question) AS question, count(*) AS times, max(created_at) AS last_asked
          FROM ask_log WHERE status = 'not_found' AND created_at > ${WINDOW}
@@ -80,6 +86,20 @@ export async function getInsights({ publishedOnly = false } = {}): Promise<Insig
               (SELECT count(*) FROM ask_log WHERE created_at > ${WINDOW} AND status = 'answered') AS answered,
               (SELECT count(*) FROM moment_events WHERE created_at > ${WINDOW} AND kind = 'share') AS shares`,
     ),
+    query<{ day: string; answered: string; unanswered: string }>(
+      `SELECT to_char(d, 'YYYY-MM-DD') AS day,
+              count(a.id) FILTER (WHERE a.status = 'answered') AS answered,
+              count(a.id) FILTER (WHERE a.status <> 'answered') AS unanswered
+         FROM generate_series(${TODAY_IST} - ${DAILY_DAYS - 1}, ${TODAY_IST}, interval '1 day') d
+         LEFT JOIN ask_log a ON (a.created_at AT TIME ZONE 'Asia/Kolkata')::date = d::date
+        GROUP BY d ORDER BY d`,
+    ),
+    query<{ id: string; title: string; answers: string }>(
+      `SELECT l.id, l.title, count(*) AS answers
+         FROM ask_log a CROSS JOIN LATERAL unnest(a.lecture_ids) AS u(lid) JOIN lectures l ON l.id = u.lid
+        WHERE a.created_at > ${WINDOW} AND a.status = 'answered' AND l.trial_expires_at IS NULL ${momentScope}
+        GROUP BY l.id ORDER BY count(*) DESC, l.title LIMIT 6`,
+    ),
   ]);
   const t = totals[0]!;
   const feedback = await query<{ helpful: string | null; unhelpful: string | null }>(
@@ -90,6 +110,8 @@ export async function getInsights({ publishedOnly = false } = {}): Promise<Insig
   );
   return {
     feedback,
+    daily: daily.map((d) => ({ day: d.day, answered: Number(d.answered), unanswered: Number(d.unanswered) })),
+    topSessions: topSessions.map((s) => ({ lectureId: s.id, title: s.title, answers: Number(s.answers) })),
     gaps: gaps.map((g) => ({ question: g.question, times: Number(g.times), lastAsked: g.last_asked.toISOString() })),
     topQuestions: topQuestions.map((q) => ({ question: q.question, times: Number(q.times), answered: Number(q.answered) })),
     topMoments: topMoments.map((m) => ({

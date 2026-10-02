@@ -92,7 +92,7 @@ Every endpoint maps to an FR in `PRD.md`; there is no endpoint without one.
 - Anonymous Moment analytics for organizer Insights
 
 ### `GET /api/insights`
-- **Auth:** organizer, or anyone while the demo Studio is on (`STUDIO_DEMO`, default `on`; `401` when `off`). Visitors get the same aggregates minus questions that look like links, e-mail addresses or phone numbers, and Moments only from published sessions · **Response:** `{ totals: { questions, answeredRate, shares }, gaps[{question,times,lastAsked}], topQuestions[{question,times,answered}], topMoments[{segmentId,lectureId,title,startS,text,opens,shares}] }` (last 30 days)
+- **Auth:** organizer, or anyone while the demo Studio is on (`STUDIO_DEMO`, default `on`; `401` when `off`). Visitors get the same aggregates minus questions that look like links, e-mail addresses or phone numbers, and Moments only from published sessions · **Response:** `{ totals: { questions, answeredRate, shares }, gaps[{question,times,lastAsked}], topQuestions[{question,times,answered}], topMoments[{segmentId,lectureId,title,startS,text,opens,shares}], daily[{day,answered,unanswered}] (last 14 days, India time), topSessions[{lectureId,title,answers}] (sessions cited by answers), feedback }` (last 30 days)
 
 ### `POST /api/ask` (additions)
 - Response adds `reel: { url, durationS, clips } | null`, the Answer Reel (Phase 12)
