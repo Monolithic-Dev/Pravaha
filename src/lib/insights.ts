@@ -31,6 +31,8 @@ export type Insights = {
   topQuestions: { question: string; times: number; answered: number }[];
   topMoments: { segmentId: number; lectureId: string; title: string; startS: number; text: string; opens: number; shares: number }[];
   totals: { questions: number; answeredRate: number; shares: number };
+  // 👍/👎 on answers (src/lib/answers.ts); null if the answers table isn't there yet.
+  feedback: { helpful: number; unhelpful: number } | null;
 };
 
 const WINDOW = `now() - interval '30 days'`;
@@ -65,7 +67,14 @@ export async function getInsights(): Promise<Insights> {
     ),
   ]);
   const t = totals[0]!;
+  const feedback = await query<{ helpful: string | null; unhelpful: string | null }>(
+    `SELECT sum(helpful) AS helpful, sum(unhelpful) AS unhelpful FROM answers WHERE created_at > ${WINDOW}`,
+  ).then(
+    ([f]) => ({ helpful: Number(f?.helpful ?? 0), unhelpful: Number(f?.unhelpful ?? 0) }),
+    () => null,
+  );
   return {
+    feedback,
     gaps: gaps.map((g) => ({ question: g.question, times: Number(g.times), lastAsked: g.last_asked.toISOString() })),
     topQuestions: topQuestions.map((q) => ({ question: q.question, times: Number(q.times), answered: Number(q.answered) })),
     topMoments: topMoments.map((m) => ({

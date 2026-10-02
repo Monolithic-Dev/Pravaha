@@ -1,6 +1,7 @@
 import { after, NextResponse } from "next/server";
 import { z } from "zod";
 
+import { saveAnswer } from "@/lib/answers";
 import { cleanFollowUps, validateAnswer } from "@/lib/citations";
 import { AiUnconfigured } from "@/lib/ai";
 import { askGrounded } from "@/lib/answer";
@@ -48,7 +49,7 @@ async function ask(question: string, lectureId: string | null, progress: (p: Pro
     // Nothing in the library matches — no reason to call the model.
     log("ask.done", { status: "not_found", retrieved: 0, cited: 0, dropped: 0, ms: Date.now() - started });
     after(() => logAsk(question, "not_found", []));
-    return { status: "not_found" as const, answer: null, citations: [], reel: null, followUps: [] };
+    return { status: "not_found" as const, answer: null, citations: [], reel: null, followUps: [], answerId: null };
   }
 
   try {
@@ -63,20 +64,23 @@ async function ask(question: string, lectureId: string | null, progress: (p: Pro
       ms: Date.now() - started,
     });
     after(() => logAsk(question, result.status, result.citations.map((c) => c.lectureId)));
-    return {
+    const body = {
       status: result.status,
       answer: result.answer,
       citations: result.citations.map(withMoment),
       reel: reelFor(result.citations),
       followUps: result.status === "answered" ? cleanFollowUps(raw.follow_ups, question) : [],
     };
+    // Stored as shown, so /a/[answerId] can be shared without re-running the model.
+    const answerId = result.status === "answered" ? await saveAnswer(question, body) : null;
+    return { ...body, answerId };
   } catch (error) {
     // NFR4: the model failing never means an error page — show the most relevant moments instead.
     const kind = error instanceof AiUnconfigured ? "unconfigured" : error instanceof Error ? error.name : "unknown";
     log("ai.error", { kind, message: error instanceof Error ? error.message.slice(0, 200) : undefined, ms: Date.now() - started });
     const citations = hits.slice(0, FALLBACK_CLIPS).map((h, i) => withMoment({ ...h, n: i + 1 }));
     after(() => logAsk(question, "fallback", citations.map((c) => c.lectureId)));
-    return { status: "fallback" as const, answer: null, citations, reel: reelFor(citations), followUps: [] };
+    return { status: "fallback" as const, answer: null, citations, reel: reelFor(citations), followUps: [], answerId: null };
   }
 }
 
