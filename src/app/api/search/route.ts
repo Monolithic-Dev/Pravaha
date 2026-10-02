@@ -14,6 +14,7 @@ export async function GET(request: Request) {
   const parsed = Query.safeParse(params);
   if (!parsed.success) return apiError(400, "invalid_query", "Search needs 2–200 characters.");
 
-  const results = await findSegments(parsed.data.q, { lectureId: parsed.data.lectureId ?? null });
-  return NextResponse.json({ results });
+  const { hits, exact } = await findSegments(parsed.data.q, { lectureId: parsed.data.lectureId ?? null });
+  // exact: false → no moment had every word, so these are the closest matches (any of the words).
+  return NextResponse.json({ results: hits, exact });
 }
