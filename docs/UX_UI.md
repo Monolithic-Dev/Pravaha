@@ -10,6 +10,8 @@ Rule: make the intelligence visible, hide the machinery. Learners see answers, m
 | `/search?q=` | Everyone | Ask answer on top, Find results below |
 | `/watch/[id]?t=` | Everyone (unlisted by link) | Player, chapters, transcript, share moment |
 | `/m/[segmentId]` | Everyone (unlisted by link, `noindex`) | A shared Moment: vertical clip, quote, full session, Ask bar; designed link preview |
+| `/a/[id]` | Everyone (by link, `noindex`) | A shared answer, exactly as it was given: question, answer, citations, Answer Reel; its own preview card; Ask bar |
+| `/saved` | Everyone (this device) | Continue watching, saved moments, recent questions |
 | `/studio` | Organizer | Passcode → upload → manage sessions |
 
 ## Home `/`
@@ -76,3 +78,8 @@ Skeletons, never bare spinners. 404 session → "This session isn't available." 
 - **Sessions | Insights** tabs
 - Per ready session: **Build Study Pack** (shows *Building… → Study Pack ready ✓*)
 - **Insights**: totals (questions asked, % answered from the library, Moments shared), **Knowledge gaps** (record these next), **Most asked**, **Moments that travel**
+
+### Answer actions, Saved and the landing story
+- **Under every answer** (Perplexity-style): the moments and sessions it was built from (small thumbnails), **Share** (system share sheet on phones, copies the `/a/[id]` link elsewhere), **Copy** (answer plus numbered sources with timestamped links), and 👍/👎 (once per answer per device; Insights shows the helpful rate)
+- **Save** on every answer clip, search result and the current Watch moment. **Saved** (`/saved`, header link) lists continue watching, saved moments and recent questions, kept in this browser only (`src/lib/saved.ts`); the home page shows a "Continue watching" row when there is one
+- **Below the library on the home page:** who it's for (colleges, coaching institutes, clubs), a comparison with a general AI chatbot and a typical lecture-capture platform, the Cloudinary features doing the media work, planned pricing (matches `docs/VISION.md`), an FAQ and a closing call to action

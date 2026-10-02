@@ -9,6 +9,8 @@ info:
     Every JSON request body must be sent with Content-Type: application/json,
     otherwise the route answers 415 (CSRF guard, docs/SECURITY.md).
 servers:
+  - url: https://pravaha-cyan.vercel.app/api
+    description: Production
   - url: http://localhost:3000/api
     description: Local development
 components:
@@ -322,6 +324,7 @@ paths:
                   citations: { type: array, items: { $ref: '#/components/schemas/Citation' } }
                   reel: { $ref: '#/components/schemas/Reel' }
                   followUps: { type: array, maxItems: 3, items: { type: string, maxLength: 120 }, description: 'Suggested next questions (answered only)' }
+                  answerId: { type: string, nullable: true, pattern: '^[A-Za-z0-9_-]{10}$', description: 'Stored answer for the share page /a/{answerId} (answered only; null if it could not be stored)' }
             application/x-ndjson:
               schema:
                 type: string
@@ -364,6 +367,26 @@ paths:
         '204': { description: Recorded }
         '400': { description: Invalid body }
         '404': { description: Unknown segment }
+  /answers/{id}/feedback:
+    post:
+      summary: Anonymous helpful / not helpful vote on a stored answer, for organizer Insights
+      operationId: recordAnswerFeedback
+      security: []  # public
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, pattern: '^[A-Za-z0-9_-]{10}$' } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [helpful]
+              properties:
+                helpful: { type: boolean }
+      responses:
+        '204': { description: Recorded }
+        '400': { description: Invalid body }
+        '404': { description: Unknown answer }
   /insights:
     get:
       summary: Organizer Insights over the last 30 days (knowledge gaps, most asked, most shared)
