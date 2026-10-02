@@ -123,7 +123,8 @@ export function Studio({ demo = false }: { demo?: boolean }) {
                     </p>
                     {s.status === "ready" && (
                       <p className="tabular mt-1 text-xs text-muted">
-                        {s.moments} moments indexed · {s.chapters} chapter{s.chapters === 1 ? "" : "s"}
+                        {s.moments} moments indexed
+                        {s.chapters > 0 ? ` · ${s.chapters} chapter${s.chapters === 1 ? "" : "s"}` : ""}
                         {s.hasStudyPack ? " · Study Pack" : ""}
                       </p>
                     )}
