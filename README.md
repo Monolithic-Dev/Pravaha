@@ -13,13 +13,21 @@ Turn hours of recorded lectures and talks into a library you can search, questio
 [![CI](https://img.shields.io/github/actions/workflow/status/Monolithic-Dev/Pravaha/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/Monolithic-Dev/Pravaha/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-D22128?style=for-the-badge&logo=apache&logoColor=white)](LICENSE)
 
-[![Cloudinary](https://img.shields.io/badge/Cloudinary-media_%26_AI-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](#how-cloudinary-powers-it)
-[![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org)
-[![React 19](https://img.shields.io/badge/React-19-149ECA?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
-[![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](tsconfig.json)
-[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Google Gemini](https://img.shields.io/badge/Google_Gemini-answers-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)](docs/AI_EVALUATION.md)
-[![Neon Postgres](https://img.shields.io/badge/Neon-Postgres-00E599?style=for-the-badge&logo=postgresql&logoColor=white)](docs/DATABASE.md)
+<p>
+  <a href="#how-cloudinary-powers-it"><img src="docs/icons/cloudinary.svg" width="48" alt="Cloudinary: video, AI transcription, chapters, previews and delivery" title="Cloudinary: video, AI transcription, chapters, previews and delivery" /></a>
+  <a href="https://nextjs.org"><img src="https://skillicons.dev/icons?i=nextjs&theme=dark" width="48" alt="Next.js 16 (App Router)" title="Next.js 16 (App Router)" /></a>
+  <a href="https://react.dev"><img src="https://skillicons.dev/icons?i=react&theme=dark" width="48" alt="React 19" title="React 19" /></a>
+  <a href="tsconfig.json"><img src="https://skillicons.dev/icons?i=ts&theme=dark" width="48" alt="TypeScript, strict" title="TypeScript, strict" /></a>
+  <a href="https://tailwindcss.com"><img src="https://skillicons.dev/icons?i=tailwind&theme=dark" width="48" alt="Tailwind CSS 4" title="Tailwind CSS 4" /></a>
+  <a href="https://nodejs.org"><img src="https://skillicons.dev/icons?i=nodejs&theme=dark" width="48" alt="Node.js" title="Node.js" /></a>
+  <a href="docs/DATABASE.md"><img src="https://skillicons.dev/icons?i=postgres&theme=dark" width="48" alt="PostgreSQL full-text search" title="PostgreSQL full-text search" /></a>
+  <a href="docs/DATABASE.md"><img src="docs/icons/neon.svg" width="48" alt="Neon serverless Postgres" title="Neon serverless Postgres" /></a>
+  <a href="docs/AI_EVALUATION.md"><img src="docs/icons/gemini.svg" width="48" alt="Google Gemini: grounded answers and Study Packs" title="Google Gemini: grounded answers and Study Packs" /></a>
+  <a href="https://pravaha-cyan.vercel.app"><img src="https://skillicons.dev/icons?i=vercel&theme=dark" width="48" alt="Vercel hosting" title="Vercel hosting" /></a>
+  <a href="https://github.com/Monolithic-Dev/Pravaha/actions/workflows/ci.yml"><img src="https://skillicons.dev/icons?i=githubactions&theme=dark" width="48" alt="GitHub Actions CI" title="GitHub Actions CI" /></a>
+  <a href="tests/unit"><img src="https://skillicons.dev/icons?i=vitest&theme=dark" width="48" alt="Vitest unit tests" title="Vitest unit tests" /></a>
+  <a href="package.json"><img src="https://skillicons.dev/icons?i=pnpm&theme=dark" width="48" alt="pnpm" title="pnpm" /></a>
+</p>
 
 [**Live app**](https://pravaha-cyan.vercel.app) · [How to test](#how-to-test-it) · [Cloudinary usage](#how-cloudinary-powers-it) · [Run locally](#quick-start) · [Docs](#documentation)
 
