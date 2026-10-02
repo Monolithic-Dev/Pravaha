@@ -8,9 +8,10 @@ import { forDemo, getInsights } from "@/lib/insights";
 export const dynamic = "force-dynamic";
 
 // Organizers see everything. With the demo Studio on (STUDIO_DEMO, default "on"), visitors see the same
-// anonymous aggregates, minus questions that look like links or contact details.
+// anonymous aggregates, minus questions that look like links or contact details and Moments from
+// sessions that aren't published.
 export async function GET() {
   if (await isOrganizer()) return NextResponse.json(await getInsights());
   if (env().STUDIO_DEMO === "off") return unauthorized();
-  return NextResponse.json(forDemo(await getInsights()));
+  return NextResponse.json(forDemo(await getInsights({ publishedOnly: true })));
 }
