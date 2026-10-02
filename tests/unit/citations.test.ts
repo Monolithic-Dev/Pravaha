@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { validateAnswer } from "@/lib/citations";
+import { cleanFollowUps, validateAnswer } from "@/lib/citations";
 
 const retrieved = [{ segmentId: 812 }, { segmentId: 813 }, { segmentId: 900 }];
 
@@ -48,5 +48,28 @@ describe("validateAnswer", () => {
       validateAnswer({ answer: "The IPL was won by [S1].", cited_segment_ids: [1, 2] }, retrieved),
     ).toMatchObject({ status: "not_found", answer: null, citations: [] });
     expect(validateAnswer({ answer: "Not covered.", cited_segment_ids: [] }, retrieved).status).toBe("not_found");
+  });
+});
+
+describe("cleanFollowUps", () => {
+  const q = "How do I stop overfitting?";
+
+  it("trims, collapses whitespace and keeps at most three", () => {
+    expect(cleanFollowUps(["  What is   dropout? ", "What is L1?", "What is L2?", "What is early stopping?"], q)).toEqual([
+      "What is dropout?",
+      "What is L1?",
+      "What is L2?",
+    ]);
+  });
+
+  it("drops empties, over-long text, duplicates and the learner's own question", () => {
+    const long = `Why ${"really ".repeat(30)}?`;
+    expect(cleanFollowUps(["", long, "What is dropout?", "what is DROPOUT", "How do I stop overfitting"], q)).toEqual([
+      "What is dropout?",
+    ]);
+  });
+
+  it("handles a missing list", () => {
+    expect(cleanFollowUps(undefined, q)).toEqual([]);
   });
 });

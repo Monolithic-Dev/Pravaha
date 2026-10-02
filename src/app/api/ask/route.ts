@@ -1,7 +1,7 @@
 import { after, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { validateAnswer } from "@/lib/citations";
+import { cleanFollowUps, validateAnswer } from "@/lib/citations";
 import { AiUnconfigured } from "@/lib/ai";
 import { askGrounded } from "@/lib/answer";
 import { apiError, parseJson } from "@/lib/http";
@@ -19,6 +19,7 @@ const Body = z.object({
 });
 
 const FALLBACK_CLIPS = 4;
+const NDJSON = "application/x-ndjson";
 
 const withMoment = (h: Hit & { n: number }) => ({
   ...h,
@@ -29,8 +30,55 @@ const withMoment = (h: Hit & { n: number }) => ({
 const reelFor = (hits: Hit[]) =>
   reelUrl(hits.map((h) => ({ publicId: h.publicId, startS: h.startS, endS: h.endS, label: h.speaker ?? h.title })));
 
-export async function POST(request: Request) {
+// Progress the client can show while it waits: real retrieval facts, then the model step.
+type Progress =
+  | { type: "retrieved"; moments: number; sessions: string[] }
+  | { type: "writing" };
+
+// One Ask, start to finish. `progress` lets the streaming response report each step as it happens;
+// the JSON response ignores it. Same retrieval, validation and fallback either way.
+async function ask(question: string, lectureId: string | null, progress: (p: Progress) => void) {
   const started = Date.now();
+  const hits = await retrieveForQuestion(question, { lectureId });
+  progress({ type: "retrieved", moments: hits.length, sessions: [...new Set(hits.map((h) => h.title))].slice(0, 5) });
+
+  if (hits.length === 0) {
+    // Nothing in the library matches — no reason to call the model.
+    log("ask.done", { status: "not_found", retrieved: 0, cited: 0, dropped: 0, ms: Date.now() - started });
+    after(() => logAsk(question, "not_found", []));
+    return { status: "not_found" as const, answer: null, citations: [], reel: null, followUps: [] };
+  }
+
+  try {
+    progress({ type: "writing" });
+    const raw = await askGrounded(question, hits);
+    const result = validateAnswer(raw, hits);
+    log("ask.done", {
+      status: result.status,
+      retrieved: hits.length,
+      cited: result.citations.length,
+      dropped: result.dropped,
+      ms: Date.now() - started,
+    });
+    after(() => logAsk(question, result.status, result.citations.map((c) => c.lectureId)));
+    return {
+      status: result.status,
+      answer: result.answer,
+      citations: result.citations.map(withMoment),
+      reel: reelFor(result.citations),
+      followUps: result.status === "answered" ? cleanFollowUps(raw.follow_ups, question) : [],
+    };
+  } catch (error) {
+    // NFR4: the model failing never means an error page — show the most relevant moments instead.
+    const kind = error instanceof AiUnconfigured ? "unconfigured" : error instanceof Error ? error.name : "unknown";
+    log("ai.error", { kind, message: error instanceof Error ? error.message.slice(0, 200) : undefined, ms: Date.now() - started });
+    const citations = hits.slice(0, FALLBACK_CLIPS).map((h, i) => withMoment({ ...h, n: i + 1 }));
+    after(() => logAsk(question, "fallback", citations.map((c) => c.lectureId)));
+    return { status: "fallback" as const, answer: null, citations, reel: reelFor(citations), followUps: [] };
+  }
+}
+
+export async function POST(request: Request) {
   const parsed = await parseJson(request, Body);
   if ("response" in parsed) return parsed.response;
   const { question, lectureId } = parsed.data;
@@ -44,36 +92,28 @@ export async function POST(request: Request) {
     return response;
   }
 
-  const hits = await retrieveForQuestion(question, { lectureId: lectureId ?? null });
-  if (hits.length === 0) {
-    // Nothing in the library matches — no reason to call the model.
-    log("ask.done", { status: "not_found", retrieved: 0, cited: 0, dropped: 0, ms: Date.now() - started });
-    after(() => logAsk(question, "not_found", []));
-    return NextResponse.json({ status: "not_found", answer: null, citations: [] });
+  // Default: one JSON body (API clients, eval script). With Accept: application/x-ndjson the same Ask is
+  // streamed as newline-delimited JSON events, ending with { type: "result", ...body }.
+  if (!request.headers.get("accept")?.includes(NDJSON)) {
+    return NextResponse.json(await ask(question, lectureId ?? null, () => {}));
   }
 
-  try {
-    const result = validateAnswer(await askGrounded(question, hits), hits);
-    log("ask.done", {
-      status: result.status,
-      retrieved: hits.length,
-      cited: result.citations.length,
-      dropped: result.dropped,
-      ms: Date.now() - started,
-    });
-    after(() => logAsk(question, result.status, result.citations.map((c) => c.lectureId)));
-    return NextResponse.json({
-      status: result.status,
-      answer: result.answer,
-      citations: result.citations.map(withMoment),
-      reel: reelFor(result.citations),
-    });
-  } catch (error) {
-    // NFR4: the model failing never means an error page — show the most relevant moments instead.
-    const kind = error instanceof AiUnconfigured ? "unconfigured" : error instanceof Error ? error.name : "unknown";
-    log("ai.error", { kind, message: error instanceof Error ? error.message.slice(0, 200) : undefined, ms: Date.now() - started });
-    const citations = hits.slice(0, FALLBACK_CLIPS).map((h, i) => withMoment({ ...h, n: i + 1 }));
-    after(() => logAsk(question, "fallback", citations.map((c) => c.lectureId)));
-    return NextResponse.json({ status: "fallback", answer: null, citations, reel: reelFor(citations) });
-  }
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const send = (event: object) => controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
+      try {
+        send({ type: "result", ...(await ask(question, lectureId ?? null, send)) });
+      } catch (error) {
+        // Retrieval or the database failed (ask() already absorbs AI failures).
+        log("ask.stream_failed", { error: error instanceof Error ? error.message.slice(0, 200) : String(error) });
+        send({ type: "error" });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+  return new Response(stream, {
+    headers: { "Content-Type": `${NDJSON}; charset=utf-8`, "Cache-Control": "no-store", "X-Accel-Buffering": "no" },
+  });
 }
