@@ -96,6 +96,7 @@ Cloudinary isn't just storage here; the product depends on it.
 | `auto_chaptering` | AI chapters on the player's seek bar |
 | Cloudinary Video Player, HLS `sp_hd_lean` | Adaptive streaming (720p / 360p / 180p) that survives slow mobile data |
 | `e_preview,fl_getinfo`, `fl_sprite` | The player's AI highlights graph and seek-bar previews |
+| `e_preview:duration_6` | **AI hover previews** on library cards: the session's most interesting moments in 6 silent seconds |
 | `so_`/`eo_` + `c_fill,ar_9:16,g_auto` + timed `l_text` captions + `f_auto,q_auto` | **Moments**: trimmed, subject-tracked, subtitled vertical clips |
 | `g_auto` thumbnails and poster frames | Content-aware library cards, results and social preview cards |
 | `l_video:…,fl_splice` + timed `l_text` labels | **Answer Reels** and **Session in 60 seconds**: moments from one or more sessions stitched into one video |
