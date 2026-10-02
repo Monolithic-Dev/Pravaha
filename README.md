@@ -71,9 +71,13 @@ Colleges, clubs and coaching institutes record hundreds of hours of lectures and
 
 ## Screenshots
 
-| Home | Watch + Study Pack |
+| Home | Watch: follow-along transcript, chapters, Ask this session |
 |---|---|
-| <img src="docs/screenshots/home.png" alt="Home page with the animated hero and the Ask bar" /> | <img src="docs/screenshots/watch.png" alt="Watch page with the adaptive player, chapters and the Study Pack" /> |
+| <img src="docs/screenshots/home.png" alt="Home page with the animated hero and the Ask bar" /> | <img src="docs/screenshots/watch.png" alt="Watch page: the adaptive player, the transcript following the line being spoken, Study, Chapters and Transcript tabs, and Ask this session" /> |
+
+| Studio (public read-only demo): Insights | Cloudinary under the hood |
+|---|---|
+| <img src="docs/screenshots/studio.png" alt="Studio Insights: questions asked, answer rate, questions per day and the sessions answers come from" /> | <img src="docs/screenshots/under-the-hood.png" alt="The under-the-hood panel listing each Cloudinary URL behind a session, with every transformation explained" /> |
 
 <p align="center">
   <img src="docs/screenshots/library.png" alt="The demo library: six lecture excerpts from IIT Kharagpur and IIT Madras" width="900" />
