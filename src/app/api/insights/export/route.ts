@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   log("insights.export", { report, organizer });
 
   // The byte-order mark makes Excel read the file as UTF-8, so Hindi and other non-Latin questions survive.
-  const csv = "﻿" + insightsCsv(report, organizer ? insights : forDemo(insights), publicBaseUrl());
+  const csv = "FEFF" + insightsCsv(report, organizer ? insights : forDemo(insights), publicBaseUrl());
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
