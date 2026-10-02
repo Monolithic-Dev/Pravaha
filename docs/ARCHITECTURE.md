@@ -107,7 +107,7 @@ flowchart TD
     RL -- Yes --> RET["Retrieve: OR-ed tsquery, top 12,<br/>± neighbour segments"]
     RET --> NONE{"Any segments?"}
     NONE -- No --> NF["not_found<br/>(no model call)"]
-    NONE -- Yes --> CL["Gemini chain: answer + cited_segment_ids<br/>(JSON schema, 12 s per model)"]
+    NONE -- Yes --> CL["Gemini chain, then Groq backup: answer + cited_segment_ids<br/>(JSON schema, 12 s per model)"]
     CL -- error/timeout --> FB["fallback: top 4 segments as clips"]
     CL --> VAL["validateAnswer():<br/>drop IDs not retrieved · strip markers · renumber"]
     VAL --> ZERO{"≥1 valid citation?"}

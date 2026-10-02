@@ -45,6 +45,7 @@ cp .env.example .env.local
 
 1. aistudio.google.com → **Get API key** → create → `GEMINI_API_KEY`. Optional: `GEMINI_MODELS` overrides the model chain.
 2. Settings → Limits → set a **monthly spend limit** (Ask is public; this is the second cost cap after the app's rate limits).
+3. **Recommended backup:** console.groq.com → API Keys → create → `GROQ_API_KEY`. When every Gemini model is busy or out of quota, Ask, Study Packs and question translation use Groq (`openai/gpt-oss-120b`, then `gpt-oss-20b`) instead of falling back to plain clips.
 
 ## 5. Organizer Secrets
 

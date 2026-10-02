@@ -27,6 +27,7 @@
 | `DATABASE_URL` | Server-only |
 | `GEMINI_API_KEY` | Server-only (optional: Ask degrades to clips without it) |
 | `GEMINI_MODELS` | Config (comma-separated model chain) |
+| `GROQ_API_KEY` | Server-only (optional backup provider, tried after Gemini) |
 | `ORGANIZER_PASSCODE`, `SESSION_SECRET` | Server-only |
 | `APP_URL` | Config (webhook URL base) |
 
