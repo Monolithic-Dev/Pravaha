@@ -34,7 +34,7 @@ export function Snippet({ parts }: { parts: SnippetPart[] }) {
 export function ResultCard({ hit, children }: { hit: ResultCardData; children?: React.ReactNode }) {
   const href = `/watch/${hit.lectureId}?t=${Math.floor(hit.startS)}`;
   return (
-    <article className="flex gap-4 rounded-2xl border border-border bg-surface p-3 sm:p-4">
+    <article className="lift flex gap-4 rounded-2xl border border-border bg-surface p-3 sm:p-4">
       <Link href={href} className="relative block w-32 shrink-0 overflow-hidden rounded-xl sm:w-44">
         <Image
           src={thumbUrl(hit.publicId, hit.startS)}
