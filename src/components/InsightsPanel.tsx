@@ -20,7 +20,7 @@ export function InsightsPanel() {
   if (failed) return <p className="mt-4 text-muted">Insights are unavailable right now.</p>;
   if (!data) return <div className="mt-4 skeleton h-64 rounded-2xl" aria-label="Loading insights…" />;
 
-  const { totals, gaps, topQuestions, topMoments, feedback } = data;
+  const { totals, gaps, topQuestions, topMoments, feedback, daily, topSessions } = data;
   const ratings = feedback ? feedback.helpful + feedback.unhelpful : 0;
   return (
     <div className="mt-4 space-y-6">
@@ -32,6 +32,11 @@ export function InsightsPanel() {
           label={ratings ? `Answers rated helpful (${ratings} ratings)` : "Answers rated helpful"}
           value={ratings ? `${Math.round((feedback!.helpful / ratings) * 100)}%` : "—"}
         />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <DailyChart days={daily} />
+        <SessionsChart sessions={topSessions} />
       </div>
 
       <Card
@@ -91,7 +96,90 @@ function Card({ title, hint, empty, children }: { title: string; hint: string; e
     <section className="rounded-2xl border border-border bg-surface p-4">
       <h3 className="font-semibold">{title}</h3>
       <p className="text-sm text-muted">{hint}</p>
-      {children.length ? <ul className="mt-2 divide-y divide-border">{children}</ul> : <p className="mt-3 text-sm text-muted">{empty}</p>}
+      {children.length ? (
+        <ul className="mt-2 divide-y divide-border">{children}</ul>
+      ) : (
+        <p className="mt-3 text-sm text-muted">{empty}</p>
+      )}
+    </section>
+  );
+}
+
+const dayLabel = (day: string) => new Date(`${day}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+
+// Questions per day, answered stacked on unanswered. Plain bars (no chart library) in theme colours.
+function DailyChart({ days }: { days: Insights["daily"] }) {
+  const max = Math.max(1, ...days.map((d) => d.answered + d.unanswered));
+  const total = days.reduce((sum, d) => sum + d.answered + d.unanswered, 0);
+  return (
+    <section className="rounded-2xl border border-border bg-surface p-4">
+      <h3 className="font-semibold">Questions per day</h3>
+      <p className="text-sm text-muted">
+        Last {days.length} days · <span className="text-accent">■</span> answered <span className="text-failed">■</span> not
+        answered
+      </p>
+      <div
+        role="img"
+        aria-label={`${total} questions in the last ${days.length} days. ${days
+          .filter((d) => d.answered + d.unanswered > 0)
+          .map((d) => `${dayLabel(d.day)}: ${d.answered} answered, ${d.unanswered} not`)
+          .join("; ")}`}
+        className="mt-4 flex h-36 items-end gap-1"
+      >
+        {days.map((d) => {
+          const count = d.answered + d.unanswered;
+          return (
+            <div
+              key={d.day}
+              className="group relative flex h-full flex-1 flex-col justify-end"
+              title={`${dayLabel(d.day)}: ${d.answered} answered, ${d.unanswered} not answered`}
+            >
+              {count === 0 ? (
+                <div className="h-0.5 rounded-full bg-border" />
+              ) : (
+                <div className="flex flex-col overflow-hidden rounded-md" style={{ height: `${(count / max) * 100}%` }}>
+                  <div className="bg-failed/70" style={{ flexGrow: d.unanswered }} />
+                  <div className="bg-accent" style={{ flexGrow: d.answered }} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-1.5 flex justify-between text-xs text-muted">
+        <span>{days[0] ? dayLabel(days[0].day) : ""}</span>
+        <span>Today</span>
+      </div>
+    </section>
+  );
+}
+
+// Which recordings answers draw on: the sessions doing the teaching.
+function SessionsChart({ sessions }: { sessions: Insights["topSessions"] }) {
+  const max = Math.max(1, ...sessions.map((s) => s.answers));
+  return (
+    <section className="rounded-2xl border border-border bg-surface p-4">
+      <h3 className="font-semibold">Sessions answers come from</h3>
+      <p className="text-sm text-muted">How many answers cited each session, last 30 days.</p>
+      {sessions.length === 0 ? (
+        <p className="mt-3 text-sm text-muted">No answers yet.</p>
+      ) : (
+        <ul className="mt-3 space-y-2.5">
+          {sessions.map((s) => (
+            <li key={s.lectureId}>
+              <div className="flex items-baseline justify-between gap-3 text-sm">
+                <Link href={`/watch/${s.lectureId}`} className="min-w-0 truncate hover:text-accent">
+                  {s.title}
+                </Link>
+                <span className="tabular shrink-0 text-muted">{s.answers}</span>
+              </div>
+              <div aria-hidden className="mt-1 h-2 overflow-hidden rounded-full bg-bg">
+                <div className="h-full rounded-full bg-accent" style={{ width: `${(s.answers / max) * 100}%` }} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
