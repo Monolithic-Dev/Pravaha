@@ -130,7 +130,7 @@ export function WatchView({ lectureId, publicId, title, durationS, startAt, sear
       </div>
 
       {segments.length > 0 && (
-        <aside aria-label="Session tools" className="rounded-2xl border border-border bg-surface lg:max-h-[78vh] lg:overflow-hidden">
+        <aside aria-label="Session tools" className="self-start rounded-2xl border border-border bg-surface lg:max-h-[78vh] lg:overflow-hidden">
           {tabs.length > 1 && (
             <div role="tablist" className="flex border-b border-border text-sm font-medium">
               {tabs.map((t) => (
