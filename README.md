@@ -72,7 +72,12 @@ Colleges, clubs and coaching institutes record hundreds of hours of lectures and
 
 | Home | Watch + Study Pack |
 |---|---|
-| <img src="docs/screenshots/home.png" alt="Home page with the Ask bar, how it works and the library" /> | <img src="docs/screenshots/watch.png" alt="Watch page with the adaptive player, chapters and the Study Pack" /> |
+| <img src="docs/screenshots/home.png" alt="Home page with the animated hero and the Ask bar" /> | <img src="docs/screenshots/watch.png" alt="Watch page with the adaptive player, chapters and the Study Pack" /> |
+
+<p align="center">
+  <img src="docs/screenshots/library.png" alt="The demo library: six lecture excerpts from IIT Kharagpur and IIT Madras" width="900" />
+  <br /><sub>The demo library: six machine-learning lecture excerpts from four NPTEL courses.</sub>
+</p>
 
 <p align="center">
   <img src="docs/screenshots/mobile-ask.png" alt="Ask on a phone" width="300" />
@@ -129,7 +134,7 @@ Diagrams and reasoning: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs
 
 Open the live app at **[pravaha-cyan.vercel.app](https://pravaha-cyan.vercel.app)**. Learners need no login.
 
-1. On the home page, type a question or tap a suggestion. Live progress appears, then an answer with numbered citations.
+1. On the home page, type a question or tap a suggestion. Try "Why should the learning rate decrease during training, and how do adaptive optimizers handle it?": live progress appears, then one answer citing two professors from two institutes, plus an Answer Reel. Or ask in Hindi: "ओवरफिटिंग क्या है?"
 2. Hover or tap a citation number to preview the quote. Play a source card: the clip starts at the exact moment. Then try **Watch the answer** (the Answer Reel), **Open full session** or **Share as Moment**.
 3. On a session page, open **Study**: the summary, key concepts, a quiz whose explanations play the moment, and "Session in 60 seconds".
 4. Search a phrase. The results jump to the second, across sessions.
@@ -217,7 +222,7 @@ openapi.yaml           API specification (OpenAPI 3.0)
   - Ask answers with a playable citation
   - Ask refuses an off-topic question
   - unauthenticated organizer requests and unsigned webhooks are rejected
-- **The AI eval** ([`docs/AI_EVALUATION.md`](docs/AI_EVALUATION.md)) checks that Ask stays grounded, cites real moments, and refuses when it should.
+- **The AI eval** ([`docs/AI_EVALUATION.md`](docs/AI_EVALUATION.md)) on production, Oct 2: **11/11 passed**: 8/8 answerable questions cited the expected session (including one in Hindi), 3/3 off-topic questions refused, 0 fallbacks, and **31/32 citations (97%)** supported their sentence on a manual check.
 - **Accessibility:** a skip link, visible focus rings, keyboard shortcuts, and every animation disabled under `prefers-reduced-motion`.
 
 ## Security
@@ -252,6 +257,18 @@ The app deploys to **Vercel**: every push to `main` deploys production, and pull
 | [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) · [`docs/phases/`](docs/phases/) | The 3-day build, phase by phase |
 | [`docs/GIT_WORKFLOW.md`](docs/GIT_WORKFLOW.md) | Branch per feature, PR, merge rules |
 | [`docs/DEMO.md`](docs/DEMO.md) · [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) | Demo script and submission tracking |
+
+## Demo library and credits
+
+The live library is six 2.5–3 minute excerpts from [NPTEL](https://nptel.ac.in) (IIT/IISc's National Programme on Technology Enhanced Learning) machine-learning courses, licensed **CC BY-NC-SA**. The excerpts are shared under the same licence, for non-commercial demonstration, with credit to:
+
+| Session | Course | Institute |
+|---|---|---|
+| Overfitting, Underfitting and Regularization · From AdaGrad to RMSProp | [Deep Learning](https://nptel.ac.in/courses/106105215), Prof. Prabir Kumar Biswas | IIT Kharagpur |
+| The Bias–Variance Trade-off · Learning Rate Decay · Gradient Descent Variants and Momentum | [Machine Learning for Engineering and Science Applications](https://nptel.ac.in/courses/106106198) | IIT Madras |
+| Underfitting and Overfitting in Practice | [Practical Machine Learning with TensorFlow](https://nptel.ac.in/courses/106106213) | IIT Madras |
+
+Pravaha is built for an institution's own recordings; these public lectures stand in for them in the demo.
 
 ## Team
 

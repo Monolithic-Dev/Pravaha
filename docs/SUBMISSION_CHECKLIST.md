@@ -13,11 +13,11 @@ Deadline: submit by **Oct 3, 2026**; code freeze **Oct 4, 00:15 IST**. Submit vi
 - [ ] Cloudinary genuinely central — re-checked against shipped code (`CLOUDINARY.md` capability map)
 - [x] Working product on a live URL: https://pravaha-cyan.vercel.app (Vercel, deploys from `main`)
 - [x] Learner flows (Watch, Find, Ask, Moments) work without login (Oct 2: Playwright smoke tests 12/12 against production, desktop and mobile)
-- [ ] Demo library: 5–8 public sessions
+- [x] Demo library: 6 public sessions (NPTEL excerpts, CC BY-NC-SA, credited in the README), uploaded through the production pipeline on Oct 2
 
 ## Repository
 - [x] Public repo: `Monolithic-Dev/Pravaha` (own repo is allowed by HackIndia's FAQ)
-- [ ] README explains track, problem, Cloudinary usage, how to test — with live URL, screenshots, demo link (all done except the demo link; retake screenshots once the real library is in)
+- [ ] README explains track, problem, Cloudinary usage, how to test — with live URL, screenshots, demo link (all done except the demo link; screenshots retaken with the real library on Oct 2)
 - [x] README keeps the HackIndia team tag line
 - [ ] Setup instructions a stranger can follow cold (`SETUP.md`)
 - [x] No API keys or credentials anywhere in history — `git log -p | grep -iE "api_secret|sk-ant|postgres://|passcode"` returns only env-variable references (checked Oct 2)
