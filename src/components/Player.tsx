@@ -5,15 +5,18 @@ import "next-cloudinary/dist/cld-video-player.css";
 import { CldVideoPlayer } from "next-cloudinary";
 import { useRef } from "react";
 
+import type { SubtitleLanguage } from "@/lib/language";
+
 type Props = {
   publicId: string;
   startAt?: number;
   searchable: boolean;
+  subtitles?: SubtitleLanguage[];
   onTime?: (seconds: number) => void;
   videoRef?: React.RefObject<HTMLVideoElement | null>;
 };
 
-export function Player({ publicId, startAt, searchable, onTime, videoRef }: Props) {
+export function Player({ publicId, startAt, searchable, subtitles = [], onTime, videoRef }: Props) {
   const ownRef = useRef<HTMLVideoElement | null>(null);
   const ref = videoRef ?? ownRef;
 
@@ -41,7 +44,13 @@ export function Player({ publicId, startAt, searchable, onTime, videoRef }: Prop
               chapters: true as unknown as object,
               chaptersButton: true,
               aiHighlightsGraph: true,
-              textTracks: { subtitles: { default: true, label: "Subtitles", maxWords: 8, wordHighlight: true } },
+              // English from auto_transcription, plus any translated tracks Cloudinary produced (src/lib/subtitles.ts).
+              textTracks: {
+                subtitles: [
+                  { default: true, label: "English", maxWords: 8, wordHighlight: true },
+                  ...subtitles.map((lang) => ({ label: lang.label, language: lang.code, maxWords: 8 })),
+                ],
+              },
             }
           : {})}
         onMetadataLoad={() => {

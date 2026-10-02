@@ -14,7 +14,8 @@
     "eval:ask": "node scripts/eval-ask.mjs",
     "db:migrate": "node scripts/migrate.mjs",
     "spike": "node scripts/spike.mjs",
-    "e2e:local": "node scripts/e2e-local.mjs"
+    "e2e:local": "node scripts/e2e-local.mjs",
+    "preset:hindi": "node scripts/enable-hindi.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.25.0",
