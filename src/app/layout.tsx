@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { LogoMark } from "@/components/Logo";
 import { SearchShortcut } from "@/components/SearchShortcut";
+import { THEME_INIT_SCRIPT, ThemeToggle } from "@/components/ThemeToggle";
 
 import "./globals.css";
 
@@ -32,8 +33,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="flex min-h-dvh flex-col">
+    // suppressHydrationWarning: the theme script may set data-theme on <html> before React hydrates.
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="flex min-h-dvh flex-col overflow-x-clip">
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-fg">
           Skip to content
         </a>
@@ -50,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/studio" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
                 Studio
               </Link>
+              <ThemeToggle />
             </div>
           </nav>
         </header>
