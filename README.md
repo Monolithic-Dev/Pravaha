@@ -112,7 +112,7 @@ flowchart LR
   API -- segments + full-text index --> DB[(Neon Postgres)]
   L[Learner] -- question --> API
   API -- retrieve --> DB
-  API -- top segments --> G[Gemini]
+  API -- top segments --> G[Gemini · Groq backup]
   G -- answer + citations --> API
   API -- validated citations + clip URLs --> L
   C -- HLS · Moments · Reels · thumbnails --> L
@@ -121,7 +121,7 @@ flowchart LR
 - **One Next.js 16 app** (App Router: frontend and API together), deployed on Vercel.
 - **Neon Postgres** holds sessions, time-coded segments, the full-text index and insights.
 - **Cloudinary** handles everything to do with media.
-- **Gemini** handles the AI, with a model fallback chain and output validated against a Zod schema. If AI fails, Pravaha shows the most relevant clips instead of an error.
+- **Gemini** handles the AI, with a model fallback chain ending in **Groq** (`gpt-oss-120b`) as a backup provider, and output validated against a Zod schema. If every model fails, Pravaha shows the most relevant clips instead of an error.
 
 Diagrams and reasoning: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/TRD.md`](docs/TRD.md).
 
@@ -162,6 +162,7 @@ pnpm dev                     # http://localhost:3000
 | `CLOUDINARY_API_SECRET`, `CLOUDINARY_UPLOAD_PRESET` | Server-side signing and the signed upload preset |
 | `DATABASE_URL` | Neon Postgres connection string |
 | `GEMINI_API_KEY`, `GEMINI_MODELS` | Gemini key and the ordered model fallback chain |
+| `GROQ_API_KEY` | Optional backup AI provider, used when every Gemini model fails |
 | `ORGANIZER_PASSCODE`, `SESSION_SECRET` | Studio sign-in and the signing key for its session cookie |
 | `APP_URL` | Public base URL (webhooks, share links, preview cards) |
 

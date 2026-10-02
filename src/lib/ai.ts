@@ -25,31 +25,72 @@ function jsonSchemaFor(schema: z.ZodType): unknown {
   return json;
 }
 
-// One structured call with a model fallback chain: the first model that answers with schema-valid JSON wins.
+// Last resort when every Gemini model is busy or out of quota (both seen on Oct 2: 503 "high demand" and
+// free-tier 429s). Groq's OpenAI-compatible API gets the same JSON schema, and the same Zod parse validates it.
+export const GROQ_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"];
+
+type Attempt = { model: string; call: (signal: AbortSignal) => Promise<string> };
+
+function geminiAttempts(apiKey: string, system: string, prompt: string, responseJsonSchema: unknown): Attempt[] {
+  client ??= new GoogleGenAI({ apiKey });
+  const gemini = client;
+  return models().map((model) => ({
+    model,
+    call: async (signal) => {
+      const response = await gemini.models.generateContent({
+        model,
+        contents: prompt,
+        config: { systemInstruction: system, responseMimeType: "application/json", responseJsonSchema, abortSignal: signal },
+      });
+      return response.text ?? "";
+    },
+  }));
+}
+
+function groqAttempts(apiKey: string, system: string, prompt: string, schema: unknown): Attempt[] {
+  return GROQ_MODELS.map((model) => ({
+    model,
+    call: async (signal) => {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        signal,
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: system },
+            { role: "user", content: prompt },
+          ],
+          // Not strict: strict mode rejects optional fields; Zod validates the result either way.
+          response_format: { type: "json_schema", json_schema: { name: "result", schema, strict: false } },
+        }),
+      });
+      if (!res.ok) throw new Error(`groq ${res.status}: ${(await res.text()).slice(0, 120)}`);
+      const body = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+      return body.choices?.[0]?.message?.content ?? "";
+    },
+  }));
+}
+
+// One structured call with a fallback chain (Gemini models, then Groq): the first model that answers with
+// schema-valid JSON wins. Either key alone is enough; with neither, callers degrade (AiUnconfigured).
 export async function generateJson<T extends z.ZodType>(
   schema: T,
   { system, prompt, timeoutMs = 12_000, task }: { system: string; prompt: string; timeoutMs?: number; task: string },
 ): Promise<{ data: z.infer<T>; model: string }> {
-  const apiKey = env().GEMINI_API_KEY;
-  if (!apiKey) throw new AiUnconfigured("GEMINI_API_KEY is not set");
-  client ??= new GoogleGenAI({ apiKey });
-  const responseJsonSchema = jsonSchemaFor(schema);
+  const { GEMINI_API_KEY, GROQ_API_KEY } = env();
+  if (!GEMINI_API_KEY && !GROQ_API_KEY) throw new AiUnconfigured("Neither GEMINI_API_KEY nor GROQ_API_KEY is set");
+  const jsonSchema = jsonSchemaFor(schema);
+  const attempts = [
+    ...(GEMINI_API_KEY ? geminiAttempts(GEMINI_API_KEY, system, prompt, jsonSchema) : []),
+    ...(GROQ_API_KEY ? groqAttempts(GROQ_API_KEY, system, prompt, jsonSchema) : []),
+  ];
 
   let lastError: unknown;
-  for (const model of models()) {
+  for (const { model, call } of attempts) {
     const started = Date.now();
     try {
-      const response = await client.models.generateContent({
-        model,
-        contents: prompt,
-        config: {
-          systemInstruction: system,
-          responseMimeType: "application/json",
-          responseJsonSchema,
-          abortSignal: AbortSignal.timeout(timeoutMs),
-        },
-      });
-      const data = schema.parse(JSON.parse(response.text ?? ""));
+      const data = schema.parse(JSON.parse(await call(AbortSignal.timeout(timeoutMs))));
       log("ai.done", { task, model, ms: Date.now() - started });
       return { data, model };
     } catch (error) {

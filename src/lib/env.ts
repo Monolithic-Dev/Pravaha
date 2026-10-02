@@ -10,6 +10,8 @@ const schema = z.object({
   // Optional: without it Ask degrades to showing the most relevant clips (NFR4) instead of breaking the app.
   GEMINI_API_KEY: z.string().optional().transform((v) => v || undefined),
   GEMINI_MODELS: z.string().optional(),
+  // Optional backup provider, tried after every Gemini model fails (src/lib/ai.ts).
+  GROQ_API_KEY: z.string().optional().transform((v) => v || undefined),
   ORGANIZER_PASSCODE: z.string().min(12),
   SESSION_SECRET: z.string().min(16),
   APP_URL: z.url(),

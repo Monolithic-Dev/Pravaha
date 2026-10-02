@@ -30,6 +30,9 @@ Two kinds of AI run in Pravaha:
 ### Asking in Hindi (Phase 15)
 Transcripts are English and retrieval is English full-text search, so a question in Devanagari (or any non-Latin script) would match nothing. Such a question gets one extra fast call that translates it into English **for retrieval only** (`src/lib/translate.ts`, detection in `src/lib/language.ts`). The answer prompt still receives the original question and already answers "in the language of the question", so the learner reads Hindi, and the citations play the English moments. Latin-script questions, including romanised Hindi ("overfitting kaise roke"), skip the call. If translation fails, the original question is searched and Ask degrades exactly as it does in English. Verified Oct 2: "ओवरफिटिंग कैसे रोकें?" was answered in Hindi with 3 citations from the English lectures, an Answer Reel, and Hindi follow-up questions.
 
+### Backup provider: Groq
+The chain is the Gemini models, then Groq's `openai/gpt-oss-120b` and `openai/gpt-oss-20b` when `GROQ_API_KEY` is set (`src/lib/ai.ts`). Groq gets the same system prompt and the same JSON schema, and the result passes the same Zod parse and server-side citation validation, so grounding rules don't depend on which model answered. Why: on Oct 2 the Gemini free tier returned 503 "high demand" and 429 quota errors, which would have turned Asks during judging into clip-only fallbacks. Verified Oct 2 with every Gemini model forced to fail: a Hindi question (4 citations, Answer Reel, Hindi follow-ups), an English question, and an off-topic refusal were all handled by `gpt-oss-120b` in about a second each.
+
 ### Fallback (NFR4)
 
 Every model in the chain failing (error, timeout, 503, or schema-invalid JSON) → `status: "fallback"`, no generated text, top 4 retrieved segments shown as clip cards with a "Showing the most relevant moments" label. Ask never shows an error page because the LLM is down.
