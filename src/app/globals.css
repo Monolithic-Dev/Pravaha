@@ -13,8 +13,9 @@
   --status-failed: #b91c1c;
 }
 
+/* Dark follows the system unless the viewer picked a theme (ThemeToggle sets data-theme on <html>). */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0e1112;
     --surface: #161a1c;
     --fg: #ecedea;
@@ -25,7 +26,22 @@
     --status-processing: #f59e0b;
     --status-ready: #4ade80;
     --status-failed: #f87171;
+    color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e1112;
+  --surface: #161a1c;
+  --fg: #ecedea;
+  --muted: #9aa2a4;
+  --border: #262c2e;
+  --accent: #2dd4bf;
+  --accent-fg: #0e1112;
+  --status-processing: #f59e0b;
+  --status-ready: #4ade80;
+  --status-failed: #f87171;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -45,6 +61,8 @@
 html {
   background: var(--bg);
   color: var(--fg);
+  /* Full-bleed decoration (the hero waves) never causes sideways scroll; clip keeps sticky positioning working. */
+  overflow-x: clip;
 }
 
 body {
@@ -127,7 +145,38 @@ body {
   animation: spin 0.7s linear infinite;
 }
 
+/* Hero: a blinking caret, a playhead crossing the first clip, and two slow waves (the logo's "flow"). */
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.caret {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes playhead {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.playhead {
+  animation: playhead 5s linear both;
+}
+
+@keyframes drift {
+  to { transform: translateX(-50%); }
+}
+
+.drift {
+  animation: drift 24s linear infinite;
+}
+
+.drift-slow {
+  animation: drift 38s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .skeleton, .pulse, .rise, .word-in, .spinner { animation: none; }
+  .skeleton, .pulse, .rise, .word-in, .spinner, .caret, .playhead, .drift, .drift-slow { animation: none; }
+  .playhead { width: 100%; }
   .lift, .lift:hover { transition: none; transform: none; }
 }

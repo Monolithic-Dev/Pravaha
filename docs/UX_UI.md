@@ -14,7 +14,8 @@ Rule: make the intelligence visible, hide the machinery. Learners see answers, m
 
 ## Home `/`
 
-- **Hero:** wordmark, "Ask your recordings. Watch the answer.", one large input ("Ask anything from the library…"), 3 example-question chips generated from the demo library topics.
+- **Hero:** "Ask your recordings. Watch the answer.", one large input ("Ask anything from the library…") and up to 4 suggested questions. The suggestions are real questions taken from published sessions' Study Pack quizzes (filtered to open "what / why / how" questions short enough for a chip), then "What is …?" from key concepts, then chapter titles before any Study Pack exists (`src/lib/suggestions.ts`). On large screens a looping demo sits beside the Ask bar: the question types itself, retrieval reports in, the answer streams with numbered citations, and the cited clips (real library thumbnails) rise in. It is decorative (`aria-hidden`) and shows its finished state, still, under reduced motion. Two slow waves (the logo's "flow") drift behind the hero.
+- **Theme:** a header toggle switches light and dark. Pravaha follows the system until the viewer picks a theme; the choice is kept on this device (`localStorage`), applied before first paint so the other theme never flashes.
 - **Library grid:** `g_auto` thumbnail, title, speaker, duration. Tap → Watch.
 - **Empty state:** "No sessions yet — Pravaha turns recorded talks into answers you can watch."
 

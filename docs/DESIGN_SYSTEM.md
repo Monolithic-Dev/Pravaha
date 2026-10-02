@@ -26,7 +26,7 @@ Calm, editorial, confident — a library, not a dashboard. Video and answers car
 | `--status-ready` | `#15803D` | `#4ADE80` | Ready badge |
 | `--status-failed` | `#B91C1C` | `#F87171` | Not searchable, errors |
 
-Dark mode via `prefers-color-scheme`. Status is never color-only — every badge has a text label. All pairs checked for WCAG AA contrast in Phase 09.
+Dark mode follows `prefers-color-scheme` unless the viewer picks a theme with the header toggle (`data-theme` on `<html>`; the same tokens, redefined for `:root[data-theme="dark"]`). Status is never color-only — every badge has a text label. All pairs checked for WCAG AA contrast in Phase 09.
 
 ## Components
 
