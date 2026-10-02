@@ -11,7 +11,7 @@ import { WatchView } from "@/components/WatchView";
 import { formatTime } from "@/lib/format";
 import { sessionHoodItems } from "@/lib/hood-items";
 import { getLecture, getSegments } from "@/lib/lectures";
-import { posterTime, SHARE_CARD, shareCardUrl } from "@/lib/media";
+import { playerUrls, posterTime, SHARE_CARD, shareCardUrl } from "@/lib/media";
 import { getStudyPack } from "@/lib/study-packs";
 import { translatedSubtitles } from "@/lib/subtitles";
 import { pickSuggestions } from "@/lib/suggestions";
@@ -65,6 +65,9 @@ export default async function WatchPage({ params, searchParams }: Props) {
 
   return (
     <article className="mt-4">
+      {/* The player's poster is the page's largest image, but the player script only asks for it once it has loaded.
+          React hoists this preload into <head>, so the browser fetches it in parallel (largest-contentful-paint). */}
+      <link rel="preload" as="image" href={playerUrls(lecture.publicId).poster} fetchPriority="high" />
       <WatchView
         lectureId={lecture.id}
         publicId={lecture.publicId}

@@ -44,7 +44,10 @@ function TrialsPaused({ seconds }: { seconds: number }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="rounded-2xl border border-border bg-surface p-6">
-        <span className="rounded-full bg-processing/10 px-2.5 py-0.5 text-xs font-semibold text-processing">Uploads paused</span>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold">
+          <span aria-hidden className="size-2 rounded-full bg-processing" />
+          Uploads paused
+        </span>
         <h2 className="mt-3 text-lg font-semibold">Trial uploads are paused on this demo</h2>
         <p className="mt-1 text-sm text-muted">
           Every trial runs Cloudinary&apos;s AI on the video (transcription, chapters, adaptive streaming, previews), and this
