@@ -321,6 +321,14 @@ paths:
                   answer: { type: string, nullable: true }
                   citations: { type: array, items: { $ref: '#/components/schemas/Citation' } }
                   reel: { $ref: '#/components/schemas/Reel' }
+                  followUps: { type: array, maxItems: 3, items: { type: string, maxLength: 120 }, description: 'Suggested next questions (answered only)' }
+            application/x-ndjson:
+              schema:
+                type: string
+                description: >
+                  Sent when the request has Accept: application/x-ndjson. One JSON event per line:
+                  {"type":"retrieved","moments":n,"sessions":[...]}, then {"type":"writing"} if the model is called,
+                  then {"type":"result", ...the application/json body}, or {"type":"error"}.
         '400': { description: Invalid body }
         '429': { description: Rate limited (Retry-After header) }
   /lectures/{id}/study-pack:
