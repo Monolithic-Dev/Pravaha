@@ -58,7 +58,7 @@ Colleges, clubs and coaching institutes record hundreds of hours of lectures and
 
 | | |
 |---|---|
-| **Watch** | Upload a raw recording. Cloudinary transcribes it, chapters it and streams it adaptively. No editing. |
+| **Watch** | Upload a raw recording. Cloudinary transcribes it, chapters it and streams it adaptively. No editing. The transcript follows along as it plays, chapters are one tap away, and **Ask this session** answers questions about just that recording. |
 | **Find** | Search every session for what was *said* and land on the exact second. |
 | **Ask** | Ask a question in plain language. The answer comes **only** from your recordings, and every claim links to a **playable clip** of the moment it came from. Progress streams live while it works, and the answer suggests follow-up questions. If the library doesn't cover a question, Pravaha says so instead of guessing. |
 | **Answer Reels** | The moments an answer cites, from different speakers and sessions, stitched into one labelled video. |
