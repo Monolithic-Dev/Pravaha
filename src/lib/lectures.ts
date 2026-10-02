@@ -3,6 +3,7 @@ import { cache } from "react";
 
 import { query } from "@/lib/db";
 import type { TimedWord } from "@/lib/segments";
+import { pickSuggestions, type PackLike } from "@/lib/suggestions";
 
 export type LectureStatus = "processing" | "ready" | "transcript_failed";
 export type Visibility = "unlisted" | "public";
@@ -106,6 +107,20 @@ export async function popularTopics(limit = 4): Promise<string[]> {
     [limit],
   );
   return rows.map((r) => r.chapter_title);
+}
+
+// Home-page Ask suggestions: real questions from published sessions' Study Packs (src/lib/suggestions.ts),
+// newest sessions first. Falls back to the most common chapter titles before any Study Pack exists.
+export async function suggestedQuestions(limit = 4): Promise<string[]> {
+  const rows = await query<{ pack: PackLike }>(
+    `SELECT sp.pack
+       FROM study_packs sp JOIN lectures l ON l.id = sp.lecture_id
+      WHERE l.status = 'ready' AND l.visibility = 'public'
+      ORDER BY l.created_at DESC
+      LIMIT 12`,
+  );
+  const questions = pickSuggestions(rows.map((r) => r.pack), limit);
+  return questions.length ? questions : popularTopics(limit);
 }
 
 export type Moment = SegmentRow & { lecture: Lecture };
