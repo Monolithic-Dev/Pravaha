@@ -1,6 +1,6 @@
 # Submission Checklist — Pravaha
 
-Deadline: **Oct 4, 2026** (confirm the exact time on Day 1). Submit via `https://forms.gle/GtukHAhcua6fviicA`. Nothing is ticked until it's actually true.
+Deadline: submit by **Oct 3, 2026**; code freeze **Oct 4, 00:15 IST**. Submit via `https://forms.gle/GtukHAhcua6fviicA`. Nothing is ticked until it's actually true.
 
 ## Day 1 admin
 - [ ] Exact submission deadline time confirmed
@@ -11,19 +11,20 @@ Deadline: **Oct 4, 2026** (confirm the exact time on Day 1). Submit via `https:/
 
 ## Product
 - [ ] Cloudinary genuinely central — re-checked against shipped code (`CLOUDINARY.md` capability map)
-- [ ] Working product on a live URL (Vercel)
-- [ ] Learner flows (Watch, Find, Ask, Moments) work without login
+- [x] Working product on a live URL: https://pravaha-cyan.vercel.app (Vercel, deploys from `main`)
+- [x] Learner flows (Watch, Find, Ask, Moments) work without login (Oct 2: Playwright smoke tests 12/12 against production, desktop and mobile)
 - [ ] Demo library: 5–8 public sessions
 
 ## Repository
-- [ ] Public repo: `Monolithic-Dev/Pravaha` (own repo is allowed by HackIndia's FAQ; **currently private: make it public before submitting**)
-- [ ] README explains track, problem, Cloudinary usage, how to test — with live URL, screenshots, demo link
-- [ ] README keeps the HackIndia team tag line
+- [x] Public repo: `Monolithic-Dev/Pravaha` (own repo is allowed by HackIndia's FAQ)
+- [ ] README explains track, problem, Cloudinary usage, how to test — with live URL, screenshots, demo link (all done except the demo link; retake screenshots once the real library is in)
+- [x] README keeps the HackIndia team tag line
 - [ ] Setup instructions a stranger can follow cold (`SETUP.md`)
-- [ ] No API keys or credentials anywhere in history — `git log -p | grep -iE "api_secret|sk-ant|postgres://|passcode"` returns nothing
+- [x] No API keys or credentials anywhere in history — `git log -p | grep -iE "api_secret|sk-ant|postgres://|passcode"` returns only env-variable references (checked Oct 2)
 
 ## Demo
 - [ ] 2–4 minute video recorded per `DEMO.md` (target 2:45), publicly viewable link
+- [ ] LinkedIn post with the demo, tagging HackIndia, Cloudinary and Jen Looper
 
 ## Submission
 - [ ] Cloudinary feedback survey at `cld.media/hackathon-survey` — **mandatory for prize eligibility**
