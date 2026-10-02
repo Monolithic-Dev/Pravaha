@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { LogoMark } from "@/components/Logo";
 import { SearchShortcut } from "@/components/SearchShortcut";
+import { SiteChrome } from "@/components/SiteChrome";
 import { THEME_INIT_SCRIPT, ThemeToggle } from "@/components/ThemeToggle";
 import { publicBaseUrl } from "@/lib/site";
 
@@ -42,57 +43,61 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-fg">
           Skip to content
         </a>
-        <header className="sticky top-0 z-30 border-b border-transparent bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/70">
-          <nav aria-label="Main" className="mx-auto flex max-w-280 items-center justify-between px-4 py-3">
-            <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-              <LogoMark />
-              Pravaha
-            </Link>
-            <div className="flex items-center gap-1 text-sm">
-              <Link href="/#library" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
-                Library
+        <SiteChrome>
+          <header className="sticky top-0 z-30 border-b border-transparent bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/70">
+            <nav aria-label="Main" className="mx-auto flex max-w-280 items-center justify-between px-4 py-3">
+              <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                <LogoMark />
+                Pravaha
               </Link>
-              <Link href="/saved" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
-                Saved
-              </Link>
-              <Link href="/studio" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
-                Studio
-              </Link>
-              <Link
-                href="/try"
-                className="ml-1 hidden rounded-lg bg-accent px-3 py-1.5 font-medium text-accent-fg hover:brightness-110 sm:inline-block"
-              >
-                Try it
-              </Link>
-              <ThemeToggle />
-            </div>
-          </nav>
-        </header>
-        <SearchShortcut />
+              <div className="flex items-center gap-1 text-sm">
+                <Link href="/#library" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
+                  Library
+                </Link>
+                <Link href="/saved" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
+                  Saved
+                </Link>
+                <Link href="/studio" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
+                  Studio
+                </Link>
+                <Link
+                  href="/try"
+                  className="ml-1 hidden rounded-lg bg-accent px-3 py-1.5 font-medium text-accent-fg hover:brightness-110 sm:inline-block"
+                >
+                  Try it
+                </Link>
+                <ThemeToggle />
+              </div>
+            </nav>
+          </header>
+          <SearchShortcut />
+        </SiteChrome>
         <main id="main" className="mx-auto w-full max-w-280 flex-1 px-4 pb-16">
           {children}
         </main>
-        <footer className="border-t border-border">
-          <div className="mx-auto flex max-w-280 flex-col gap-2 px-4 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-            <p className="flex items-center gap-2">
-              <LogoMark className="size-5" />
-              Pravaha · ask your recordings, watch the answer
-            </p>
-            <p>
-              <Link href="/privacy" className="underline-offset-4 hover:text-fg hover:underline">
-                Privacy
-              </Link>{" "}
-              ·{" "}
-              <Link href="/terms" className="underline-offset-4 hover:text-fg hover:underline">
-                Terms
-              </Link>{" "}
-              · Built on <span className="text-fg">Cloudinary</span> · Team Code Blooded ·{" "}
-              <a href="https://github.com/Monolithic-Dev/Pravaha" className="underline-offset-4 hover:text-fg hover:underline">
-                GitHub
-              </a>
-            </p>
-          </div>
-        </footer>
+        <SiteChrome>
+          <footer className="border-t border-border">
+            <div className="mx-auto flex max-w-280 flex-col gap-2 px-4 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
+              <p className="flex items-center gap-2">
+                <LogoMark className="size-5" />
+                Pravaha · ask your recordings, watch the answer
+              </p>
+              <p>
+                <Link href="/privacy" className="underline-offset-4 hover:text-fg hover:underline">
+                  Privacy
+                </Link>{" "}
+                ·{" "}
+                <Link href="/terms" className="underline-offset-4 hover:text-fg hover:underline">
+                  Terms
+                </Link>{" "}
+                · Built on <span className="text-fg">Cloudinary</span> · Team Code Blooded ·{" "}
+                <a href="https://github.com/Monolithic-Dev/Pravaha" className="underline-offset-4 hover:text-fg hover:underline">
+                  GitHub
+                </a>
+              </p>
+            </div>
+          </footer>
+        </SiteChrome>
       </body>
     </html>
   );

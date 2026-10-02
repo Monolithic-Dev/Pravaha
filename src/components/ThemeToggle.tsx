@@ -7,7 +7,8 @@ type Theme = "light" | "dark";
 const KEY = "pravaha-theme";
 
 // Runs before first paint (inlined in <head> by the layout) so a saved theme never flashes the other one.
-export const THEME_INIT_SCRIPT = `try{var t=localStorage.getItem("${KEY}");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
+// An embed (/embed/…?theme=dark) follows the theme its host page asks for instead.
+export const THEME_INIT_SCRIPT = `try{var t=location.pathname.indexOf("/embed")===0?new URLSearchParams(location.search).get("theme"):null;try{t=t||localStorage.getItem("${KEY}")}catch(e){}if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
 
 function current(): Theme {
   const set = document.documentElement.dataset.theme;

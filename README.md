@@ -78,6 +78,7 @@ Colleges, clubs and coaching institutes record hundreds of hours of lectures and
 | **Study Packs** | Every session gets a summary, key concepts, a quiz whose explanations **play the moment** the teacher explains it, and a "Session in 60 seconds" highlight reel. Pravaha generates them automatically from the transcript. |
 | **Moments** | One tap turns any cited clip into a vertical, AI-cropped, subtitled short for WhatsApp or Instagram, with its own share page and preview card. The short is just a Cloudinary URL; nothing is rendered. |
 | **Insights** | Organizers see what learners ask, the **knowledge gaps** the library can't answer yet (what to record next), and which Moments get shared. Visitors can explore a read-only demo of the Studio. |
+| **Embed** | Organizers copy one `<iframe>` from the Studio and put **Ask** inside Moodle, Canvas or any course page, for the whole library or one session. Only that route can be framed. See [`docs/EMBED.md`](docs/EMBED.md). |
 | **Try it** | Anyone can upload a short video at `/try`, no account: Cloudinary keeps the first 60 seconds, transcribes and chapters it, and about 20 seconds later it has a Study Pack and an **Ask this session** box. Trials are private and deleted after 24 hours. |
 
 > *ChatGPT gives you text. Pravaha gives you the moment your professor said it.*
@@ -277,6 +278,7 @@ The app deploys to **Vercel**: every push to `main` deploys production, and pull
 | [`docs/CLOUDINARY.md`](docs/CLOUDINARY.md) | Every Cloudinary capability, and what breaks without it |
 | [`docs/TRD.md`](docs/TRD.md) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Stack, reasoning, diagrams |
 | [`docs/DATABASE.md`](docs/DATABASE.md) · [`docs/API.md`](docs/API.md) · [`openapi.yaml`](openapi.yaml) | Schema and endpoints |
+| [`docs/EMBED.md`](docs/EMBED.md) | Putting Ask inside an LMS: snippet, sizing, framing policy |
 | [`docs/AI_EVALUATION.md`](docs/AI_EVALUATION.md) | Ask's retrieval, prompt, citation validation, fallback and eval |
 | [`docs/UX_UI.md`](docs/UX_UI.md) · [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) | Screens, interaction and motion, design tokens |
 | [`docs/SECURITY.md`](docs/SECURITY.md) · [`docs/COST.md`](docs/COST.md) | Trust boundaries and cost controls |
