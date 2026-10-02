@@ -113,6 +113,12 @@ export function shareCardUrl(
   return [base(cloud), ...parts, "f_jpg,q_auto", `${publicId}.jpg`].join("/");
 }
 
+// Cloudinary's AI video preview: e_preview picks the most interesting segments of the whole session and
+// joins them into a short silent clip (3 segments, 6 s, about 150 KB at 640 px), played on library cards on hover.
+export function previewUrl(publicId: string, cloud = CLOUD): string {
+  return `${base(cloud)}/e_preview:duration_6:max_seg_3:min_seg_dur_1/c_fill,ar_16:9,w_640/f_auto:video,q_auto/${publicId}.mp4`;
+}
+
 // The same window in the original 16:9 framing — for inline playback of a citation.
 export function clipUrl(publicId: string, startS: number, endS: number, cloud = CLOUD): string {
   const { start, end } = momentWindow(startS, endS);

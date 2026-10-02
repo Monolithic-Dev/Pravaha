@@ -7,6 +7,7 @@ import {
   MOMENT_MAX_S,
   momentUrl,
   momentWindow,
+  previewUrl,
   reelUrl,
   shareCardUrl,
   thumbUrl,
@@ -155,5 +156,13 @@ describe("shareCardUrl (Open Graph cards, verified on real output)", () => {
     const url = card("x".repeat(200));
     expect(url).toContain(`${"x".repeat(89)}%E2%80%A6,`);
     expect(url).not.toContain("x".repeat(90));
+  });
+});
+
+describe("previewUrl", () => {
+  it("asks Cloudinary for a short AI preview of the whole session, cropped for a card", () => {
+    expect(previewUrl("pravaha/abc", "demo")).toBe(
+      "https://res.cloudinary.com/demo/video/upload/e_preview:duration_6:max_seg_3:min_seg_dur_1/c_fill,ar_16:9,w_640/f_auto:video,q_auto/pravaha/abc.mp4",
+    );
   });
 });

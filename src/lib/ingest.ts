@@ -5,7 +5,7 @@ import { query, transaction } from "@/lib/db";
 import { env } from "@/lib/env";
 import type { Lecture } from "@/lib/lectures";
 import { log } from "@/lib/log";
-import { trackingWarmupUrl } from "@/lib/media";
+import { previewUrl, trackingWarmupUrl } from "@/lib/media";
 import { buildSegments, TranscriptFile, transcriptLanguage } from "@/lib/segments";
 
 // Built from our own cloud name + the public_id in our DB — never from a URL in the webhook payload (no SSRF).
@@ -52,6 +52,7 @@ export async function ingestTranscript(lecture: Lecture): Promise<number> {
 
   log("ingest.done", { lectureId: lecture.id, segments: segments.length, ms: Date.now() - started });
   await warmTrackingCrop(lecture);
+  await warmPreview(lecture);
   return segments.length;
 }
 
@@ -63,6 +64,17 @@ async function warmTrackingCrop(lecture: Lecture): Promise<void> {
     log("moment.warmup", { lectureId: lecture.id, status: res.status });
   } catch {
     log("moment.warmup", { lectureId: lecture.id, status: "timeout" });
+  }
+}
+
+// Generates the library card's AI hover preview now, so the first learner to hover doesn't wait for it.
+// Best-effort, like the tracking warm-up.
+async function warmPreview(lecture: Lecture): Promise<void> {
+  try {
+    const res = await fetch(previewUrl(lecture.publicId), { method: "HEAD", signal: AbortSignal.timeout(5000) });
+    log("preview.warmup", { lectureId: lecture.id, status: res.status });
+  } catch {
+    log("preview.warmup", { lectureId: lecture.id, status: "timeout" });
   }
 }
 
