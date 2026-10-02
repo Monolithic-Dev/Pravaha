@@ -14,6 +14,9 @@ Deadline: submit by **Oct 3, 2026**; code freeze **Oct 4, 00:15 IST**. Submit vi
 - [x] Working product on a live URL: https://pravaha-cyan.vercel.app (Vercel, deploys from `main`)
 - [x] Learner flows (Watch, Find, Ask, Moments) work without login (Oct 2: Playwright smoke tests 12/12 against production, desktop and mobile)
 - [x] Demo library: 6 public sessions (NPTEL excerpts, CC BY-NC-SA, credited in the README), uploaded through the production pipeline on Oct 2
+- [x] Organizer and enterprise features merged and checked on Vercel previews (Oct 2–3): demo Studio, Insights charts and CSV export, LMS embed, Privacy and Terms, health endpoint
+- [ ] **Cloudinary credits:** 24.3 of 25 used on Oct 3 (free plan). Upgrade, or confirm the reset date is before judging, so new answer clips and Moments keep generating
+- [ ] Trials decision after that: keep `/try` paused (`TRIALS_PER_DAY=0`) or re-enable (`TRIALS_PER_DAY=5`, then redeploy)
 
 ## Repository
 - [x] Public repo: `Monolithic-Dev/Pravaha` (own repo is allowed by HackIndia's FAQ)
@@ -23,7 +26,8 @@ Deadline: submit by **Oct 3, 2026**; code freeze **Oct 4, 00:15 IST**. Submit vi
 - [x] No API keys or credentials anywhere in history — `git log -p | grep -iE "api_secret|sk-ant|postgres://|passcode"` returns only env-variable references (checked Oct 2)
 
 ## Demo
-- [ ] 2–4 minute video recorded per `DEMO.md` (target 2:45), publicly viewable link
+- [ ] 2–4 minute video recorded per `DEMO.md` (target 2:45), publicly viewable link (check credits first: see its pre-recording checklist)
+- [ ] Demo video link added to the README
 - [ ] LinkedIn post with the demo, tagging HackIndia, Cloudinary and Jen Looper
 
 ## Submission
