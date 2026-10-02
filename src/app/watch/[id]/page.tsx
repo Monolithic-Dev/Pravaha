@@ -27,13 +27,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     subtitle: [lecture.speaker, lecture.durationS ? formatTime(lecture.durationS) : null].filter(Boolean).join(" · "),
   });
   const listed = lecture.status === "ready" && lecture.visibility === "public";
+  const description = `${lecture.speaker ? `${lecture.speaker}: ` : ""}watch “${lecture.title}” with chapters, a searchable transcript, a Study Pack and shareable moments.`;
   return {
     title: `${lecture.title} — Pravaha`,
+    description,
     robots: listed ? undefined : { index: false, follow: false },
     openGraph: {
       type: "video.other",
       siteName: "Pravaha",
       title: lecture.title,
+      description,
       url: `/watch/${lecture.id}`,
       images: [{ url: image, ...SHARE_CARD, alt: lecture.title }],
     },

@@ -126,10 +126,21 @@ function Steps({ progress }: { progress: Progress }) {
         )}
         {retrieved && retrieved.moments > 0 && <Step done={false} active={!!writing} label="Writing an answer only from those moments…" />}
       </ol>
-      <div className="mt-5 space-y-2.5">
+      {/* Shaped like the answer that replaces it (text, Answer Reel, clip cards), so the page below doesn't jump. */}
+      <div className="mt-5 space-y-2.5" aria-hidden>
         <div className="skeleton h-4 w-11/12" />
         <div className="skeleton h-4 w-10/12" />
         <div className="skeleton h-4 w-7/12" />
+      </div>
+      <div className="skeleton mt-6 h-20 rounded-2xl" aria-hidden />
+      <div className="mt-5 grid gap-3 md:grid-cols-2" aria-hidden>
+        {[0, 1].map((i) => (
+          <div key={i} className="rounded-2xl border border-border p-3">
+            <div className="skeleton aspect-video rounded-xl" />
+            <div className="skeleton mt-3 h-4 w-2/3" />
+            <div className="skeleton mt-2 h-3 w-1/3" />
+          </div>
+        ))}
       </div>
     </div>
   );
