@@ -43,6 +43,10 @@ components:
         durationS: { type: number, nullable: true }
         publicId: { type: string }
         createdAt: { type: string, format: date-time }
+        trialExpiresAt: { type: string, format: date-time, nullable: true, description: "Set only on trial sessions" }
+        moments: { type: integer, description: "GET /lectures only: indexed moments" }
+        chapters: { type: integer, description: "GET /lectures only: distinct chapters" }
+        hasStudyPack: { type: boolean, description: "GET /lectures only" }
     SearchResult:
       type: object
       properties:
@@ -172,8 +176,9 @@ paths:
   /upload-signature:
     post:
       summary: Sign a CldUploadWidget upload for an existing lecture (allow-listed params only)
+      description: "Organizer preset: organizer only. Trial preset: public, only for a fresh trial row (POST /trials)."
       operationId: signUpload
-      security: [{ organizerCookie: [] }]
+      security: [{ organizerCookie: [] }, {}]
       requestBody:
         required: true
         content:
@@ -197,6 +202,34 @@ paths:
                   signature: { type: string }
         '400': { description: Unsignable params or unknown lecture }
         '401': { description: Not an organizer }
+  /trials:
+    post:
+      summary: Start a public trial session (first 60 s kept, unlisted, deleted after 24 h)
+      operationId: startTrial
+      security: []  # public, rate-limited
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, rightsConfirmed]
+              properties:
+                title: { type: string, minLength: 1, maxLength: 140 }
+                rightsConfirmed: { type: boolean, enum: [true] }
+      responses:
+        '201':
+          description: Trial created; upload with the returned preset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lecture: { $ref: '#/components/schemas/Lecture' }
+                  uploadPreset: { type: string }
+        '400': { description: Invalid body }
+        '429': { description: Per-network or daily trial limit reached, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '503': { description: Trials are switched off (TRIALS_PER_DAY=0) }
   /webhooks/cloudinary:
     post:
       summary: Cloudinary notification (transcription complete/failed)
@@ -390,8 +423,9 @@ paths:
   /insights:
     get:
       summary: Organizer Insights over the last 30 days (knowledge gaps, most asked, most shared)
+      description: "Public while the demo Studio is on (STUDIO_DEMO): link-like questions and Moments from unpublished sessions are left out."
       operationId: getInsights
-      security: [{ organizerCookie: [] }]
+      security: [{ organizerCookie: [] }, {}]
       responses:
         '200': { description: Insights, content: { application/json: { schema: { $ref: '#/components/schemas/Insights' } } } }
-        '401': { description: Not an organizer }
+        '401': { description: Not an organizer and the demo Studio is off }

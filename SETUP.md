@@ -33,7 +33,8 @@ cp .env.example .env.local
    - Notification URL: `https://<your-vercel-app>/api/webhooks/cloudinary` (update it once Vercel gives you the URL)
    - `CLOUDINARY_UPLOAD_PRESET=pravaha_signed`
 4. Check the AI video features (transcription, chaptering) are available on the account; Phase 01 confirms them on a real upload.
-5. **Optional, Hindi subtitles (Phase 15):** Console → Add-ons → enable **Google Translation**, then run `pnpm preset:hindi`. It sets the preset's `auto_transcription` to `{ "translate": ["hi-IN"] }` and prints the before and after settings. Uploads from then on get a Hindi subtitle track on the Watch page; earlier sessions keep English only. Asking in Hindi needs no setup: it works on every session.
+5. **Trial preset (for `/try`):** run `pnpm preset:trial`. It creates `pravaha_trial` from the organizer preset's settings and webhook, plus an incoming transformation that keeps only the first 60 seconds, and prints the result. Without it, trial uploads fail; set `TRIALS_PER_DAY=0` to switch trials off instead.
+6. **Optional, Hindi subtitles (Phase 15):** Console → Add-ons → enable **Google Translation**, then run `pnpm preset:hindi`. It sets the preset's `auto_transcription` to `{ "translate": ["hi-IN"] }` and prints the before and after settings. Uploads from then on get a Hindi subtitle track on the Watch page; earlier sessions keep English only. Asking in Hindi needs no setup: it works on every session.
 
 ## 3. Database — Neon
 

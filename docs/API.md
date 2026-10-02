@@ -24,7 +24,7 @@ JSON in, JSON out. Errors: `{ "error": { "code": string, "message": string } }`.
 - **Errors:** `400` (incl. `rightsConfirmed` not `true`) · `401`
 
 ### `POST /api/upload-signature` — sign the widget upload (step 2)
-- **Auth:** organizer
+- **Auth:** organizer for the organizer preset; none for the trial preset, which is signed only for a trial row that is still `processing` and under 30 minutes old (see `POST /api/trials`). Each preset only works for its own kind of session
 - **Contract:** `CldUploadWidget`'s `signatureEndpoint`: `{ "paramsToSign": {...} }` in, `{ "signature" }` out
 - **Policy (`src/lib/upload-policy.ts`):** only the keys `public_id`, `upload_preset`, `timestamp`, `source`; preset must be ours; `public_id` must be an existing `processing` lecture; timestamp within 10 min. The AI params (`auto_transcription`, `auto_chaptering`, `notification_url`) live in the **signed upload preset**, so a client can't add or change them.
 - **Errors:** `400` unsignable / unknown lecture · `401`
@@ -47,8 +47,8 @@ JSON in, JSON out. Errors: `{ "error": { "code": string, "message": string } }`.
 - **Errors:** `400` (incl. publishing a session that isn't `ready`) · `401` · `404`
 
 ### `GET /api/lectures`
-- **Auth:** public → `ready` + `public` only; organizer → all, with status (the Studio polls this every 5 s while anything is processing)
-- **Response:** `[{ id, title, speaker, status, visibility, durationS, publicId, createdAt }]`
+- **Auth:** public → `ready` + `public` only (the demo Studio); organizer → every session except trials, with status (the Studio polls this every 5 s while anything is processing)
+- **Response:** `[{ id, title, speaker, status, visibility, durationS, publicId, createdAt, trialExpiresAt, moments, chapters, hasStudyPack }]`: what the pipeline built for each session
 
 ### `GET /api/search?q=&lectureId=`
 - **Auth:** public. Searches `ready` + `public` sessions; with `lectureId`, that one session (unlisted allowed — you have the link)
@@ -91,7 +91,7 @@ Every endpoint maps to an FR in `PRD.md`; there is no endpoint without one.
 - Anonymous Moment analytics for organizer Insights
 
 ### `GET /api/insights`
-- **Auth:** organizer · **Response:** `{ totals: { questions, answeredRate, shares }, gaps[{question,times,lastAsked}], topQuestions[{question,times,answered}], topMoments[{segmentId,lectureId,title,startS,text,opens,shares}] }` (last 30 days)
+- **Auth:** organizer, or anyone while the demo Studio is on (`STUDIO_DEMO`, default `on`; `401` when `off`). Visitors get the same aggregates minus questions that look like links, e-mail addresses or phone numbers, and Moments only from published sessions · **Response:** `{ totals: { questions, answeredRate, shares }, gaps[{question,times,lastAsked}], topQuestions[{question,times,answered}], topMoments[{segmentId,lectureId,title,startS,text,opens,shares}] }` (last 30 days)
 
 ### `POST /api/ask` (additions)
 - Response adds `reel: { url, durationS, clips } | null`, the Answer Reel (Phase 12)
@@ -104,3 +104,16 @@ Every endpoint maps to an FR in `PRD.md`; there is no endpoint without one.
 - **Request:** `{ "helpful": boolean }`. Public, anonymous: no identity or IP is stored; the browser remembers its vote per answer
 - **Response:** `204`; `404` for an unknown answer; `400` for an invalid body
 - Insights reports the share of answers rated helpful over the last 30 days
+
+## Trials (`/try`)
+
+### `POST /api/trials`
+- **Auth:** public. **Limits:** 2 per network (salted IP hash) and `TRIALS_PER_DAY` in total (default 5) per 24 h; `TRIALS_PER_DAY=0` turns trials off
+- **Request:** `{ "title": string(1–140), "rightsConfirmed": true }`
+- **Effect:** inserts an unlisted `lectures` row with `trial_expires_at = now() + 24 h` and returns the trial preset (`CLOUDINARY_TRIAL_PRESET`, default `pravaha_trial`), which keeps only the first 60 s of the upload. The browser then uploads through `POST /api/upload-signature` like the Studio. Expired trials are deleted with their Cloudinary assets after each trial request
+- **Response:** `201 { "lecture": Lecture, "uploadPreset": string }`
+- **Errors:** `400` · `429` `trial_limit` / `trials_full` · `503` `trials_disabled`
+- A trial is never listed, searched or asked across the library. `POST /api/ask` with its `lectureId` works; those questions are not logged to Insights and their answers aren't stored as share links (`answerId: null`)
+
+### `POST /api/ask` with `lectureId`
+- Scopes the Ask to one session (the Watch page's **Ask this session**). If no keyword matches ("What is this video about?"), retrieval falls back to moments sampled evenly across the session, so the model can summarise it; it still refuses when they don't answer the question

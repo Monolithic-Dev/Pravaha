@@ -64,7 +64,8 @@ Colleges, clubs and coaching institutes record hundreds of hours of lectures and
 | **Answer Reels** | The moments an answer cites, from different speakers and sessions, stitched into one labelled video. |
 | **Study Packs** | Every session gets a summary, key concepts, a quiz whose explanations **play the moment** the teacher explains it, and a "Session in 60 seconds" highlight reel. Pravaha generates them automatically from the transcript. |
 | **Moments** | One tap turns any cited clip into a vertical, AI-cropped, subtitled short for WhatsApp or Instagram, with its own share page and preview card. The short is just a Cloudinary URL; nothing is rendered. |
-| **Insights** | Organizers see what learners ask, the **knowledge gaps** the library can't answer yet (what to record next), and which Moments get shared. |
+| **Insights** | Organizers see what learners ask, the **knowledge gaps** the library can't answer yet (what to record next), and which Moments get shared. Visitors can explore a read-only demo of the Studio. |
+| **Try it** | Anyone can upload a short video at `/try`, no account: Cloudinary keeps the first 60 seconds, transcribes and chapters it, and about 20 seconds later it has a Study Pack and an **Ask this session** box. Trials are private and deleted after 24 hours. |
 
 > *ChatGPT gives you text. Pravaha gives you the moment your professor said it.*
 
@@ -140,8 +141,8 @@ Open the live app at **[pravaha-cyan.vercel.app](https://pravaha-cyan.vercel.app
 4. Search a phrase. The results jump to the second, across sessions.
 5. Ask something off-topic ("Who won the IPL?"). Pravaha says the library doesn't cover it instead of making something up.
 6. Press `/` or `Ctrl/⌘ K` anywhere to jump to the Ask bar.
-
-Organizer features (upload, publish, insights) live at [`/studio`](https://pravaha-cyan.vercel.app/studio) behind a passcode. Judges can get it from the team.
+7. Open **[Try it](https://pravaha-cyan.vercel.app/try)** and upload any short video with speech (up to 50 MB). Follow the live pipeline, then ask it "What is this video about?" on its page.
+8. Open **[Studio](https://pravaha-cyan.vercel.app/studio)**: a read-only demo of the organizer side, with every session's pipeline output and live Insights (knowledge gaps, most asked questions, answers rated helpful). Uploading to the main library and publishing need the organizer passcode at `/studio/sign-in`.
 
 ## Quick start
 
@@ -165,6 +166,8 @@ pnpm dev                     # http://localhost:3000
 |---|---|
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `NEXT_PUBLIC_CLOUDINARY_API_KEY` | Public Cloudinary identifiers for the player and Upload Widget |
 | `CLOUDINARY_API_SECRET`, `CLOUDINARY_UPLOAD_PRESET` | Server-side signing and the signed upload preset |
+| `CLOUDINARY_TRIAL_PRESET`, `TRIALS_PER_DAY` | Optional: the `/try` preset (default `pravaha_trial`) and the daily trial cap (default 5; 0 turns trials off) |
+| `STUDIO_DEMO` | Optional: `on` (default) shows visitors a read-only Studio; `off` keeps it behind the passcode |
 | `DATABASE_URL` | Neon Postgres connection string |
 | `GEMINI_API_KEY`, `GEMINI_MODELS` | Gemini key and the ordered model fallback chain |
 | `GROQ_API_KEY` | Optional backup AI provider, used when every Gemini model fails |
@@ -182,6 +185,7 @@ pnpm dev                     # http://localhost:3000
 | `APP_URL=… pnpm test:e2e` | Playwright smoke tests against a deployed app, desktop and mobile |
 | `pnpm eval:ask` | Evaluate Ask: grounding, citations and refusals ([`docs/AI_EVALUATION.md`](docs/AI_EVALUATION.md)) |
 | `pnpm db:migrate` | Apply database migrations |
+| `pnpm preset:trial` | Create or update the 60-second trial upload preset used by `/try` |
 
 ## Project structure
 

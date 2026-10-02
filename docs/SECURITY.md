@@ -37,6 +37,8 @@ Server modules (`src/lib/cloudinary.ts`, `db.ts`, `ai.ts`, `answer.ts`, `auth.ts
 
 Signed uploads only (the upload preset is **signed**, so an unsigned upload with our cloud name is rejected). The server chooses `public_id` and `notification_url`; client-supplied values for those are ignored. The preset restricts uploads to video formats; the widget caps files at 100 MB, the free plan's limit.
 
+**Public trials (`/try`).** A second signed preset, `pravaha_trial`, carries the same AI settings plus an incoming transformation (`end_offset: 60`), so Cloudinary itself keeps only the first 60 seconds whatever is uploaded. The signature endpoint signs that preset without a sign-in, but only for a trial row that is still waiting for its video and under 30 minutes old. It never signs the organizer preset without the organizer cookie, and neither preset can upload into the other's sessions. Trials are unlisted, never in library search or Ask, kept out of Insights, and deleted with their Cloudinary assets after 24 hours. Limits: 50 MB in the widget, 2 trials per network and `TRIALS_PER_DAY` (default 5) per day; `TRIALS_PER_DAY=0` is the kill switch.
+
 ## Webhook Security
 
 Verify `X-Cld-Signature` over the **raw** body + `X-Cld-Timestamp` with the SDK helper before `JSON.parse`; reject timestamps older than 2 hours (replay). The transcript is then fetched from **our own** Cloudinary CDN URL built from the `public_id` in our DB — never from a URL in the payload (no SSRF).
@@ -73,7 +75,7 @@ Rights confirmation is required before upload (`rights_confirmed_at`), sessions 
 
 ## v3 additions
 
-- **Learner privacy in Insights:** `ask_log` keeps question text only (no IP, no user); `moment_events` keeps segment id + kind. Insights are organizer-only (`401` otherwise).
+- **Learner privacy in Insights:** `ask_log` keeps question text only (no IP, no user); `moment_events` keeps segment id + kind. Organizers see everything. The public demo Studio (`STUDIO_DEMO=on`, the default) shows the same anonymous aggregates without questions that look like links, e-mail addresses or phone numbers, and with Moments only from published sessions. `STUDIO_DEMO=off` makes Insights organizer-only (`401`).
 - **`/api/events`** is public but only counts events against existing segments (`404` otherwise) and stores no identity. Worst-case abuse is inflated share counts, not data exposure.
 - **Study Pack prompt injection:** same containment as Ask: schema-only output, and every reference validated against the session's real segment ids.
 
