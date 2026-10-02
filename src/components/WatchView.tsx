@@ -6,6 +6,7 @@ import { MomentButton } from "@/components/MomentButton";
 import { Player } from "@/components/Player";
 import { StudyPanel } from "@/components/StudyPanel";
 import { formatTime } from "@/lib/format";
+import type { SubtitleLanguage } from "@/lib/language";
 import type { SegmentRow } from "@/lib/lectures";
 import type { StudyPack } from "@/lib/study-pack-schema";
 
@@ -16,13 +17,14 @@ type Props = {
   durationS: number | null;
   startAt: number;
   searchable: boolean;
+  subtitles: SubtitleLanguage[];
   segments: SegmentRow[];
   pack: StudyPack | null;
   // Title, speaker and status, rendered under the player in the same column (not below the whole grid).
   children?: React.ReactNode;
 };
 
-export function WatchView({ lectureId, publicId, title, durationS, startAt, searchable, segments, pack, children }: Props) {
+export function WatchView({ lectureId, publicId, title, durationS, startAt, searchable, subtitles, segments, pack, children }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [time, setTime] = useState(startAt);
   const [filter, setFilter] = useState("");
@@ -54,6 +56,7 @@ export function WatchView({ lectureId, publicId, title, durationS, startAt, sear
           publicId={publicId}
           startAt={startAt}
           searchable={searchable}
+          subtitles={subtitles}
           videoRef={videoRef}
           onTime={(t) => setTime((prev) => (Math.abs(prev - t) >= 0.5 ? t : prev))}
         />

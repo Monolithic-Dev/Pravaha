@@ -35,7 +35,7 @@ Two steps. `POST /api/lectures` (organizer-only) creates the `lectures` row with
 The Cloudinary AI work is configured on the **signed upload preset** `pravaha_signed`, not sent by the browser — so no client can add or alter it:
 
 ```
-auto_transcription = true                          (verified; P2: translate)
+auto_transcription = true | { translate: ["hi-IN"] } (verified; translate needs the Google Translation add-on, `pnpm preset:hindi`)
 auto_chaptering    = true                          (verified)
 notification_url   = <APP_URL>/api/webhooks/cloudinary
 allowed formats    = mp4, mov, webm, mkv, m4v · max file size 500 MB · no folder (public_id already has one)

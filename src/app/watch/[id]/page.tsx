@@ -8,6 +8,7 @@ import { formatTime } from "@/lib/format";
 import { getLecture, getSegments } from "@/lib/lectures";
 import { posterTime, SHARE_CARD, shareCardUrl } from "@/lib/media";
 import { getStudyPack } from "@/lib/study-packs";
+import { translatedSubtitles } from "@/lib/subtitles";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -47,7 +48,9 @@ export default async function WatchPage({ params, searchParams }: Props) {
 
   const startAt = Math.max(0, Number(t) || 0);
   const ready = lecture.status === "ready";
-  const [segments, pack] = ready ? await Promise.all([getSegments(lecture.id), getStudyPack(lecture.id)]) : [[], null];
+  const [segments, pack, subtitles] = ready
+    ? await Promise.all([getSegments(lecture.id), getStudyPack(lecture.id), translatedSubtitles(lecture.publicId)])
+    : [[], null, []];
 
   return (
     <article className="mt-4">
@@ -58,6 +61,7 @@ export default async function WatchPage({ params, searchParams }: Props) {
         durationS={lecture.durationS}
         startAt={startAt}
         searchable={lecture.status === "ready"}
+        subtitles={subtitles}
         segments={segments}
         pack={pack}
       >
