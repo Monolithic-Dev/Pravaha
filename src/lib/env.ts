@@ -6,6 +6,12 @@ const schema = z.object({
   NEXT_PUBLIC_CLOUDINARY_API_KEY: z.string().min(1),
   CLOUDINARY_API_SECRET: z.string().min(1),
   CLOUDINARY_UPLOAD_PRESET: z.string().min(1).default("pravaha_signed"),
+  // Public trials (/try): their own preset (scripts/trial-preset.mjs keeps only the first 60 s) and a daily cap.
+  // TRIALS_PER_DAY=0 turns trials off.
+  CLOUDINARY_TRIAL_PRESET: z.string().min(1).default("pravaha_trial"),
+  TRIALS_PER_DAY: z.coerce.number().int().min(0).default(5),
+  // The read-only demo Studio for visitors (/studio without a sign-in). "off" for a private deployment.
+  STUDIO_DEMO: z.enum(["on", "off"]).default("on"),
   DATABASE_URL: z.string().min(1),
   // Optional: without it Ask degrades to showing the most relevant clips (NFR4) instead of breaking the app.
   GEMINI_API_KEY: z.string().optional().transform((v) => v || undefined),

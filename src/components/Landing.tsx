@@ -53,7 +53,8 @@ const PLANS = [
     per: "",
     for: "Student clubs and departments starting out",
     features: ["Up to 10 hours of recordings", "Watch, Find, Ask and Moments", "Shareable answers", "Community support"],
-    cta: "Start free",
+    cta: "Try it with your video",
+    href: "/try",
   },
   {
     name: "Institute",
@@ -61,7 +62,8 @@ const PLANS = [
     per: "/month",
     for: "Coaching institutes and colleges",
     features: ["Up to 200 hours of recordings", "Study Packs and quizzes", "Knowledge-gap insights", "Hindi subtitles and Hindi Ask", "Priority support"],
-    cta: "Start a pilot",
+    cta: "See the organizer Studio",
+    href: "/studio",
     featured: true,
   },
   {
@@ -71,6 +73,7 @@ const PLANS = [
     for: "Universities and companies",
     features: ["Unlimited hours", "Single sign-on (planned)", "LMS integration (planned)", "Dedicated success manager"],
     cta: "Talk to us",
+    href: "https://github.com/Monolithic-Dev/Pravaha",
   },
 ];
 
@@ -85,7 +88,7 @@ const FAQ = [
   ],
   [
     "What do I need to upload?",
-    "Any recorded lecture or talk: a phone video is fine. Cloudinary transcribes it, chapters it and makes it streamable automatically. There is no editing step.",
+    "Any recorded lecture or talk: a phone video is fine. Cloudinary transcribes it, chapters it and makes it streamable automatically. There is no editing step. You can try it now with the first minute of any video, no account needed.",
   ],
   [
     "Which languages work?",
@@ -200,7 +203,7 @@ export function Landing() {
                 ))}
               </ul>
               <Link
-                href="/studio"
+                href={p.href}
                 className={`mt-6 rounded-lg px-4 py-2.5 text-center text-sm font-medium ${p.featured ? "bg-accent text-accent-fg" : "border border-border hover:border-accent"}`}
               >
                 {p.cta}
@@ -229,13 +232,16 @@ export function Landing() {
 
       <section className="relative isolate overflow-hidden rounded-3xl bg-accent px-6 py-14 text-center text-accent-fg">
         <h2 className="text-3xl font-semibold tracking-tight text-balance">Your recordings already hold the answers.</h2>
-        <p className="mx-auto mt-3 max-w-xl opacity-90">Ask one now, or upload a session and watch it become searchable in minutes.</p>
+        <p className="mx-auto mt-3 max-w-xl opacity-90">Ask one now, or upload a short video and ask it in about a minute.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <a href="#q" className="rounded-lg bg-accent-fg px-5 py-2.5 font-medium text-accent">
             Ask a question
           </a>
+          <Link href="/try" className="rounded-lg border border-current/40 px-5 py-2.5 font-medium">
+            Try with your own video
+          </Link>
           <Link href="/studio" className="rounded-lg border border-current/40 px-5 py-2.5 font-medium">
-            Open Studio
+            See the Studio
           </Link>
         </div>
       </section>

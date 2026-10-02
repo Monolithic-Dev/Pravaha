@@ -80,3 +80,23 @@ export function findSegments(q: string, { lectureId = null as string | null, lim
 export function retrieveForQuestion(q: string, { lectureId = null as string | null, limit = 12 } = {}) {
   return run(`to_tsquery('english', replace(plainto_tsquery('english', $1)::text, '&', '|'))`, q, lectureId, limit);
 }
+
+// Ask within one session when no keyword matches: questions like "What is this video about?" share no terms
+// with the transcript. Moments spread evenly across the session (in order) let the model summarise it.
+export async function sessionOverview(lectureId: string, limit = 12): Promise<Hit[]> {
+  const rows = await query<Row>(
+    `WITH ordered AS (
+       SELECT s.*, row_number() OVER (ORDER BY s.start_s) AS rn, count(*) OVER () AS total
+         FROM segments s WHERE s.lecture_id = $1::uuid
+     )
+     SELECT o.id, o.lecture_id, l.public_id, l.title, l.speaker, o.start_s, o.end_s, o.text, o.chapter_title,
+            l.duration_s, o.words, array_to_string((string_to_array(o.text, ' '))[1:28], ' ') AS snippet
+       FROM ordered o JOIN lectures l ON l.id = o.lecture_id
+      WHERE (o.rn - 1) % greatest(1, ceil(o.total::numeric / $2)::int) = 0
+      ORDER BY o.start_s
+      LIMIT $2`,
+    [lectureId, limit],
+  );
+  return rows.map(toHit);
+}
+

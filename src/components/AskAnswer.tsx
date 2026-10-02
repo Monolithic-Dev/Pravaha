@@ -44,7 +44,17 @@ type State =
 
 const UNAVAILABLE = "Ask is unavailable right now — the moments below still work.";
 
-export function AskAnswer({ question }: { question: string }) {
+// `lectureId` scopes the Ask to one session (the Watch page's "Ask this session"); `onFollowUp` then keeps
+// suggested next questions in that scope instead of linking to a library-wide search.
+export function AskAnswer({
+  question,
+  lectureId,
+  onFollowUp,
+}: {
+  question: string;
+  lectureId?: string;
+  onFollowUp?: (question: string) => void;
+}) {
   const [state, setState] = useState<State>({ kind: "loading", progress: {} });
 
   useEffect(() => {
@@ -54,7 +64,7 @@ export function AskAnswer({ question }: { question: string }) {
       const res = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/x-ndjson" },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, lectureId }),
         signal: controller.signal,
       });
       if (res.status === 429) return setState({ kind: "error", message: "You've asked a lot — try again in a few minutes." });
@@ -88,23 +98,23 @@ export function AskAnswer({ question }: { question: string }) {
       if (e?.name !== "AbortError") setState({ kind: "error", message: "Couldn't reach Pravaha. Check your connection." });
     });
     return () => controller.abort();
-  }, [question]);
+  }, [question, lectureId]);
 
   return (
     <section aria-labelledby="answer-heading" aria-live="polite" className="rise mt-6 rounded-3xl border border-border bg-surface p-5 sm:p-6">
       <h2 id="answer-heading" className="text-sm font-semibold tracking-wide text-accent uppercase">
-        Answer from your library
+        {lectureId ? "Answer from this session" : "Answer from your library"}
       </h2>
 
-      {state.kind === "loading" && <Steps progress={state.progress} />}
+      {state.kind === "loading" && <Steps progress={state.progress} scoped={!!lectureId} />}
       {state.kind === "error" && <p className="mt-3 text-muted">{state.message}</p>}
-      {state.kind === "done" && <AnswerBody data={state.data} question={question} />}
+      {state.kind === "done" && <AnswerBody data={state.data} question={question} onFollowUp={onFollowUp} />}
     </section>
   );
 }
 
 // The live "what is happening" list: every line reflects a real server step.
-function Steps({ progress }: { progress: Progress }) {
+function Steps({ progress, scoped }: { progress: Progress; scoped: boolean }) {
   const { retrieved, writing } = progress;
   const found = retrieved
     ? retrieved.moments
@@ -114,7 +124,7 @@ function Steps({ progress }: { progress: Progress }) {
   return (
     <div className="mt-4" aria-label="Finding the moments that answer this…">
       <ol className="space-y-2.5 text-sm">
-        <Step done={!!retrieved} label={found ?? "Searching every session for what was said…"} />
+        <Step done={!!retrieved} label={found ?? (scoped ? "Searching this session for what was said…" : "Searching every session for what was said…")} />
         {retrieved && retrieved.sessions.length > 0 && (
           <li className="rise flex flex-wrap gap-1.5 pl-7">
             {retrieved.sessions.map((s) => (
@@ -166,7 +176,15 @@ function Step({ done, active = !done, label }: { done: boolean; active?: boolean
   );
 }
 
-export function AnswerBody({ data, question }: { data: AskResponse; question: string }) {
+export function AnswerBody({
+  data,
+  question,
+  onFollowUp,
+}: {
+  data: AskResponse;
+  question: string;
+  onFollowUp?: (question: string) => void;
+}) {
   return (
     <>
       {data.status === "answered" && <AnswerText text={data.answer} citations={data.citations} />}
@@ -188,7 +206,7 @@ export function AnswerBody({ data, question }: { data: AskResponse; question: st
           ))}
         </ol>
       )}
-      {data.followUps && data.followUps.length > 0 && <FollowUps questions={data.followUps} />}
+      {data.followUps && data.followUps.length > 0 && <FollowUps questions={data.followUps} onAsk={onFollowUp} />}
     </>
   );
 }
@@ -333,21 +351,26 @@ function Thumb({ filled, down = false }: { filled: boolean; down?: boolean }) {
   );
 }
 
-// Suggested next questions: each is a new Ask against the same library.
-function FollowUps({ questions }: { questions: string[] }) {
+// Suggested next questions: each is a new Ask in the same scope (the library, or `onAsk`'s session).
+function FollowUps({ questions, onAsk }: { questions: string[]; onAsk?: (question: string) => void }) {
+  const chip = "lift inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-3 py-1.5 text-left text-sm hover:border-accent";
   return (
     <div className="rise mt-6 border-t border-border pt-4" style={{ animationDelay: "350ms" }}>
       <p className="text-sm font-semibold text-muted">Ask next</p>
       <ul className="mt-2 flex flex-wrap gap-2">
         {questions.map((q) => (
           <li key={q}>
-            <Link
-              href={`/search?q=${encodeURIComponent(q)}`}
-              className="lift inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-3 py-1.5 text-sm hover:border-accent"
-            >
-              <span aria-hidden className="text-accent">↳</span>
-              {q}
-            </Link>
+            {onAsk ? (
+              <button type="button" onClick={() => onAsk(q)} className={chip}>
+                <span aria-hidden className="text-accent">↳</span>
+                {q}
+              </button>
+            ) : (
+              <Link href={`/search?q=${encodeURIComponent(q)}`} className={chip}>
+                <span aria-hidden className="text-accent">↳</span>
+                {q}
+              </Link>
+            )}
           </li>
         ))}
       </ul>

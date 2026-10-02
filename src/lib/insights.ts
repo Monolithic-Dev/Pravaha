@@ -37,8 +37,23 @@ export type Insights = {
 
 const WINDOW = `now() - interval '30 days'`;
 
+// The public demo Studio shows real aggregates, but learner-typed text is shown only if it reads like a
+// question: no links, e-mail addresses or long digit runs (phone numbers).
+const LOOKS_PRIVATE = /https?:|www\.|\S+@\S+|\d{6,}/i;
+export function forDemo(insights: Insights): Insights {
+  const shown = (q: string) => !LOOKS_PRIVATE.test(q);
+  return {
+    ...insights,
+    gaps: insights.gaps.filter((g) => shown(g.question)),
+    topQuestions: insights.topQuestions.filter((q) => shown(q.question)),
+  };
+}
+
 // Questions are grouped case- and whitespace-insensitively, so "What is dropout?" and "what is  dropout" count together.
-export async function getInsights(): Promise<Insights> {
+// `publishedOnly` (the public demo Studio): Moments only from published sessions, so an unlisted session's
+// title and words never show up there.
+export async function getInsights({ publishedOnly = false } = {}): Promise<Insights> {
+  const momentScope = publishedOnly ? `AND l.status = 'ready' AND l.visibility = 'public'` : "";
   const [gaps, topQuestions, topMoments, totals] = await Promise.all([
     query<{ question: string; times: string; last_asked: Date }>(
       `SELECT min(question) AS question, count(*) AS times, max(created_at) AS last_asked
@@ -56,7 +71,7 @@ export async function getInsights(): Promise<Insights> {
       `SELECT s.id AS segment_id, l.id AS lecture_id, l.title, s.start_s, s.text,
               count(*) FILTER (WHERE e.kind = 'open') AS opens, count(*) FILTER (WHERE e.kind = 'share') AS shares
          FROM moment_events e JOIN segments s ON s.id = e.segment_id JOIN lectures l ON l.id = s.lecture_id
-        WHERE e.created_at > ${WINDOW}
+        WHERE e.created_at > ${WINDOW} ${momentScope}
         GROUP BY s.id, l.id
         ORDER BY count(*) FILTER (WHERE e.kind = 'share') DESC, count(*) DESC LIMIT 10`,
     ),

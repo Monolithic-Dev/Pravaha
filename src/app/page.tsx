@@ -71,6 +71,12 @@ export default async function Home() {
                   ))}
                 </div>
               )}
+              <p className="mt-4 text-sm text-muted">
+                Have a lecture of your own?{" "}
+                <Link href="/try" className="font-medium text-accent hover:underline">
+                  Ask your own video →
+                </Link>
+              </p>
             </div>
           </div>
           <div className="rise hidden lg:block" style={{ animationDelay: "240ms" }}>

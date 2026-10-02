@@ -11,8 +11,11 @@ export const ASK_GLOBAL_PER_DAY = 500;
 // Shared Postgres counter: correct across serverless instances, unlike an in-memory limiter.
 // ponytail: check-then-insert can overshoot by a few under concurrent bursts; a single
 // INSERT … WHERE (SELECT count…) < cap would close that if it ever matters.
+// Salted, so the stored value can't be turned back into an address.
+export const hashIp = (ip: string) => createHash("sha256").update(`${ip}:${env().SESSION_SECRET}`).digest("hex");
+
 export async function takeAskToken(ip: string): Promise<{ ok: true } | { ok: false; scope: "ip" | "global"; retryAfterS: number }> {
-  const ipHash = createHash("sha256").update(`${ip}:${env().SESSION_SECRET}`).digest("hex");
+  const ipHash = hashIp(ip);
   const [counts] = await query<{ per_ip: string; global: string }>(
     `SELECT count(*) FILTER (WHERE ip_hash = $1 AND created_at > now() - interval '1 hour') AS per_ip,
             count(*) AS global

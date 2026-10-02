@@ -3,12 +3,17 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { z } from "zod";
 
+import Link from "next/link";
+
+import { AskSession } from "@/components/AskSession";
 import { WatchView } from "@/components/WatchView";
 import { formatTime } from "@/lib/format";
 import { getLecture, getSegments } from "@/lib/lectures";
 import { posterTime, SHARE_CARD, shareCardUrl } from "@/lib/media";
 import { getStudyPack } from "@/lib/study-packs";
 import { translatedSubtitles } from "@/lib/subtitles";
+import { pickSuggestions } from "@/lib/suggestions";
+import { hoursLeft } from "@/lib/trial-policy";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -26,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: lecture.title,
     subtitle: [lecture.speaker, lecture.durationS ? formatTime(lecture.durationS) : null].filter(Boolean).join(" · "),
   });
-  const listed = lecture.status === "ready" && lecture.visibility === "public";
+  const listed = lecture.status === "ready" && lecture.visibility === "public" && !lecture.trialExpiresAt;
   const description = `${lecture.speaker ? `${lecture.speaker}: ` : ""}watch “${lecture.title}” with chapters, a searchable transcript, a Study Pack and shareable moments.`;
   return {
     title: `${lecture.title} — Pravaha`,
@@ -54,6 +59,7 @@ export default async function WatchPage({ params, searchParams }: Props) {
   const [segments, pack, subtitles] = ready
     ? await Promise.all([getSegments(lecture.id), getStudyPack(lecture.id), translatedSubtitles(lecture.publicId)])
     : [[], null, []];
+  const trialHoursLeft = lecture.trialExpiresAt ? hoursLeft(lecture.trialExpiresAt) : null;
 
   return (
     <article className="mt-4">
@@ -75,6 +81,21 @@ export default async function WatchPage({ params, searchParams }: Props) {
             {lecture.durationS ? <span className="tabular"> · {formatTime(lecture.durationS)}</span> : null}
           </p>
         </header>
+        {trialHoursLeft !== null && (
+          <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-accent/40 bg-accent/5 p-4 text-sm">
+            <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-accent-fg">Trial</span>
+            <span className="flex-1">
+              Your trial session: only people with this link can open it, and it is deleted in about {trialHoursLeft}{" "}
+              hour{trialHoursLeft === 1 ? "" : "s"}.
+            </span>
+            <Link href="/try" className="font-medium text-accent hover:underline">
+              Try another video
+            </Link>
+          </p>
+        )}
+        {ready && segments.length > 0 && (
+          <AskSession lectureId={lecture.id} suggestions={pack ? pickSuggestions([pack], 3) : []} />
+        )}
         {lecture.status === "processing" && (
           <p className="mt-4 rounded-xl border border-border bg-surface p-4 text-sm">
             Transcribing — search, chapters and subtitles are on their way. The video already plays.

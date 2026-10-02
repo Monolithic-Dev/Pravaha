@@ -17,6 +17,8 @@ export type Lecture = {
   visibility: Visibility;
   durationS: number | null;
   createdAt: string;
+  // Set only on public trial sessions (/try), which are deleted at this time (src/lib/trials.ts).
+  trialExpiresAt: string | null;
 };
 
 type Row = {
@@ -28,9 +30,10 @@ type Row = {
   visibility: Visibility;
   duration_s: number | null;
   created_at: Date;
+  trial_expires_at: Date | null;
 };
 
-const COLUMNS = "id, public_id, title, speaker, status, visibility, duration_s, created_at";
+const COLUMNS = "id, public_id, title, speaker, status, visibility, duration_s, created_at, trial_expires_at";
 
 const toLecture = (r: Row): Lecture => ({
   id: r.id,
@@ -41,22 +44,44 @@ const toLecture = (r: Row): Lecture => ({
   visibility: r.visibility,
   durationS: r.duration_s,
   createdAt: r.created_at.toISOString(),
+  trialExpiresAt: r.trial_expires_at?.toISOString() ?? null,
 });
 
-export async function createLecture(input: { title: string; speaker?: string }): Promise<Lecture> {
+export async function createLecture(input: {
+  title: string;
+  speaker?: string;
+  trial?: { expiresAt: Date; ipHash: string };
+}): Promise<Lecture> {
   const id = crypto.randomUUID();
   const rows = await query<Row>(
-    `INSERT INTO lectures (id, public_id, title, speaker, rights_confirmed_at)
-     VALUES ($1, $2, $3, $4, now()) RETURNING ${COLUMNS}`,
-    [id, `pravaha/${id}`, input.title, input.speaker || null],
+    `INSERT INTO lectures (id, public_id, title, speaker, rights_confirmed_at, trial_expires_at, trial_ip_hash)
+     VALUES ($1, $2, $3, $4, now(), $5, $6) RETURNING ${COLUMNS}`,
+    [id, `pravaha/${id}`, input.title, input.speaker || null, input.trial?.expiresAt ?? null, input.trial?.ipHash ?? null],
   );
   return toLecture(rows[0]!);
 }
 
+// The library (public) or, for organizers, every session. Trials never appear in either.
 export async function listLectures({ includeAll }: { includeAll: boolean }): Promise<Lecture[]> {
-  const where = includeAll ? "" : "WHERE status = 'ready' AND visibility = 'public'";
+  const where = includeAll ? "WHERE trial_expires_at IS NULL" : "WHERE status = 'ready' AND visibility = 'public'";
   const rows = await query<Row>(`SELECT ${COLUMNS} FROM lectures ${where} ORDER BY created_at DESC LIMIT 200`);
   return rows.map(toLecture);
+}
+
+// What the pipeline produced for each session, for the Studio: indexed moments, chapters and the Study Pack.
+export type StudioSession = Lecture & { moments: number; chapters: number; hasStudyPack: boolean };
+
+export async function listStudioSessions({ includeAll }: { includeAll: boolean }): Promise<StudioSession[]> {
+  const where = includeAll ? "WHERE l.trial_expires_at IS NULL" : "WHERE l.status = 'ready' AND l.visibility = 'public'";
+  const rows = await query<Row & { moments: string; chapters: string; has_pack: boolean }>(
+    `SELECT ${COLUMNS.split(", ").map((c) => `l.${c}`).join(", ")},
+            (SELECT count(*) FROM segments s WHERE s.lecture_id = l.id) AS moments,
+            (SELECT count(DISTINCT chapter_title) FROM segments s WHERE s.lecture_id = l.id) AS chapters,
+            EXISTS (SELECT 1 FROM study_packs sp WHERE sp.lecture_id = l.id) AS has_pack
+       FROM lectures l ${where}
+      ORDER BY l.created_at DESC LIMIT 200`,
+  );
+  return rows.map((r) => ({ ...toLecture(r), moments: Number(r.moments), chapters: Number(r.chapters), hasStudyPack: r.has_pack }));
 }
 
 export async function getLecture(id: string): Promise<Lecture | null> {
