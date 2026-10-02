@@ -7,6 +7,7 @@ import { AiUnconfigured } from "@/lib/ai";
 import { askGrounded } from "@/lib/answer";
 import { apiError, parseJson } from "@/lib/http";
 import { logAsk } from "@/lib/insights";
+import { getLecture } from "@/lib/lectures";
 import { log } from "@/lib/log";
 import { momentUrl, reelUrl } from "@/lib/media";
 import { clientIp, takeAskToken } from "@/lib/rate-limit";
@@ -41,6 +42,10 @@ type Progress =
 // the JSON response ignores it. Same retrieval, validation and fallback either way.
 async function ask(question: string, lectureId: string | null, progress: (p: Progress) => void) {
   const started = Date.now();
+  // A trial session (/try) is private and short-lived: its questions stay out of Insights and its answers
+  // aren't stored as shareable links (they would outlive the video).
+  const trial = lectureId ? Boolean((await getLecture(lectureId))?.trialExpiresAt) : false;
+  const logged = (...args: Parameters<typeof logAsk>) => (trial ? Promise.resolve() : logAsk(...args));
   // A question in Hindi (or any non-Latin script) is searched in English; the answer stays in its language.
   const hits = await retrieveForQuestion(await searchableQuestion(question), { lectureId });
   progress({ type: "retrieved", moments: hits.length, sessions: [...new Set(hits.map((h) => h.title))].slice(0, 5) });
@@ -48,7 +53,7 @@ async function ask(question: string, lectureId: string | null, progress: (p: Pro
   if (hits.length === 0) {
     // Nothing in the library matches — no reason to call the model.
     log("ask.done", { status: "not_found", retrieved: 0, cited: 0, dropped: 0, ms: Date.now() - started });
-    after(() => logAsk(question, "not_found", []));
+    after(() => logged(question, "not_found", []));
     return { status: "not_found" as const, answer: null, citations: [], reel: null, followUps: [], answerId: null };
   }
 
@@ -63,7 +68,7 @@ async function ask(question: string, lectureId: string | null, progress: (p: Pro
       dropped: result.dropped,
       ms: Date.now() - started,
     });
-    after(() => logAsk(question, result.status, result.citations.map((c) => c.lectureId)));
+    after(() => logged(question, result.status, result.citations.map((c) => c.lectureId)));
     const body = {
       status: result.status,
       answer: result.answer,
@@ -72,14 +77,14 @@ async function ask(question: string, lectureId: string | null, progress: (p: Pro
       followUps: result.status === "answered" ? cleanFollowUps(raw.follow_ups, question) : [],
     };
     // Stored as shown, so /a/[answerId] can be shared without re-running the model.
-    const answerId = result.status === "answered" ? await saveAnswer(question, body) : null;
+    const answerId = result.status === "answered" && !trial ? await saveAnswer(question, body) : null;
     return { ...body, answerId };
   } catch (error) {
     // NFR4: the model failing never means an error page — show the most relevant moments instead.
     const kind = error instanceof AiUnconfigured ? "unconfigured" : error instanceof Error ? error.name : "unknown";
     log("ai.error", { kind, message: error instanceof Error ? error.message.slice(0, 200) : undefined, ms: Date.now() - started });
     const citations = hits.slice(0, FALLBACK_CLIPS).map((h, i) => withMoment({ ...h, n: i + 1 }));
-    after(() => logAsk(question, "fallback", citations.map((c) => c.lectureId)));
+    after(() => logged(question, "fallback", citations.map((c) => c.lectureId)));
     return { status: "fallback" as const, answer: null, citations, reel: reelFor(citations), followUps: [], answerId: null };
   }
 }

@@ -4,15 +4,18 @@
 const ALLOWED_KEYS = new Set(["public_id", "upload_preset", "timestamp", "source"]);
 const MAX_SKEW_S = 10 * 60;
 
-export type SignCheck = { ok: true; publicId: string } | { ok: false; reason: string };
+export type SignCheck = { ok: true; publicId: string; preset: string } | { ok: false; reason: string };
 
+// `presets`: the signed presets this deployment uses (organizer, trial). Which one a given upload may use
+// depends on its lecture row, checked by the caller.
 export function checkParamsToSign(
   params: Record<string, unknown>,
-  { preset, nowMs = Date.now() }: { preset: string; nowMs?: number },
+  { presets, nowMs = Date.now() }: { presets: string[]; nowMs?: number },
 ): SignCheck {
   const extra = Object.keys(params).filter((k) => !ALLOWED_KEYS.has(k));
   if (extra.length) return { ok: false, reason: `unexpected params: ${extra.join(", ")}` };
-  if (params.upload_preset !== preset) return { ok: false, reason: "wrong upload preset" };
+  const preset = params.upload_preset;
+  if (typeof preset !== "string" || !presets.includes(preset)) return { ok: false, reason: "wrong upload preset" };
 
   const publicId = params.public_id;
   if (typeof publicId !== "string" || !/^pravaha\/[0-9a-f-]{36}$/.test(publicId)) {
@@ -23,5 +26,5 @@ export function checkParamsToSign(
   if (!Number.isFinite(timestamp) || Math.abs(nowMs / 1000 - timestamp) > MAX_SKEW_S) {
     return { ok: false, reason: "stale or missing timestamp" };
   }
-  return { ok: true, publicId };
+  return { ok: true, publicId, preset };
 }
