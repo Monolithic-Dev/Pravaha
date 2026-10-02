@@ -13,7 +13,13 @@ export function StudyPanel({ pack, publicId, onSeek }: Props) {
 
   return (
     <div className="space-y-6 p-4">
-      {reel && <HighlightReel url={reel.url} durationS={reel.durationS} clips={reel.clips} />}
+      {reel && (
+        <ReelButton
+          url={reel.url}
+          title={`Session in ${Math.round(reel.durationS)} seconds`}
+          subtitle={`${reel.clips} AI-picked highlights, stitched by Cloudinary`}
+        />
+      )}
 
       {pack.summary.length > 0 && (
         <section>
@@ -47,12 +53,13 @@ export function StudyPanel({ pack, publicId, onSeek }: Props) {
         </section>
       )}
 
-      {pack.quiz.length > 0 && <Quiz quiz={pack.quiz} onSeek={onSeek} />}
+      {pack.quiz.length > 0 && <Quiz quiz={pack.quiz} publicId={publicId} onSeek={onSeek} />}
     </div>
   );
 }
 
-function HighlightReel({ url, durationS, clips }: { url: string; durationS: number; clips: number }) {
+// A Cloudinary-stitched reel behind a play button; the video loads only when asked for.
+function ReelButton({ url, title, subtitle }: { url: string; title: string; subtitle: string }) {
   const [playing, setPlaying] = useState(false);
   if (playing) return <video src={url} className="aspect-video w-full rounded-xl bg-black" controls autoPlay playsInline />;
   return (
@@ -63,17 +70,30 @@ function HighlightReel({ url, durationS, clips }: { url: string; durationS: numb
     >
       <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-accent-fg">▶</span>
       <span>
-        <span className="block font-semibold">Session in {Math.round(durationS)} seconds</span>
-        <span className="text-xs text-muted">{clips} AI-picked highlights, stitched by Cloudinary</span>
+        <span className="block font-semibold">{title}</span>
+        <span className="text-xs text-muted">{subtitle}</span>
       </span>
     </button>
   );
 }
 
-function Quiz({ quiz, onSeek }: { quiz: StudyPack["quiz"]; onSeek: (seconds: number) => void }) {
+function Quiz({ quiz, publicId, onSeek }: { quiz: StudyPack["quiz"]; publicId: string; onSeek: (seconds: number) => void }) {
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  // Bumped on every retry so the "missed" reel remounts closed instead of replaying the old one.
+  const [round, setRound] = useState(0);
   const answered = Object.keys(answers).length;
   const correct = quiz.filter((q, i) => answers[i] === q.correctIndex).length;
+  const missed = quiz.map((q, i) => ({ q, i })).filter(({ q, i }) => answers[i] !== undefined && answers[i] !== q.correctIndex);
+  const finished = answered === quiz.length;
+  // Every explanation you got wrong, stitched by Cloudinary into one video (fl_splice), in quiz order.
+  const missedReel = finished
+    ? reelUrl(missed.map(({ q, i }) => ({ publicId, startS: q.startS, endS: q.endS, label: `Question ${i + 1}` })))
+    : null;
+
+  function retry(onlyMissed: boolean) {
+    setAnswers((a) => (onlyMissed ? Object.fromEntries(Object.entries(a).filter(([i, j]) => quiz[Number(i)]!.correctIndex === j)) : {}));
+    setRound((r) => r + 1);
+  }
 
   return (
     <section>
@@ -137,6 +157,37 @@ function Quiz({ quiz, onSeek }: { quiz: StudyPack["quiz"]; onSeek: (seconds: num
           );
         })}
       </ol>
+      {finished && (
+        <div key={round} className="rise mt-4 rounded-xl border border-accent/40 bg-accent/5 p-4" aria-live="polite">
+          <p className="tabular text-2xl font-semibold">
+            {correct}/{quiz.length}
+          </p>
+          <p className="text-sm text-muted">
+            {correct === quiz.length
+              ? "All correct. You've got this session."
+              : `${missed.length} to review. The explanations are in the session itself.`}
+          </p>
+          {missedReel && (
+            <div className="mt-3">
+              <ReelButton
+                url={missedReel.url}
+                title={missedReel.clips > 1 ? "Watch what you missed" : "Watch the explanation you missed"}
+                subtitle={`${missedReel.clips} explanation${missedReel.clips === 1 ? "" : "s"}, ${Math.round(missedReel.durationS)} s, stitched by Cloudinary`}
+              />
+            </div>
+          )}
+          <div className="mt-3 flex flex-wrap gap-2 text-sm">
+            {missed.length > 0 && (
+              <button type="button" onClick={() => retry(true)} className="rounded-lg bg-accent px-3 py-1.5 font-medium text-accent-fg">
+                Retry the {missed.length} I missed
+              </button>
+            )}
+            <button type="button" onClick={() => retry(false)} className="rounded-lg border border-border px-3 py-1.5 hover:border-accent">
+              Start over
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
