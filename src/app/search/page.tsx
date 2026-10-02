@@ -32,8 +32,8 @@ export default async function SearchPage({ searchParams }: Props) {
           <p className="mt-3 text-muted">Nothing said matches “{q}” — try different words.</p>
         ) : (
           <ul className="mt-3 space-y-3">
-            {hits.map((hit) => (
-              <li key={hit.segmentId}>
+            {hits.map((hit, i) => (
+              <li key={hit.segmentId} className="rise" style={{ animationDelay: `${Math.min(i, 10) * 40}ms` }}>
                 <ResultCard hit={hit}>
                   <div className="mt-2">
                     <MomentButton

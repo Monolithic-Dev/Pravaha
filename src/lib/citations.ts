@@ -2,7 +2,26 @@
 // actually retrieved and handed to the model. Anything else is deleted before the learner sees it,
 // and an answer left with no valid citation is not shown at all.
 
-export type RawAnswer = { answer: string; cited_segment_ids: number[] };
+export type RawAnswer = { answer: string; cited_segment_ids: number[]; follow_ups?: string[] };
+
+const FOLLOW_UP_MAX = 3;
+const FOLLOW_UP_MAX_CHARS = 120;
+
+// Follow-up suggestions are model text shown as links: trimmed, length-capped, de-duplicated (also against
+// the learner's own question), and at most three. They only steer the next search; they are never cited.
+export function cleanFollowUps(raw: string[] | undefined, question: string): string[] {
+  const key = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  const seen = new Set([key(question)]);
+  const out: string[] = [];
+  for (const candidate of raw ?? []) {
+    const q = candidate.replace(/\s+/g, " ").trim();
+    if (!q || q.length > FOLLOW_UP_MAX_CHARS || seen.has(key(q))) continue;
+    seen.add(key(q));
+    out.push(q);
+    if (out.length === FOLLOW_UP_MAX) break;
+  }
+  return out;
+}
 
 export type Validated<T> =
   | { status: "answered"; answer: string; citations: (T & { n: number })[]; dropped: number }

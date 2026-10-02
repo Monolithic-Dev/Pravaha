@@ -61,6 +61,15 @@ Skeletons, never bare spinners. 404 session → "This session isn't available." 
 
 ### Search → Answer card
 - **Watch the answer**: when an answer cites 2+ moments, one stitched Answer Reel, each clip labelled with its speaker
+- **Live progress** (streamed from `/api/ask`): "Found N moments in M sessions" with the session names, then "Writing an answer only from those moments…". Every line is a real server step, never a fake timer
+- The validated answer appears word by word; citation chips preview the quote, speaker and time on hover or focus, and click to the clip card
+- **Ask next**: up to 3 follow-up questions, each a new Ask
+
+### Motion & shell (v3)
+- `rise` (staggered entrance), `word-in` (answer reveal), `lift` (hover), `spinner`; all disabled under `prefers-reduced-motion`
+- Sticky blurred header with the Pravaha mark (also the favicon, `app/icon.svg`), Library and Studio links, a skip link, and a footer
+- Home: "How it works" in three steps under the Ask bar
+- `/` or Ctrl/⌘K focuses the Ask bar from anywhere
 
 ### Studio
 - **Sessions | Insights** tabs

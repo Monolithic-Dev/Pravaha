@@ -83,6 +83,51 @@ body {
   animation: pulse-ring 0.9s ease-out 2;
 }
 
+/* Entrance: content rises into place. Stagger with an inline animation-delay. */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.rise {
+  animation: rise 0.42s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* The answer arrives word by word (presentation only — the text is validated before it is sent). */
+@keyframes word-in {
+  from { opacity: 0; filter: blur(3px); }
+  to { opacity: 1; filter: none; }
+}
+
+.word-in {
+  animation: word-in 0.32s ease-out both;
+}
+
+/* Cards and chips lift slightly under the pointer. */
+.lift {
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+@media (hover: hover) {
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--fg) 25%, transparent);
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  border: 2px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-top-color: var(--accent);
+  border-radius: 9999px;
+  animation: spin 0.7s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .skeleton, .pulse { animation: none; }
+  .skeleton, .pulse, .rise, .word-in, .spinner { animation: none; }
+  .lift, .lift:hover { transition: none; transform: none; }
 }

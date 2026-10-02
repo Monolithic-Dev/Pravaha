@@ -15,10 +15,10 @@ export function LibraryGrid({ lectures }: { lectures: Lecture[] }) {
   }
   return (
     <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {lectures.map((l) => (
-        <li key={l.id}>
+      {lectures.map((l, i) => (
+        <li key={l.id} className="rise" style={{ animationDelay: `${Math.min(i, 8) * 60}ms` }}>
           <Link href={`/watch/${l.id}`} className="group block">
-            <div className="relative overflow-hidden rounded-2xl bg-border">
+            <div className="lift relative overflow-hidden rounded-2xl bg-border">
               <Image
                 src={thumbUrl(l.publicId, posterTime(l.durationS))}
                 alt=""

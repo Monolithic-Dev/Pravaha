@@ -15,9 +15,14 @@ export function SearchBar({ defaultValue = "", autoFocus = false }: { defaultVal
         maxLength={300}
         required
         placeholder="Ask anything from the library…"
-        className="h-14 w-full rounded-2xl border border-border bg-surface pr-28 pl-5 text-base shadow-sm placeholder:text-muted"
+        className="h-14 w-full rounded-2xl border border-border bg-surface pr-36 pl-5 text-base shadow-sm transition-shadow placeholder:text-muted focus:border-accent focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--accent)_15%,transparent)] focus:outline-none sm:pr-40"
       />
-      <button className="absolute top-2 right-2 h-10 rounded-xl bg-accent px-5 font-medium text-accent-fg">Ask</button>
+      <kbd aria-hidden className="pointer-events-none absolute top-1/2 right-24 hidden -translate-y-1/2 rounded-md border border-border bg-bg px-1.5 py-0.5 font-sans text-xs text-muted sm:block">
+        /
+      </kbd>
+      <button className="absolute top-2 right-2 h-10 rounded-xl bg-accent px-5 font-medium text-accent-fg transition-transform hover:brightness-110 active:scale-95">
+        Ask
+      </button>
     </form>
   );
 }
