@@ -27,6 +27,10 @@ export function Player({ publicId, startAt, searchable, onTime, videoRef }: Prop
         videoRef={ref}
         // HLS: adaptive bitrate — quality drops on a weak connection instead of stalling.
         sourceTypes={["hls"]}
+        // A named profile, not sp_auto: next-cloudinary always adds q_auto, and Cloudinary rejects
+        // sp_auto combined with a quality ("sp_auto transformation is not allowed"). full_hd is still an
+        // adaptive ladder (1080p down to low renditions), and q_auto/sp_full_hd is accepted.
+        transformation={{ streaming_profile: "full_hd" }}
         colors={{ accent: "#2dd4bf", base: "#0e1112", text: "#ecedea" }}
         seekThumbnails
         // Chapters and subtitles come from Cloudinary's auto_chaptering / auto_transcription outputs.
