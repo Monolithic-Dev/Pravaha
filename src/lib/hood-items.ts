@@ -64,7 +64,7 @@ export function sessionHoodItems(session: Session, moments: Moment[], highlights
   if (sample) {
     items.push({
       title: "A Moment (vertical short)",
-      what: `What "Share this moment" makes at ${formatTime(sample.startS)}: trimmed, cropped to 9:16 following the speaker, with word-timed captions burned in.`,
+      what: `What "Share this moment" makes at ${formatTime(sample.startS)}: trimmed, cropped to 9:16 following the speaker, with word-timed captions burned in. The first open can take a few seconds while Cloudinary analyses the video.`,
       url: momentUrl(publicId, sample.startS, sample.endS, { durationS, words: sample.words }),
     });
   }

@@ -109,3 +109,19 @@ export function explainUrl(url: string): ExplainedUrl | null {
       .replace(/^v\d+\//, ""),
   };
 }
+
+export type ParamSummary = Param & { meaning: string; count: number };
+
+// One line per kind of parameter: a Moment repeats a caption layer (text, style, timing) for every card and a
+// reel repeats its trim per clip, so lines that differ only in numbers or layer text are counted, not repeated.
+export function summarizeParams(explained: ExplainedUrl): ParamSummary[] {
+  const groups = new Map<string, ParamSummary>();
+  for (const p of explained.steps.flatMap((s) => s.params)) {
+    if (!p.meaning) continue;
+    const kind = p.meaning.replace(/“[^”]*”/g, "“”").replace(/#?[\d.]+/g, "#");
+    const group = groups.get(kind);
+    if (group) group.count++;
+    else groups.set(kind, { raw: p.raw, meaning: p.meaning, count: 1 });
+  }
+  return [...groups.values()];
+}

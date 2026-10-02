@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { explainUrl } from "@/lib/explain-url";
+import { explainUrl, summarizeParams } from "@/lib/explain-url";
 import type { HoodItem } from "@/lib/hood-items";
 
 // Step colours cycle (theme tokens, so they follow the light/dark toggle) to keep each URL component apart.
@@ -41,12 +41,13 @@ export function UnderTheHood({ items, title = "Cloudinary under the hood" }: { i
 
 function HoodRow({ item }: { item: HoodItem }) {
   const [copied, setCopied] = useState(false);
+  const [full, setFull] = useState(false);
   const explained = explainUrl(item.url);
-  // One line per parameter, each said once (a Moment repeats its caption style for every card).
-  const seen = new Set<string>();
-  const params = (explained?.steps ?? [])
-    .flatMap((s) => s.params)
-    .filter((p) => p.meaning && !seen.has(p.meaning) && seen.add(p.meaning));
+  const params = explained ? summarizeParams(explained) : [];
+  // Long URLs (a Moment has a layer per caption card) show their first and last steps until expanded.
+  const steps = explained?.steps ?? [];
+  const hidden = full || steps.length <= MAX_STEPS ? 0 : steps.length - (HEAD_STEPS + TAIL_STEPS);
+  const shown = hidden ? [...steps.slice(0, HEAD_STEPS), null, ...steps.slice(-TAIL_STEPS)] : steps;
 
   async function copy() {
     await navigator.clipboard?.writeText(item.url).then(
@@ -81,12 +82,23 @@ function HoodRow({ item }: { item: HoodItem }) {
       </div>
       <p className="mt-2 font-mono text-xs leading-relaxed break-all">
         <span className="text-muted">…/{explained?.resource ?? "video"}/upload/</span>
-        {explained?.steps.map((step, i) => (
-          <span key={i}>
-            <span className={STEP_COLORS[i % STEP_COLORS.length]}>{shorten(step.raw)}</span>
-            <span className="text-muted">/</span>
-          </span>
-        ))}
+        {shown.map((step, i) =>
+          step ? (
+            <span key={i}>
+              <span className={STEP_COLORS[i % STEP_COLORS.length]}>{shorten(step.raw)}</span>
+              <span className="text-muted">/</span>
+            </span>
+          ) : (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setFull(true)}
+              className="mx-0.5 rounded bg-bg px-1.5 text-muted hover:text-fg"
+            >
+              … {hidden} more steps (show all) …
+            </button>
+          ),
+        )}
         <span className="text-muted">{explained?.asset ?? item.url}</span>
       </p>
       {params.length > 0 && (
@@ -94,7 +106,10 @@ function HoodRow({ item }: { item: HoodItem }) {
           {params.map((p) => (
             <div key={p.raw} className="contents">
               <dt className="font-mono text-muted">{shorten(p.raw, 28)}</dt>
-              <dd>{p.meaning}</dd>
+              <dd>
+                {p.meaning}
+                {p.count > 1 && <span className="text-muted"> · and {p.count - 1} more like it</span>}
+              </dd>
             </div>
           ))}
         </dl>
@@ -102,6 +117,10 @@ function HoodRow({ item }: { item: HoodItem }) {
     </li>
   );
 }
+
+const MAX_STEPS = 8;
+const HEAD_STEPS = 4;
+const TAIL_STEPS = 2;
 
 // Text layers carry URL-encoded captions; keep the display readable.
 function shorten(text: string, max = 60) {

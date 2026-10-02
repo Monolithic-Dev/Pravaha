@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { explainUrl } from "@/lib/explain-url";
+import { explainUrl, summarizeParams } from "@/lib/explain-url";
 import { momentUrl, playerUrls, reelUrl, thumbUrl } from "@/lib/media";
 
 const ID = "pravaha/3f2b8c1e-0d4a-4c55-9b7e-1a2b3c4d5e6f";
@@ -44,5 +44,20 @@ describe("explainUrl", () => {
 
   it("returns null for anything that isn't a Cloudinary delivery URL", () => {
     expect(explainUrl("https://example.com/video/upload/x.mp4")).toBeNull();
+  });
+});
+
+describe("summarizeParams", () => {
+  it("counts a Moment's repeated caption layers instead of listing each one", () => {
+    const words = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"].map((w, i) => ({
+      w,
+      s: 10 + i * 0.5,
+      e: 10.4 + i * 0.5,
+    }));
+    const summary = summarizeParams(explainUrl(momentUrl(ID, 10, 14, { cloud: "demo", words }))!);
+    const textLayers = summary.find((p) => p.meaning.startsWith("text layer"))!;
+    expect(textLayers.count).toBe(3);
+    expect(summary.filter((p) => p.meaning.startsWith("text layer"))).toHaveLength(1);
+    expect(summary.length).toBeLessThan(20);
   });
 });
