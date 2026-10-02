@@ -14,6 +14,9 @@ export const dynamic = "force-dynamic";
 // Each list in full, not the top 10 the Studio shows; still bounded.
 const EXPORT_ROWS = 1000;
 
+// India time, like the daily report ("en-CA" formats as YYYY-MM-DD).
+const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+
 // One Insights report as a CSV download. Same access as GET /api/insights: organizers get everything; with
 // the demo Studio on, visitors get the same filtered aggregates.
 export async function GET(request: NextRequest) {
@@ -31,7 +34,7 @@ export async function GET(request: NextRequest) {
   return new NextResponse(csv, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="pravaha-${report}-${new Date().toISOString().slice(0, 10)}.csv"`,
+      "Content-Disposition": `attachment; filename="pravaha-${report}-${today()}.csv"`,
       "Cache-Control": "private, no-store",
     },
   });

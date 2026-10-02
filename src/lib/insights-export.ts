@@ -8,7 +8,7 @@ export const INSIGHT_REPORTS = ["gaps", "questions", "moments", "daily", "sessio
 export type InsightReport = (typeof INSIGHT_REPORTS)[number];
 
 export function insightsCsv(report: InsightReport, insights: Insights, origin: string): string {
-  const watch = (lectureId: string, startS = 0) => `${origin}/watch/${lectureId}${startS ? `?t=${Math.floor(startS)}` : ""}`;
+  const watch = (lectureId: string, startS = 0) => `${origin}/watch/${lectureId}${startS >= 1 ? `?t=${Math.floor(startS)}` : ""}`;
   switch (report) {
     case "gaps":
       return toCsv(
