@@ -328,6 +328,7 @@ paths:
                 type: object
                 properties:
                   results: { type: array, items: { $ref: '#/components/schemas/SearchResult' } }
+                  exact: { type: boolean, description: "false: no moment had every word, so results are the closest matches (any of the words)" }
         '400': { description: Invalid query }
   /ask:
     post:

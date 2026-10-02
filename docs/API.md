@@ -53,7 +53,8 @@ JSON in, JSON out. Errors: `{ "error": { "code": string, "message": string } }`.
 ### `GET /api/search?q=&lectureId=`
 - **Auth:** public. Searches `ready` + `public` sessions; with `lectureId`, that one session (unlisted allowed — you have the link)
 - **Validation:** `q` 2–200 chars
-- **Response:** `{ "results": [{ segmentId, lectureId, publicId, title, speaker, startS, endS, text, chapterTitle, snippet: [{ text, hit }] }] }` — `ts_headline` marks matches with sentinel characters that are split into plain-text parts (`src/lib/highlight.ts`), so transcript text is never rendered as HTML
+- **Matching:** every word, web-search style (`"phrases"`, `-exclusions`, `OR`). If nothing matches every word and no search syntax was used, the closest moments (any of the words, best-ranked, up to 10) are returned with `exact: false`, so a full question still finds the relevant moments
+- **Response:** `{ "exact": boolean, "results": [{ segmentId, lectureId, publicId, title, speaker, startS, endS, text, chapterTitle, snippet: [{ text, hit }] }] }` — `ts_headline` marks matches with sentinel characters that are split into plain-text parts (`src/lib/highlight.ts`), so transcript text is never rendered as HTML
 - **Errors:** `400`
 
 ### `POST /api/ask`

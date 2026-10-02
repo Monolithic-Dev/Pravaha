@@ -16,7 +16,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function SearchPage({ searchParams }: Props) {
   const q = ((await searchParams).q ?? "").trim().slice(0, 300);
-  const hits = q.length >= 2 ? await findSegments(q) : [];
+  const { hits, exact } = q.length >= 2 ? await findSegments(q) : { hits: [], exact: true };
 
   return (
     <div className="mt-4">
@@ -32,38 +32,41 @@ export default async function SearchPage({ searchParams }: Props) {
         ) : hits.length === 0 ? (
           <p className="mt-3 text-muted">Nothing said matches “{q}” — try different words.</p>
         ) : (
-          <ul className="mt-3 space-y-3">
-            {hits.map((hit, i) => (
-              <li key={hit.segmentId} className="rise" style={{ animationDelay: `${Math.min(i, 10) * 40}ms` }}>
-                <ResultCard hit={hit}>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <MomentButton
-                      lectureId={hit.lectureId}
-                      publicId={hit.publicId}
-                      title={hit.title}
-                      startS={hit.startS}
-                      endS={hit.endS}
-                      durationS={hit.durationS}
-                      words={hit.words}
-                      segmentId={hit.segmentId}
-                    />
-                    <SaveButton
-                      moment={{
-                        segmentId: hit.segmentId,
-                        lectureId: hit.lectureId,
-                        publicId: hit.publicId,
-                        title: hit.title,
-                        speaker: hit.speaker,
-                        startS: hit.startS,
-                        endS: hit.endS,
-                        text: hit.text,
-                      }}
-                    />
-                  </div>
-                </ResultCard>
-              </li>
-            ))}
-          </ul>
+          <>
+            {!exact && <p className="mt-3 text-sm text-muted">No single moment has every word, so these are the closest.</p>}
+            <ul className="mt-3 space-y-3">
+              {hits.map((hit, i) => (
+                <li key={hit.segmentId} className="rise" style={{ animationDelay: `${Math.min(i, 10) * 40}ms` }}>
+                  <ResultCard hit={hit}>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <MomentButton
+                        lectureId={hit.lectureId}
+                        publicId={hit.publicId}
+                        title={hit.title}
+                        startS={hit.startS}
+                        endS={hit.endS}
+                        durationS={hit.durationS}
+                        words={hit.words}
+                        segmentId={hit.segmentId}
+                      />
+                      <SaveButton
+                        moment={{
+                          segmentId: hit.segmentId,
+                          lectureId: hit.lectureId,
+                          publicId: hit.publicId,
+                          title: hit.title,
+                          speaker: hit.speaker,
+                          startS: hit.startS,
+                          endS: hit.endS,
+                          text: hit.text,
+                        }}
+                      />
+                    </div>
+                  </ResultCard>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </section>
     </div>

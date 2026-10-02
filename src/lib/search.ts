@@ -71,14 +71,27 @@ async function run(tsquery: string, q: string, lectureId: string | null, limit: 
   return rows.map(toHit);
 }
 
+// "quoted phrase", -exclusion or OR: the learner is using search syntax, so take the query literally.
+export const usesSearchSyntax = (q: string) => /"|(^|\s)-\S|\bor\b/i.test(q);
+
+const ANY_TERM = `to_tsquery('english', replace(plainto_tsquery('english', $1)::text, '&', '|'))`;
+
 // Find: what the learner typed, as a web-style query ("quoted phrases", -exclusions, AND by default).
-export function findSegments(q: string, { lectureId = null as string | null, limit = 20 } = {}) {
-  return run(`websearch_to_tsquery('english', $1)`, q, lectureId, limit);
+// A full question rarely has every word in one sentence, so when nothing matches all of them (and no
+// search syntax was used) Find shows the closest moments: any of the words, best-ranked first.
+// `exact` says which one the learner is looking at.
+export async function findSegments(
+  q: string,
+  { lectureId = null as string | null, limit = 20 } = {},
+): Promise<{ hits: Hit[]; exact: boolean }> {
+  const hits = await run(`websearch_to_tsquery('english', $1)`, q, lectureId, limit);
+  if (hits.length > 0 || usesSearchSyntax(q)) return { hits, exact: true };
+  return { hits: await run(ANY_TERM, q, lectureId, Math.min(limit, 10)), exact: false };
 }
 
 // Ask retrieval: questions rarely contain every term verbatim, so OR the stemmed, stop-word-free terms.
 export function retrieveForQuestion(q: string, { lectureId = null as string | null, limit = 12 } = {}) {
-  return run(`to_tsquery('english', replace(plainto_tsquery('english', $1)::text, '&', '|'))`, q, lectureId, limit);
+  return run(ANY_TERM, q, lectureId, limit);
 }
 
 // Ask within one session when no keyword matches: questions like "What is this video about?" share no terms
@@ -99,4 +112,3 @@ export async function sessionOverview(lectureId: string, limit = 12): Promise<Hi
   );
   return rows.map(toHit);
 }
-
