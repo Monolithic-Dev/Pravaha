@@ -24,3 +24,16 @@ export function parseChaptersVtt(vtt: string): Chapter[] {
   }
   return chapters.sort((a, b) => a.startS - b.startS);
 }
+
+// The chapter list for the Watch page, rebuilt from indexed segments (each carries its chapter title):
+// consecutive segments with the same title form one chapter, which runs until the next one starts.
+export function chaptersFromSegments(segments: { startS: number; endS: number; chapterTitle: string | null }[]): Chapter[] {
+  const chapters: Chapter[] = [];
+  for (const s of segments) {
+    if (!s.chapterTitle) continue;
+    const last = chapters.at(-1);
+    if (last && last.title === s.chapterTitle) last.endS = s.endS;
+    else chapters.push({ startS: s.startS, endS: s.endS, title: s.chapterTitle });
+  }
+  return chapters;
+}
