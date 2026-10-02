@@ -46,6 +46,30 @@ const CLOUDINARY = [
   ["f_auto, q_auto", "Right format and size per device"],
 ];
 
+// What an institute's IT and legal reviewers ask first. Each point is true of the code (docs/SECURITY.md).
+const TRUST = [
+  {
+    title: "Grounded, or it says so",
+    body: "Answers come only from your recordings. The server rejects any citation the model wasn't given, and Pravaha refuses rather than guess.",
+    icon: "M9 12l2 2 4-4m5 2a8 8 0 11-16 0 8 8 0 0116 0z",
+  },
+  {
+    title: "No learner accounts",
+    body: "Students never sign up. Questions are stored without identity; saved moments and history stay on their own device.",
+    icon: "M12 11a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 0114 0",
+  },
+  {
+    title: "Your recordings stay yours",
+    body: "Organizers confirm rights before upload, sessions start unlisted, and nothing is public until you publish it.",
+    icon: "M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z",
+  },
+  {
+    title: "Secure by default",
+    body: "Signed uploads only, verified webhooks, rate limits, security headers, and IPs kept only as salted hashes for a day.",
+    icon: "M7 11V8a5 5 0 0110 0v3M6 11h12v9H6z",
+  },
+];
+
 const PLANS = [
   {
     name: "Club",
@@ -177,6 +201,35 @@ export function Landing() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section aria-labelledby="trust-heading">
+        <Heading
+          id="trust-heading"
+          eyebrow="Trust"
+          title="Built to pass an institute's review"
+          lead="What IT and legal teams ask before a pilot, answered in the product rather than in a sales call."
+        />
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {TRUST.map((t) => (
+            <li key={t.title} className="lift rounded-2xl border border-border bg-surface p-5">
+              <span className="grid size-10 place-items-center rounded-xl bg-accent/10 text-accent">
+                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d={t.icon} />
+                </svg>
+              </span>
+              <h3 className="mt-4 font-semibold">{t.title}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted">{t.body}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 text-sm text-muted">
+          Details: <Link href="/privacy" className="text-accent hover:underline">Privacy</Link> ·{" "}
+          <Link href="/terms" className="text-accent hover:underline">Terms</Link> ·{" "}
+          <a href="https://github.com/Monolithic-Dev/Pravaha/blob/main/docs/SECURITY.md" className="text-accent hover:underline">
+            Security model
+          </a>
+        </p>
       </section>
 
       <section aria-labelledby="pricing-heading">
