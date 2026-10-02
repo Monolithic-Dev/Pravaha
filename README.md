@@ -10,11 +10,16 @@ Turn hours of recorded lectures and talks into a library you can search, questio
 
 [![Live demo](https://img.shields.io/badge/live-pravaha--cyan.vercel.app-0f766e?style=for-the-badge&logo=vercel&logoColor=white)](https://pravaha-cyan.vercel.app)
 
-[![CI](https://github.com/Monolithic-Dev/Pravaha/actions/workflows/ci.yml/badge.svg)](https://github.com/Monolithic-Dev/Pravaha/actions/workflows/ci.yml)
-[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
-![Cloudinary](https://img.shields.io/badge/media-Cloudinary-3448c5?logo=cloudinary&logoColor=white)
+[![CI](https://img.shields.io/github/actions/workflow/status/Monolithic-Dev/Pravaha/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/Monolithic-Dev/Pravaha/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-D22128?style=for-the-badge&logo=apache&logoColor=white)](LICENSE)
+
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-media_%26_AI-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](#how-cloudinary-powers-it)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![React 19](https://img.shields.io/badge/React-19-149ECA?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
+[![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](tsconfig.json)
+[![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Google Gemini](https://img.shields.io/badge/Google_Gemini-answers-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)](docs/AI_EVALUATION.md)
+[![Neon Postgres](https://img.shields.io/badge/Neon-Postgres-00E599?style=for-the-badge&logo=postgresql&logoColor=white)](docs/DATABASE.md)
 
 [**Live app**](https://pravaha-cyan.vercel.app) · [How to test](#how-to-test-it) · [Cloudinary usage](#how-cloudinary-powers-it) · [Run locally](#quick-start) · [Docs](#documentation)
 
@@ -70,6 +75,8 @@ Colleges, clubs and coaching institutes record hundreds of hours of lectures and
 > *ChatGPT gives you text. Pravaha gives you the moment your professor said it.*
 
 ## Screenshots
+
+Shown in dark mode; the light theme is one tap away in the header and follows the system setting by default.
 
 | Home | Watch: follow-along transcript, chapters, Ask this session |
 |---|---|
