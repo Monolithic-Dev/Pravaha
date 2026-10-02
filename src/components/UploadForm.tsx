@@ -6,6 +6,8 @@ import { useState } from "react";
 type Created = { lectureId: string; publicId: string; uploadPreset: string; title: string };
 
 const FORMATS = ["mp4", "mov", "webm", "mkv", "m4v"];
+// Cloudinary's free plan rejects videos over 100 MB; checking in the widget gives a clear error up front.
+const MAX_UPLOAD_BYTES = 100_000_000;
 
 export function UploadForm({ onUploaded }: { onUploaded: () => void }) {
   const [title, setTitle] = useState("");
@@ -47,7 +49,8 @@ export function UploadForm({ onUploaded }: { onUploaded: () => void }) {
         <p className="text-sm text-muted">Step 2 of 2</p>
         <h2 className="mt-1 text-lg font-semibold">Upload “{created.title}”</h2>
         <p className="mt-1 text-sm text-muted">
-          The video goes straight to Cloudinary. Transcription and chapters start automatically.
+          The video goes straight to Cloudinary. Transcription and chapters start automatically. Up to 100 MB:
+          export phone recordings at 720p.
         </p>
         <CldUploadWidget
           signatureEndpoint="/api/upload-signature"
@@ -59,13 +62,13 @@ export function UploadForm({ onUploaded }: { onUploaded: () => void }) {
             maxFiles: 1,
             sources: ["local", "url"],
             clientAllowedFormats: FORMATS,
-            maxFileSize: 500_000_000,
+            maxFileSize: MAX_UPLOAD_BYTES,
           }}
           onSuccess={() => {
             onUploaded();
             reset();
           }}
-          onError={() => setError("Upload failed — try again.")}
+          onError={() => setError("Upload failed. Check the file is a video under 100 MB, then try again.")}
         >
           {({ open }) => (
             <div className="mt-5 flex flex-wrap gap-3">
