@@ -34,7 +34,7 @@ export function EmbedCode({ lectureId, title }: { lectureId?: string; title: str
         id={`embed-${lectureId ?? "library"}`}
         readOnly
         value={html}
-        rows={3}
+        rows={4}
         onFocus={(e) => e.currentTarget.select()}
         className="mt-3 w-full resize-none rounded-lg border border-border bg-surface p-3 font-mono text-xs break-all text-fg"
       />
