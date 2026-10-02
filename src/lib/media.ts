@@ -162,3 +162,22 @@ export function reelUrl(clips: ReelClip[], cloud = CLOUD): { url: string; durati
     clips: windows.length,
   };
 }
+
+// What the Cloudinary Video Player requests for a session, as plain URLs, for "Cloudinary under the hood".
+// They mirror the player's own requests (src/components/Player.tsx); the player builds the real ones.
+export const STREAMING_PROFILE = "hd_lean";
+
+export function playerUrls(publicId: string, cloud = CLOUD) {
+  const raw = `https://res.cloudinary.com/${cloud}/raw/upload/${publicId}`;
+  return {
+    // Adaptive HLS: a master playlist over the profile's 720p / 360p / 180p renditions.
+    stream: `${base(cloud)}/q_auto/sp_${STREAMING_PROFILE}/${publicId}.m3u8`,
+    // Seek-bar thumbnails: one sprite of frames plus a VTT that maps time to tile.
+    seekSprite: `${base(cloud)}/q_auto/sp_${STREAMING_PROFILE}/fl_sprite/${publicId}.vtt`,
+    // The AI highlights graph above the seek bar.
+    highlights: `${base(cloud)}/e_preview,fl_getinfo/${publicId}`,
+    // Written by auto_transcription and auto_chaptering at upload.
+    transcript: `${raw}.transcript`,
+    chapters: `${raw}-chapters.vtt`,
+  };
+}

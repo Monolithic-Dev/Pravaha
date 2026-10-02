@@ -94,11 +94,13 @@ Cloudinary isn't just storage here; the product depends on it.
 | Upload Widget + signed upload preset | Browser-to-Cloudinary video upload with real progress, no server proxy |
 | `auto_transcription` | Word-timed transcript: the corpus for Find and Ask, plus subtitles |
 | `auto_chaptering` | AI chapters on the player's seek bar |
-| Cloudinary Video Player, HLS `sp_full_hd` | Adaptive streaming that survives slow mobile data |
+| Cloudinary Video Player, HLS `sp_hd_lean` | Adaptive streaming (720p / 360p / 180p) that survives slow mobile data |
+| `e_preview,fl_getinfo`, `fl_sprite` | The player's AI highlights graph and seek-bar previews |
 | `so_`/`eo_` + `c_fill,ar_9:16,g_auto` + timed `l_text` captions + `f_auto,q_auto` | **Moments**: trimmed, subject-tracked, subtitled vertical clips |
 | `g_auto` thumbnails and poster frames | Content-aware library cards, results and social preview cards |
 | `l_video:…,fl_splice` + timed `l_text` labels | **Answer Reels** and **Session in 60 seconds**: moments from one or more sessions stitched into one video |
 | Webhooks (`notification_url`, signature-verified) | Upload → transcribed → `ready` with no polling |
+| Incoming transformation `eo_60` on a second signed preset | **Try it** uploads: Cloudinary keeps only the first 60 seconds, so a public upload can't cost more |
 
 **What we built on top:**
 - turning transcripts into time-coded segments and indexing them
@@ -106,6 +108,8 @@ Cloudinary isn't just storage here; the product depends on it.
 - grounded Ask, with citations checked on the server and refusal when the library doesn't cover a question
 - the Moment and Reel URL composers
 - the learner and organizer experience
+
+Every session page and answer has a **Cloudinary under the hood** panel that lists the real URLs behind it, with each transformation explained in plain words and an Open button.
 
 Full detail: [`docs/CLOUDINARY.md`](docs/CLOUDINARY.md).
 

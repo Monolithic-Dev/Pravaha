@@ -5,11 +5,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { MomentButton } from "@/components/MomentButton";
+import { UnderTheHood } from "@/components/UnderTheHood";
 import { Snippet } from "@/components/ResultCard";
 import { SaveButton } from "@/components/SaveButton";
 import { formatTime } from "@/lib/format";
 import type { SnippetPart } from "@/lib/highlight";
 import type { TimedWord } from "@/lib/segments";
+import { answerHoodItems } from "@/lib/hood-items";
 import { clipUrl, thumbUrl } from "@/lib/media";
 import { recordQuestion } from "@/lib/saved";
 
@@ -207,6 +209,9 @@ export function AnswerBody({
         </ol>
       )}
       {data.followUps && data.followUps.length > 0 && <FollowUps questions={data.followUps} onAsk={onFollowUp} />}
+      {data.citations.length > 0 && (
+        <UnderTheHood title="How Cloudinary built this answer" items={answerHoodItems(data.citations, data.reel)} />
+      )}
     </>
   );
 }

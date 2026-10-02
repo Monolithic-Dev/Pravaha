@@ -6,8 +6,10 @@ import { z } from "zod";
 import Link from "next/link";
 
 import { AskSession } from "@/components/AskSession";
+import { UnderTheHood } from "@/components/UnderTheHood";
 import { WatchView } from "@/components/WatchView";
 import { formatTime } from "@/lib/format";
+import { sessionHoodItems } from "@/lib/hood-items";
 import { getLecture, getSegments } from "@/lib/lectures";
 import { posterTime, SHARE_CARD, shareCardUrl } from "@/lib/media";
 import { getStudyPack } from "@/lib/study-packs";
@@ -85,8 +87,8 @@ export default async function WatchPage({ params, searchParams }: Props) {
           <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-accent/40 bg-accent/5 p-4 text-sm">
             <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-accent-fg">Trial</span>
             <span className="flex-1">
-              Your trial session: only people with this link can open it, and it is deleted in about {trialHoursLeft}{" "}
-              hour{trialHoursLeft === 1 ? "" : "s"}.
+              Your trial session: only people with this link can open it, and it is deleted in about {trialHoursLeft} hour
+              {trialHoursLeft === 1 ? "" : "s"}.
             </span>
             <Link href="/try" className="font-medium text-accent hover:underline">
               Try another video
@@ -106,6 +108,7 @@ export default async function WatchPage({ params, searchParams }: Props) {
             We couldn&apos;t transcribe this session, so it isn&apos;t searchable. The video still plays.
           </p>
         )}
+        {ready && segments.length > 0 && <UnderTheHood items={sessionHoodItems(lecture, segments, pack?.highlights)} />}
       </WatchView>
     </article>
   );
