@@ -6,6 +6,7 @@ import { CldVideoPlayer } from "next-cloudinary";
 import { useRef } from "react";
 
 import type { SubtitleLanguage } from "@/lib/language";
+import { STREAMING_PROFILE } from "@/lib/media";
 
 type Props = {
   publicId: string;
@@ -34,7 +35,7 @@ export function Player({ publicId, startAt, searchable, subtitles = [], onTime, 
         // sp_auto combined with a quality ("sp_auto transformation is not allowed"). hd_lean is still an
         // adaptive ladder (720p, 360p, 180p) and costs about half of full_hd's six renditions in
         // transformation credits; 720p is plenty for lectures and slides (docs/COST.md).
-        transformation={{ streaming_profile: "hd_lean" }}
+        transformation={{ streaming_profile: STREAMING_PROFILE }}
         colors={{ accent: "#2dd4bf", base: "#0e1112", text: "#ecedea" }}
         seekThumbnails
         // Chapters and subtitles come from Cloudinary's auto_chaptering / auto_transcription outputs.
