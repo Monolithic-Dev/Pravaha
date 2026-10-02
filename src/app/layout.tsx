@@ -79,7 +79,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               Pravaha · ask your recordings, watch the answer
             </p>
             <p>
-              Built on <span className="text-fg">Cloudinary</span> · Team Code Blooded ·{" "}
+              <Link href="/privacy" className="underline-offset-4 hover:text-fg hover:underline">
+                Privacy
+              </Link>{" "}
+              ·{" "}
+              <Link href="/terms" className="underline-offset-4 hover:text-fg hover:underline">
+                Terms
+              </Link>{" "}
+              · Built on <span className="text-fg">Cloudinary</span> · Team Code Blooded ·{" "}
               <a href="https://github.com/Monolithic-Dev/Pravaha" className="underline-offset-4 hover:text-fg hover:underline">
                 GitHub
               </a>
