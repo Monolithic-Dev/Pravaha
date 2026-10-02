@@ -11,7 +11,7 @@ import { getLecture } from "@/lib/lectures";
 import { log } from "@/lib/log";
 import { momentUrl, reelUrl } from "@/lib/media";
 import { clientIp, takeAskToken } from "@/lib/rate-limit";
-import { retrieveForQuestion, type Hit } from "@/lib/search";
+import { retrieveForQuestion, sessionOverview, type Hit } from "@/lib/search";
 import { searchableQuestion } from "@/lib/translate";
 
 export const maxDuration = 30;
@@ -47,7 +47,10 @@ async function ask(question: string, lectureId: string | null, progress: (p: Pro
   const trial = lectureId ? Boolean((await getLecture(lectureId))?.trialExpiresAt) : false;
   const logged = (...args: Parameters<typeof logAsk>) => (trial ? Promise.resolve() : logAsk(...args));
   // A question in Hindi (or any non-Latin script) is searched in English; the answer stays in its language.
-  const hits = await retrieveForQuestion(await searchableQuestion(question), { lectureId });
+  const matched = await retrieveForQuestion(await searchableQuestion(question), { lectureId });
+  // In one session, a question with no keyword match ("What is this about?") is answered from moments across
+  // the whole session; the model still refuses if they don't answer it.
+  const hits = matched.length === 0 && lectureId ? await sessionOverview(lectureId) : matched;
   progress({ type: "retrieved", moments: hits.length, sessions: [...new Set(hits.map((h) => h.title))].slice(0, 5) });
 
   if (hits.length === 0) {
