@@ -28,9 +28,10 @@ export function Player({ publicId, startAt, searchable, onTime, videoRef }: Prop
         // HLS: adaptive bitrate — quality drops on a weak connection instead of stalling.
         sourceTypes={["hls"]}
         // A named profile, not sp_auto: next-cloudinary always adds q_auto, and Cloudinary rejects
-        // sp_auto combined with a quality ("sp_auto transformation is not allowed"). full_hd is still an
-        // adaptive ladder (1080p down to low renditions), and q_auto/sp_full_hd is accepted.
-        transformation={{ streaming_profile: "full_hd" }}
+        // sp_auto combined with a quality ("sp_auto transformation is not allowed"). hd_lean is still an
+        // adaptive ladder (720p, 360p, 180p) and costs about half of full_hd's six renditions in
+        // transformation credits; 720p is plenty for lectures and slides (docs/COST.md).
+        transformation={{ streaming_profile: "hd_lean" }}
         colors={{ accent: "#2dd4bf", base: "#0e1112", text: "#ecedea" }}
         seekThumbnails
         // Chapters and subtitles come from Cloudinary's auto_chaptering / auto_transcription outputs.

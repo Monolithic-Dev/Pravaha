@@ -34,7 +34,7 @@ Server modules (`src/lib/cloudinary.ts`, `db.ts`, `ai.ts`, `answer.ts`, `auth.ts
 
 ## Upload Security
 
-Signed uploads only (the upload preset is **signed**, so an unsigned upload with our cloud name is rejected). The server chooses `public_id` and `notification_url`; client-supplied values for those are ignored. The preset restricts to video formats and 500 MB.
+Signed uploads only (the upload preset is **signed**, so an unsigned upload with our cloud name is rejected). The server chooses `public_id` and `notification_url`; client-supplied values for those are ignored. The preset restricts uploads to video formats; the widget caps files at 100 MB, the free plan's limit.
 
 ## Webhook Security
 
