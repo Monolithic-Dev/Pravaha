@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { ContinueWatching } from "@/components/ContinueWatching";
 import { HeroDemo } from "@/components/HeroDemo";
+import { Landing } from "@/components/Landing";
 import { LibraryGrid } from "@/components/LibraryGrid";
 import { SearchBar } from "@/components/SearchBar";
 import { listLectures, suggestedQuestions, type Lecture } from "@/lib/lectures";
@@ -88,6 +89,8 @@ export default async function Home() {
         </h2>
         <LibraryGrid lectures={lectures} />
       </section>
+
+      <Landing />
     </>
   );
 }
