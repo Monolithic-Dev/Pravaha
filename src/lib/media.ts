@@ -176,6 +176,8 @@ export const STREAMING_PROFILE = "hd_lean";
 export function playerUrls(publicId: string, cloud = CLOUD) {
   const raw = `https://res.cloudinary.com/${cloud}/raw/upload/${publicId}`;
   return {
+    // The poster the player shows before playback (its own default transformation, versioned as v1).
+    poster: `${base(cloud)}/c_limit,h_400,w_800/v1/${publicId}.jpg`,
     // Adaptive HLS: a master playlist over the profile's 720p / 360p / 180p renditions.
     stream: `${base(cloud)}/q_auto/sp_${STREAMING_PROFILE}/${publicId}.m3u8`,
     // Seek-bar thumbnails: one sprite of frames plus a VTT that maps time to tile.
