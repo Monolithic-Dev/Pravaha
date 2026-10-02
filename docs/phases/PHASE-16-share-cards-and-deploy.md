@@ -7,7 +7,7 @@
 - 9 env vars on Production + Preview; the 5 secrets are stored as Sensitive. Production has its own `ORGANIZER_PASSCODE` and `SESSION_SECRET` (not the local ones)
 - Preset `pravaha_signed` (signed) → `notification_url = https://pravaha-cyan.vercel.app/api/webhooks/cloudinary`
 - Verified on production: every page 200 and the library loads from Neon; Ask answered across both sessions with 4 citations and a 4-clip Answer Reel (~5 s) and refused an off-topic question; an unsigned webhook and an anonymous upload signature both get `401`; per-deployment preview URLs stay behind Vercel Authentication
-- The project is Git-connected to the fork `Mahakisore7/pixels-to-products-cloudinary-ai-hackathon-2026-code-blooded` (HackIndia's org repo can't install the Vercel app): syncing the fork's `main` deploys production
+- The Vercel project deploys from `Monolithic-Dev/Pravaha` (it was first connected to a personal fork while the team repo was read-only for one member)
 - First deploy was `main` before this branch merged; Moment pages and share cards go live when it merges and the fork is synced
 
 ## Objective

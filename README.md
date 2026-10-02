@@ -1,6 +1,6 @@
 # Pravaha — ask your recordings, watch the answer
 
-Hackathon team repository for Code Blooded - [hackindia-team:pixels-to-products-cloudinary-ai-hackathon-2026:code-blooded]
+Hackathon project by Team Code Blooded - [hackindia-team:pixels-to-products-cloudinary-ai-hackathon-2026:code-blooded]
 
 **Pixels to Products — Cloudinary AI Hackathon 2026 (HackIndia × Cloudinary) · PS-03 · Track 3: Your Media-Savvy Startup · Team Code Blooded**
 
@@ -84,4 +84,4 @@ Next.js 16 (App Router, TypeScript) · Tailwind CSS · `next-cloudinary` + `clou
 
 ## License
 
-MIT, see [`LICENSE`](LICENSE). No credentials are committed anywhere in this repository.
+Apache-2.0, see [`LICENSE`](LICENSE). No credentials are committed anywhere in this repository.

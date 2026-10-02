@@ -1,6 +1,6 @@
 # Git Workflow Rules — Pravaha
 
-**Remote:** `origin` → `https://github.com/HackIndiaXYZ/pixels-to-products-cloudinary-ai-hackathon-2026-code-blooded.git`
+**Remote:** `origin` → `https://github.com/Monolithic-Dev/Pravaha.git` (moved here from the HackIndia-provisioned repo on Oct 2; see Repo Setup Notes)
 **Default branch:** `main` — always deployable (Vercel production deploys from it).
 
 These rules apply to every contributor — human or AI assistant.
@@ -86,5 +86,7 @@ Lowercase, kebab-case, describes the feature — not a person or a date.
 - Never commit secrets — check `git diff --cached` before every commit (`SECURITY.md`).
 
 ## Repo Setup Notes
+
+**Oct 2 — repository moved.** HackIndia's auto-provisioned team repo could only be written by one member (the other's GitHub profile didn't match), and HackIndia's rules allow submitting your own public repo. The project, with its full history and every author's commits, now lives at `Monolithic-Dev/Pravaha`, where all members have write access. The sections below describe the original setup and remain accurate as history.
 
 The local repository was initialised on Oct 1 and based on `origin/main`'s initial commit (`daf3d9d`), so all history is linear on top of what HackIndia created. The remote README's team tag line (`[hackindia-team:pixels-to-products-cloudinary-ai-hackathon-2026:code-blooded]`) is kept in `README.md` — HackIndia uses it to identify the team repo.

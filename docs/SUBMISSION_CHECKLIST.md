@@ -16,7 +16,7 @@ Deadline: **Oct 4, 2026** (confirm the exact time on Day 1). Submit via `https:/
 - [ ] Demo library: 5–8 public sessions
 
 ## Repository
-- [ ] Public repo: `HackIndiaXYZ/pixels-to-products-cloudinary-ai-hackathon-2026-code-blooded`
+- [ ] Public repo: `Monolithic-Dev/Pravaha` (own repo is allowed by HackIndia's FAQ; **currently private: make it public before submitting**)
 - [ ] README explains track, problem, Cloudinary usage, how to test — with live URL, screenshots, demo link
 - [ ] README keeps the HackIndia team tag line
 - [ ] Setup instructions a stranger can follow cold (`SETUP.md`)

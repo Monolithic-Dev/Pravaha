@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Pravaha API
   version: 0.3.0
-  license: { name: MIT, url: 'https://opensource.org/licenses/MIT' }
+  license: { name: Apache-2.0, url: 'https://www.apache.org/licenses/LICENSE-2.0' }
   description: >
     Pravaha's internal API (v3). Prose explanation of auth, validation and
     rate-limiting decisions: docs/API.md. Every endpoint maps to an FR in docs/PRD.md.

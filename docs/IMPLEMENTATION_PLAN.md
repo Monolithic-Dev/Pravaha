@@ -1,7 +1,7 @@
 # Implementation Plan — Pravaha (v2, 3-day build)
 
 **Calendar:** Day 1 Thu Oct 1 · Day 2 Fri Oct 2 · Day 3 Sat Oct 3 · **Sun Oct 4 = submission only, no features.**
-**Repo:** `HackIndiaXYZ/pixels-to-products-cloudinary-ai-hackathon-2026-code-blooded` — frontend and backend in this one Next.js app.
+**Repo:** `Monolithic-Dev/Pravaha` — frontend and backend in this one Next.js app.
 
 ## The Demo Is the Spec
 

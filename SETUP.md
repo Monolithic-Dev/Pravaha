@@ -11,7 +11,7 @@ Every external account Pravaha needs, created from scratch, and exactly where ea
 ## 1. Clone and Install
 
 ```bash
-git clone https://github.com/HackIndiaXYZ/pixels-to-products-cloudinary-ai-hackathon-2026-code-blooded.git pravaha
+git clone https://github.com/Monolithic-Dev/Pravaha.git pravaha
 cd pravaha
 pnpm install
 cp .env.example .env.local
@@ -67,7 +67,7 @@ Webhooks need a public URL. Rather than tunnelling, Pravaha deploys to Vercel on
 Dev scripts (`pnpm db:migrate`, `pnpm spike`, `pnpm e2e:local`) read `.env.local`, then `.env`; variables already set in your shell win.
 
 1. **Database ready:** `pnpm db:migrate` against the Neon database production will use (prints `migrations up to date` when nothing is pending).
-2. **Import:** `vercel.com` → Add New → Project → import `HackIndiaXYZ/pixels-to-products-cloudinary-ai-hackathon-2026-code-blooded`. Framework preset **Next.js**; leave build and install commands at their defaults (pnpm is picked up from `pnpm-lock.yaml` and `packageManager`). Function region (Settings → Functions): the one nearest your Neon region, e.g. Cleveland (`cle1`) for `us-east-2`, Washington, D.C. (`iad1`) for `us-east-1`.
+2. **Import:** `vercel.com` → Add New → Project → import `Monolithic-Dev/Pravaha`. Framework preset **Next.js**; leave build and install commands at their defaults (pnpm is picked up from `pnpm-lock.yaml` and `packageManager`). Function region (Settings → Functions): the one nearest your Neon region, e.g. Cleveland (`cle1`) for `us-east-2`, Washington, D.C. (`iad1`) for `us-east-1`.
 3. **Environment variables** (Production *and* Preview): every key in `.env.example` with production values. Store the secrets (`CLOUDINARY_API_SECRET`, `DATABASE_URL`, `GEMINI_API_KEY`, `ORGANIZER_PASSCODE`, `SESSION_SECRET`) as **Sensitive**. Vercel warns that `NEXT_PUBLIC_CLOUDINARY_API_KEY` will be exposed to the browser; that is intended (it is useless without the server-side secret, `docs/SECURITY.md`). Use a **fresh** `ORGANIZER_PASSCODE` (≥ 24 chars) and `SESSION_SECRET` (`openssl rand -base64 32`), not your local ones. Set `APP_URL` to the production URL Vercel shows for the project, e.g. `https://pravaha.vercel.app`, with no trailing slash. It is read at **build time** for Open Graph URLs, so changing it later needs a redeploy.
 4. **Deploy**, then open the URL: the home page should list the library.
 5. **Point Cloudinary at the live webhook:** `APP_URL=https://<your-project>.vercel.app pnpm spike` (no file argument) sets the `pravaha_signed` preset's `notification_url` to `<APP_URL>/api/webhooks/cloudinary` and prints the preset settings; check the URL in the output.
