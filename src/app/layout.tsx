@@ -58,6 +58,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/studio" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
                 Studio
               </Link>
+              <Link
+                href="/try"
+                className="ml-1 hidden rounded-lg bg-accent px-3 py-1.5 font-medium text-accent-fg hover:brightness-110 sm:inline-block"
+              >
+                Try it
+              </Link>
               <ThemeToggle />
             </div>
           </nav>
