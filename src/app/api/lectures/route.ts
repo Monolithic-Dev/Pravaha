@@ -4,13 +4,14 @@ import { z } from "zod";
 import { isOrganizer } from "@/lib/auth";
 import { env } from "@/lib/env";
 import { parseJson, unauthorized } from "@/lib/http";
-import { createLecture, listLectures } from "@/lib/lectures";
+import { createLecture, listStudioSessions } from "@/lib/lectures";
 import { log } from "@/lib/log";
 
 export const dynamic = "force-dynamic";
 
+// Public: the published library. Organizers: every session. Each with what the pipeline produced for it.
 export async function GET() {
-  const lectures = await listLectures({ includeAll: await isOrganizer() });
+  const lectures = await listStudioSessions({ includeAll: await isOrganizer() });
   return NextResponse.json(lectures);
 }
 

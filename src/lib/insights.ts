@@ -37,6 +37,18 @@ export type Insights = {
 
 const WINDOW = `now() - interval '30 days'`;
 
+// The public demo Studio shows real aggregates, but learner-typed text is shown only if it reads like a
+// question: no links, e-mail addresses or long digit runs (phone numbers).
+const LOOKS_PRIVATE = /https?:|www\.|\S+@\S+|\d{6,}/i;
+export function forDemo(insights: Insights): Insights {
+  const shown = (q: string) => !LOOKS_PRIVATE.test(q);
+  return {
+    ...insights,
+    gaps: insights.gaps.filter((g) => shown(g.question)),
+    topQuestions: insights.topQuestions.filter((q) => shown(q.question)),
+  };
+}
+
 // Questions are grouped case- and whitespace-insensitively, so "What is dropout?" and "what is  dropout" count together.
 export async function getInsights(): Promise<Insights> {
   const [gaps, topQuestions, topMoments, totals] = await Promise.all([
