@@ -11,6 +11,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { formatTime } from "@/lib/format";
 import type { SnippetPart } from "@/lib/highlight";
 import type { TimedWord } from "@/lib/segments";
+import { citationLabel, groupCitations, type CitationGroup } from "@/lib/citation-groups";
 import { answerHoodItems } from "@/lib/hood-items";
 import { clipUrl, thumbUrl } from "@/lib/media";
 import { recordQuestion } from "@/lib/saved";
@@ -201,8 +202,15 @@ export function AnswerBody({
       {data.reel && data.reel.clips > 1 && <AnswerReel reel={data.reel} />}
       {data.citations.length > 0 && (
         <ol className="mt-5 grid gap-3 md:grid-cols-2">
-          {data.citations.map((c, i) => (
-            <li key={c.segmentId} id={`cite-${c.n}`} className="rise scroll-mt-24 rounded-2xl" style={{ animationDelay: `${120 + i * 70}ms` }}>
+          {/* Back-to-back moments of one session share a card; data-cites lets every [n] in the text find it. */}
+          {groupCitations(data.citations).map((c, i) => (
+            <li
+              key={c.segmentId}
+              id={`cite-${c.ns[0]}`}
+              data-cites={c.ns.join(" ")}
+              className="rise scroll-mt-24 rounded-2xl"
+              style={{ animationDelay: `${120 + i * 70}ms` }}
+            >
               <CitationCard c={c} />
             </li>
           ))}
@@ -418,7 +426,7 @@ function AnswerText({ text, citations }: { text: string; citations: Citation[] }
   const delay = () => `${Math.min(word++ * WORD_STAGGER_MS, WORD_STAGGER_CAP_MS)}ms`;
 
   function focus(n: string) {
-    const el = document.getElementById(`cite-${n}`);
+    const el = document.querySelector<HTMLElement>(`[data-cites~="${n}"]`);
     if (!el) return;
     el.scrollIntoView({ behavior: "smooth", block: "center" });
     el.classList.remove("pulse");
@@ -472,7 +480,7 @@ function AnswerText({ text, citations }: { text: string; citations: Citation[] }
   );
 }
 
-function CitationCard({ c }: { c: Citation }) {
+function CitationCard({ c }: { c: CitationGroup<Citation> }) {
   const [playing, setPlaying] = useState(false);
   return (
     <article className="lift h-full rounded-2xl border border-border bg-bg p-3">
@@ -494,13 +502,14 @@ function CitationCard({ c }: { c: Citation }) {
             </span>
           </button>
         )}
-        <span className="absolute top-2 left-2 grid size-6 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-fg">
-          {c.n}
+        <span className="absolute top-2 left-2 grid h-6 min-w-6 place-items-center rounded-full bg-accent px-1.5 text-xs font-semibold text-accent-fg">
+          {citationLabel(c.ns)}
         </span>
       </div>
       <p className="mt-2.5 font-medium">{c.title}</p>
       <p className="text-sm text-muted">
         {c.speaker ?? "Unknown speaker"} · <span className="tabular">{formatTime(c.startS)}</span>
+        {c.ns.length > 1 && <span className="tabular"> to {formatTime(c.endS)}</span>}
       </p>
       <p className="mt-1.5 line-clamp-3 text-sm">
         “<Snippet parts={c.snippet} />”
