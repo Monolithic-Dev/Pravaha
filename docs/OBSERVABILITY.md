@@ -38,3 +38,14 @@ Vercel's function logs and analytics. No Sentry, no tracing backend — `lecture
 | `insights.log_failed` | `error` |
 
 `ai.model_failed` followed by `ai.done` on another model is the fallback chain working; a run of `ai.model_failed` across the whole chain means the provider is down (Ask is then serving clips).
+
+## Health and server errors
+
+- **`GET /api/health`**: `200 { status: "ok", checks: { database: { ok, ms }, ai: { configured, providers }, trials, demoStudio }, version }`, or `503` with `status: "degraded"` when the database doesn't answer within 3 s. Booleans, timings and the deployed commit only; point an uptime monitor at it.
+- **`server.error`** (`src/instrumentation.ts`, Next's `onRequestError`): every unhandled server error with `method`, `path` (query string dropped, since search and Ask URLs carry the question), `route`, `routeType`, `digest` and a 200-character `error`. The error page shows the same `digest` as "Reference", so a learner's report maps to one log line.
+
+| Event | Fields |
+|---|---|
+| `server.error` | `method`, `path`, `route`, `routeType`, `digest`, `error` |
+| `health.degraded` | `dbMs` |
+| `trial.created` / `trial.refused` / `trial.purged` / `trial.purge_failed` | `lectureId` / `reason` / `count` / `error` |
