@@ -27,6 +27,9 @@ Two kinds of AI run in Pravaha:
 - **Verifiability:** every claim plays as a clip of the original speaker. The learner checks the source in one tap — that's the product's core promise, and it doubles as the hallucination check.
 - **Prompt injection:** transcripts are untrusted (anyone can *say* "ignore previous instructions" in a talk). The model has no tools, its output is schema-validated, and its only power is choosing which of our retrieved IDs to cite. Worst case: an odd sentence in an answer that still links to real footage.
 
+### Asking in Hindi (Phase 15)
+Transcripts are English and retrieval is English full-text search, so a question in Devanagari (or any non-Latin script) would match nothing. Such a question gets one extra fast call that translates it into English **for retrieval only** (`src/lib/translate.ts`, detection in `src/lib/language.ts`). The answer prompt still receives the original question and already answers "in the language of the question", so the learner reads Hindi, and the citations play the English moments. Latin-script questions, including romanised Hindi ("overfitting kaise roke"), skip the call. If translation fails, the original question is searched and Ask degrades exactly as it does in English. Verified Oct 2: "ओवरफिटिंग कैसे रोकें?" was answered in Hindi with 3 citations from the English lectures, an Answer Reel, and Hindi follow-up questions.
+
 ### Fallback (NFR4)
 
 Every model in the chain failing (error, timeout, 503, or schema-invalid JSON) → `status: "fallback"`, no generated text, top 4 retrieved segments shown as clip cards with a "Showing the most relevant moments" label. Ask never shows an error page because the LLM is down.

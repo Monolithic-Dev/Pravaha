@@ -10,6 +10,7 @@ import { log } from "@/lib/log";
 import { momentUrl, reelUrl } from "@/lib/media";
 import { clientIp, takeAskToken } from "@/lib/rate-limit";
 import { retrieveForQuestion, type Hit } from "@/lib/search";
+import { searchableQuestion } from "@/lib/translate";
 
 export const maxDuration = 30;
 
@@ -39,7 +40,8 @@ type Progress =
 // the JSON response ignores it. Same retrieval, validation and fallback either way.
 async function ask(question: string, lectureId: string | null, progress: (p: Progress) => void) {
   const started = Date.now();
-  const hits = await retrieveForQuestion(question, { lectureId });
+  // A question in Hindi (or any non-Latin script) is searched in English; the answer stays in its language.
+  const hits = await retrieveForQuestion(await searchableQuestion(question), { lectureId });
   progress({ type: "retrieved", moments: hits.length, sessions: [...new Set(hits.map((h) => h.title))].slice(0, 5) });
 
   if (hits.length === 0) {
