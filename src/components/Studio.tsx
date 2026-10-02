@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { EmbedCode } from "@/components/EmbedCode";
 import { InsightsPanel } from "@/components/InsightsPanel";
 import { StatusBadge } from "@/components/StatusBadge";
 import { UploadForm } from "@/components/UploadForm";
@@ -26,6 +27,9 @@ export function Studio({ demo = false }: { demo?: boolean }) {
   const [sessions, setSessions] = useState<Session[] | null>(null);
   const [view, setView] = useState<"sessions" | "insights">("sessions");
   const [packState, setPackState] = useState<Record<string, "building" | "done" | "failed">>({});
+  // Which embed snippet is open: "library" or a session id.
+  const [embedFor, setEmbedFor] = useState<string | null>(null);
+  const toggleEmbed = (key: string) => setEmbedFor((open) => (open === key ? null : key));
 
   const refresh = useCallback(async () => {
     const res = await fetch("/api/lectures", { cache: "no-store" });
@@ -110,6 +114,17 @@ export function Studio({ demo = false }: { demo?: boolean }) {
         ) : (
           <>
             <LibraryStats sessions={sessions} />
+            <div className="mt-3 flex justify-end">
+              <button
+                type="button"
+                onClick={() => toggleEmbed("library")}
+                aria-expanded={embedFor === "library"}
+                className="rounded-lg border border-border px-3 py-1 text-sm hover:border-accent"
+              >
+                {"</>"} Embed Ask in your LMS
+              </button>
+            </div>
+            {embedFor === "library" && <EmbedCode title="the library" />}
             <ul className="mt-4 divide-y divide-border rounded-2xl border border-border bg-surface">
               {sessions.map((s) => (
                 <li key={s.id} className="flex flex-wrap items-center gap-3 p-4">
@@ -159,6 +174,21 @@ export function Studio({ demo = false }: { demo?: boolean }) {
                             ? "Retry Study Pack"
                             : "Build Study Pack"}
                     </button>
+                  )}
+                  {s.status === "ready" && (
+                    <button
+                      type="button"
+                      onClick={() => toggleEmbed(s.id)}
+                      aria-expanded={embedFor === s.id}
+                      className="rounded-lg border border-border px-3 py-1 text-sm hover:border-accent"
+                    >
+                      Embed
+                    </button>
+                  )}
+                  {embedFor === s.id && (
+                    <div className="basis-full">
+                      <EmbedCode lectureId={s.id} title={s.title} />
+                    </div>
                   )}
                 </li>
               ))}

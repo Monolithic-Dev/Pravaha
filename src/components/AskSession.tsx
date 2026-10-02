@@ -6,7 +6,16 @@ import { AskAnswer } from "@/components/AskAnswer";
 
 // "Ask this session": the same grounded Ask as the home page, scoped to one recording. Follow-up
 // questions stay in this session. Suggestions come from the session's Study Pack when it has one.
-export function AskSession({ lectureId, suggestions = [] }: { lectureId: string; suggestions?: string[] }) {
+// Without `lectureId` it asks the whole library (the /embed/ask box an LMS frames).
+export function AskSession({
+  lectureId,
+  suggestions = [],
+  heading = "Ask this session",
+}: {
+  lectureId?: string;
+  suggestions?: string[];
+  heading?: string;
+}) {
   const [draft, setDraft] = useState("");
   const [question, setQuestion] = useState<string | null>(null);
 
@@ -20,7 +29,7 @@ export function AskSession({ lectureId, suggestions = [] }: { lectureId: string;
   return (
     <section aria-labelledby="ask-session-heading" className="mt-6">
       <h2 id="ask-session-heading" className="text-lg font-semibold">
-        Ask this session
+        {heading}
       </h2>
       <form
         onSubmit={(e) => {
@@ -30,7 +39,7 @@ export function AskSession({ lectureId, suggestions = [] }: { lectureId: string;
         className="relative mt-3"
       >
         <label htmlFor="ask-session" className="sr-only">
-          Ask a question about this session
+          {lectureId ? "Ask a question about this session" : "Ask a question about the library"}
         </label>
         <input
           id="ask-session"
