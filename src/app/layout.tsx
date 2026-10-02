@@ -52,6 +52,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/#library" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
                 Library
               </Link>
+              <Link href="/saved" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
+                Saved
+              </Link>
               <Link href="/studio" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
                 Studio
               </Link>

@@ -4,10 +4,12 @@ import { useMemo, useRef, useState } from "react";
 
 import { MomentButton } from "@/components/MomentButton";
 import { Player } from "@/components/Player";
+import { SaveButton } from "@/components/SaveButton";
 import { StudyPanel } from "@/components/StudyPanel";
 import { formatTime } from "@/lib/format";
 import type { SubtitleLanguage } from "@/lib/language";
 import type { SegmentRow } from "@/lib/lectures";
+import { recordProgress } from "@/lib/saved";
 import type { StudyPack } from "@/lib/study-pack-schema";
 
 type Props = {
@@ -26,6 +28,7 @@ type Props = {
 
 export function WatchView({ lectureId, publicId, title, durationS, startAt, searchable, subtitles, segments, pack, children }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const lastSaved = useRef(startAt);
   const [time, setTime] = useState(startAt);
   const [filter, setFilter] = useState("");
   const [tab, setTab] = useState<"transcript" | "study">(pack ? "study" : "transcript");
@@ -58,7 +61,14 @@ export function WatchView({ lectureId, publicId, title, durationS, startAt, sear
           searchable={searchable}
           subtitles={subtitles}
           videoRef={videoRef}
-          onTime={(t) => setTime((prev) => (Math.abs(prev - t) >= 0.5 ? t : prev))}
+          onTime={(t) => {
+            setTime((prev) => (Math.abs(prev - t) >= 0.5 ? t : prev));
+            // "Continue watching" (this device only), written at most every 5 s of playback.
+            if (durationS && Math.abs(t - lastSaved.current) >= 5) {
+              lastSaved.current = t;
+              recordProgress({ lectureId, publicId, title, t, durationS });
+            }
+          }}
         />
         {current && (
           <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -73,6 +83,18 @@ export function WatchView({ lectureId, publicId, title, durationS, startAt, sear
               segmentId={current.id}
               label="Share this moment"
               className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-fg"
+            />
+            <SaveButton
+              moment={{
+                segmentId: current.id,
+                lectureId,
+                publicId,
+                title,
+                speaker: null,
+                startS: current.startS,
+                endS: current.endS,
+                text: current.text,
+              }}
             />
             <span className="text-sm text-muted">
               {current.chapterTitle ? `${current.chapterTitle} · ` : ""}

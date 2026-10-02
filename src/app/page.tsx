@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ContinueWatching } from "@/components/ContinueWatching";
 import { HeroDemo } from "@/components/HeroDemo";
 import { LibraryGrid } from "@/components/LibraryGrid";
 import { SearchBar } from "@/components/SearchBar";
@@ -76,6 +77,8 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      <ContinueWatching />
 
       <HowItWorks />
 
