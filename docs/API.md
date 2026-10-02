@@ -94,6 +94,12 @@ Every endpoint maps to an FR in `PRD.md`; there is no endpoint without one.
 ### `GET /api/insights`
 - **Auth:** organizer, or anyone while the demo Studio is on (`STUDIO_DEMO`, default `on`; `401` when `off`). Visitors get the same aggregates minus questions that look like links, e-mail addresses or phone numbers, and Moments only from published sessions · **Response:** `{ totals: { questions, answeredRate, shares }, gaps[{question,times,lastAsked}], topQuestions[{question,times,answered}], topMoments[{segmentId,lectureId,title,startS,text,opens,shares}], daily[{day,answered,unanswered}] (last 14 days, India time), topSessions[{lectureId,title,answers}] (sessions cited by answers), feedback }` (last 30 days)
 
+### `GET /api/insights/export?report=gaps|questions|moments|daily|sessions`
+- **Auth:** same as `GET /api/insights` (visitors get the same filtered aggregates) · **Response:** `text/csv; charset=utf-8` with a byte-order mark (Excel opens non-Latin questions correctly), `Content-Disposition: attachment; filename="pravaha-<report>-<date>.csv"`, `Cache-Control: private, no-store`
+- Each list in full (up to 1000 rows), not the top 10 the Studio shows. Columns: `gaps` question, times_asked, last_asked · `questions` question, times_asked, times_answered, answered_percent · `moments` session, at, start_seconds, quote, opens, shares, url · `daily` date, answered, not_answered (14 days) · `sessions` session, answers_cited_in, url
+- Learner-typed cells that start with `=`, `+`, `-`, `@`, a tab or a carriage return get a leading `'`, so a question can't run as a formula in a spreadsheet (CSV injection)
+- **Errors:** `400 invalid_report` · `401` as above
+
 ### `POST /api/ask` (additions)
 - Response adds `reel: { url, durationS, clips } | null`, the Answer Reel (Phase 12)
 - Every Ask is logged to `ask_log` after the response (`after()`), with no identity

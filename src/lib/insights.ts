@@ -57,21 +57,21 @@ export function forDemo(insights: Insights): Insights {
 
 // Questions are grouped case- and whitespace-insensitively, so "What is dropout?" and "what is  dropout" count together.
 // `publishedOnly` (the public demo Studio): Moments and sessions only from published sessions, so an unlisted
-// session's title and words never show up there.
-export async function getInsights({ publishedOnly = false } = {}): Promise<Insights> {
+// session's title and words never show up there. `limit` caps each list (the CSV export asks for all of it).
+export async function getInsights({ publishedOnly = false, limit = 10, sessionsLimit = 6 } = {}): Promise<Insights> {
   const momentScope = publishedOnly ? `AND l.status = 'ready' AND l.visibility = 'public'` : "";
   const [gaps, topQuestions, topMoments, totals, daily, topSessions] = await Promise.all([
     query<{ question: string; times: string; last_asked: Date }>(
       `SELECT min(question) AS question, count(*) AS times, max(created_at) AS last_asked
          FROM ask_log WHERE status = 'not_found' AND created_at > ${WINDOW}
         GROUP BY lower(regexp_replace(trim(question), '\\s+', ' ', 'g'))
-        ORDER BY count(*) DESC, max(created_at) DESC LIMIT 10`,
+        ORDER BY count(*) DESC, max(created_at) DESC LIMIT ${limit}`,
     ),
     query<{ question: string; times: string; answered: string }>(
       `SELECT min(question) AS question, count(*) AS times, count(*) FILTER (WHERE status = 'answered') AS answered
          FROM ask_log WHERE created_at > ${WINDOW}
         GROUP BY lower(regexp_replace(trim(question), '\\s+', ' ', 'g'))
-        ORDER BY count(*) DESC LIMIT 10`,
+        ORDER BY count(*) DESC LIMIT ${limit}`,
     ),
     query<{ segment_id: string; lecture_id: string; title: string; start_s: number; text: string; opens: string; shares: string }>(
       `SELECT s.id AS segment_id, l.id AS lecture_id, l.title, s.start_s, s.text,
@@ -79,7 +79,7 @@ export async function getInsights({ publishedOnly = false } = {}): Promise<Insig
          FROM moment_events e JOIN segments s ON s.id = e.segment_id JOIN lectures l ON l.id = s.lecture_id
         WHERE e.created_at > ${WINDOW} ${momentScope}
         GROUP BY s.id, l.id
-        ORDER BY count(*) FILTER (WHERE e.kind = 'share') DESC, count(*) DESC LIMIT 10`,
+        ORDER BY count(*) FILTER (WHERE e.kind = 'share') DESC, count(*) DESC LIMIT ${limit}`,
     ),
     query<{ questions: string; answered: string; shares: string }>(
       `SELECT (SELECT count(*) FROM ask_log WHERE created_at > ${WINDOW}) AS questions,
@@ -98,7 +98,7 @@ export async function getInsights({ publishedOnly = false } = {}): Promise<Insig
       `SELECT l.id, l.title, count(*) AS answers
          FROM ask_log a CROSS JOIN LATERAL unnest(a.lecture_ids) AS u(lid) JOIN lectures l ON l.id = u.lid
         WHERE a.created_at > ${WINDOW} AND a.status = 'answered' AND l.trial_expires_at IS NULL ${momentScope}
-        GROUP BY l.id ORDER BY count(*) DESC, l.title LIMIT 6`,
+        GROUP BY l.id ORDER BY count(*) DESC, l.title LIMIT ${sessionsLimit}`,
     ),
   ]);
   const t = totals[0]!;
