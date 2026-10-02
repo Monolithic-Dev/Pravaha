@@ -75,7 +75,7 @@ Rights confirmation is required before upload (`rights_confirmed_at`), sessions 
 
 ## v3 additions
 
-- **Learner privacy in Insights:** `ask_log` keeps question text only (no IP, no user); `moment_events` keeps segment id + kind. Organizers see everything. The public demo Studio (`STUDIO_DEMO=on`, the default) shows the same anonymous aggregates without questions that look like links, e-mail addresses or phone numbers, and with Moments only from published sessions. `STUDIO_DEMO=off` makes Insights organizer-only (`401`).
+- **Learner privacy in Insights:** `ask_log` keeps question text only (no IP, no user); `moment_events` keeps segment id + kind. Organizers see everything. The public demo Studio (`STUDIO_DEMO=on`, the default) shows the same anonymous aggregates without questions that look like links, e-mail addresses or phone numbers, and with Moments only from published sessions. `STUDIO_DEMO=off` makes Insights organizer-only (`401`). The CSV export (`/api/insights/export`) follows the same rules, and any learner-typed cell starting with `=`, `+`, `-`, `@`, a tab or a carriage return gets a leading `'`, so a question can't run as a formula when an organizer opens the file (CSV injection).
 - **`/api/events`** is public but only counts events against existing segments (`404` otherwise) and stores no identity. Worst-case abuse is inflated share counts, not data exposure.
 - **Study Pack prompt injection:** same containment as Ask: schema-only output, and every reference validated against the session's real segment ids.
 

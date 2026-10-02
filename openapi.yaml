@@ -448,3 +448,15 @@ paths:
       responses:
         '200': { description: Insights, content: { application/json: { schema: { $ref: '#/components/schemas/Insights' } } } }
         '401': { description: Not an organizer and the demo Studio is off }
+  /insights/export:
+    get:
+      summary: One Insights report as a CSV download, each list in full (up to 1000 rows)
+      description: "Same access as /insights. Cells that start with = + - @ get a leading ' (CSV injection)."
+      operationId: exportInsights
+      security: [{ organizerCookie: [] }, {}]
+      parameters:
+        - { name: report, in: query, required: true, schema: { type: string, enum: [gaps, questions, moments, daily, sessions] } }
+      responses:
+        '200': { description: 'CSV with a UTF-8 byte-order mark, as an attachment', content: { text/csv: { schema: { type: string } } } }
+        '400': { description: Unknown report, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '401': { description: Not an organizer and the demo Studio is off }

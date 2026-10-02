@@ -48,4 +48,5 @@ Vercel's function logs and analytics. No Sentry, no tracing backend — `lecture
 |---|---|
 | `server.error` | `method`, `path`, `route`, `routeType`, `digest`, `error` |
 | `health.degraded` | `dbMs` |
+| `insights.export` | `report`, `organizer` |
 | `trial.created` / `trial.refused` / `trial.purged` / `trial.purge_failed` | `lectureId` / `reason` / `count` / `error` |

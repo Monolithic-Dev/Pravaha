@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { formatTime } from "@/lib/format";
 import type { Insights } from "@/lib/insights";
+import type { InsightReport } from "@/lib/insights-export";
 
 export function InsightsPanel() {
   const [data, setData] = useState<Insights | null>(null);
@@ -41,6 +42,7 @@ export function InsightsPanel() {
 
       <Card
         title="Knowledge gaps"
+        report="gaps"
         hint="Learners asked these and your library had no answer. Record a session on them next."
         empty="No gaps yet: everything learners asked was covered."
       >
@@ -52,7 +54,7 @@ export function InsightsPanel() {
         ))}
       </Card>
 
-      <Card title="Most asked" hint="What learners want to know, over the last 30 days." empty="No questions yet.">
+      <Card title="Most asked" report="questions" hint="What learners want to know, over the last 30 days." empty="No questions yet.">
         {topQuestions.map((q) => (
           <li key={q.question} className="flex items-start justify-between gap-3 py-2">
             <Link href={`/search?q=${encodeURIComponent(q.question)}`} className="hover:text-accent">
@@ -65,7 +67,7 @@ export function InsightsPanel() {
         ))}
       </Card>
 
-      <Card title="Moments that travel" hint="Opened and shared as Moments, most shared first." empty="No Moments shared yet.">
+      <Card title="Moments that travel" report="moments" hint="Opened and shared as Moments, most shared first." empty="No Moments shared yet.">
         {topMoments.map((m) => (
           <li key={m.segmentId} className="py-2">
             <Link href={`/watch/${m.lectureId}?t=${Math.floor(m.startS)}`} className="font-medium hover:text-accent">
@@ -91,10 +93,22 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Card({ title, hint, empty, children }: { title: string; hint: string; empty: string; children: React.ReactNode[] }) {
+function Card({
+  title,
+  report,
+  hint,
+  empty,
+  children,
+}: {
+  title: string;
+  report: InsightReport;
+  hint: string;
+  empty: string;
+  children: React.ReactNode[];
+}) {
   return (
     <section className="rounded-2xl border border-border bg-surface p-4">
-      <h3 className="font-semibold">{title}</h3>
+      <CardTitle title={title} report={report} />
       <p className="text-sm text-muted">{hint}</p>
       {children.length ? (
         <ul className="mt-2 divide-y divide-border">{children}</ul>
@@ -102,6 +116,23 @@ function Card({ title, hint, empty, children }: { title: string; hint: string; e
         <p className="mt-3 text-sm text-muted">{empty}</p>
       )}
     </section>
+  );
+}
+
+// Every list downloads in full as CSV (GET /api/insights/export), for a spreadsheet or an LMS report.
+function CardTitle({ title, report }: { title: string; report: InsightReport }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <h3 className="font-semibold">{title}</h3>
+      <a
+        href={`/api/insights/export?report=${report}`}
+        download
+        aria-label={`Download “${title}” as CSV`}
+        className="shrink-0 rounded-md px-1.5 py-0.5 text-xs font-medium text-muted hover:bg-bg hover:text-fg"
+      >
+        CSV ↓
+      </a>
+    </div>
   );
 }
 
@@ -113,7 +144,7 @@ function DailyChart({ days }: { days: Insights["daily"] }) {
   const total = days.reduce((sum, d) => sum + d.answered + d.unanswered, 0);
   return (
     <section className="rounded-2xl border border-border bg-surface p-4">
-      <h3 className="font-semibold">Questions per day</h3>
+      <CardTitle title="Questions per day" report="daily" />
       <p className="text-sm text-muted">
         Last {days.length} days · <span className="text-accent">■</span> answered <span className="text-failed">■</span> not
         answered
@@ -159,7 +190,7 @@ function SessionsChart({ sessions }: { sessions: Insights["topSessions"] }) {
   const max = Math.max(1, ...sessions.map((s) => s.answers));
   return (
     <section className="rounded-2xl border border-border bg-surface p-4">
-      <h3 className="font-semibold">Sessions answers come from</h3>
+      <CardTitle title="Sessions answers come from" report="sessions" />
       <p className="text-sm text-muted">How many answers cited each session, last 30 days.</p>
       {sessions.length === 0 ? (
         <p className="mt-3 text-sm text-muted">No answers yet.</p>
