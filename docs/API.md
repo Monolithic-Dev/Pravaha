@@ -118,3 +118,10 @@ Every endpoint maps to an FR in `PRD.md`; there is no endpoint without one.
 
 ### `POST /api/ask` with `lectureId`
 - Scopes the Ask to one session (the Watch page's **Ask this session**). If no keyword matches ("What is this video about?"), retrieval falls back to moments sampled evenly across the session, so the model can summarise it; it still refuses when they don't answer the question
+
+## Operations
+
+### `GET /api/health`
+- **Auth:** public, `Cache-Control: no-store`
+- **Response:** `200 { "status": "ok", "checks": { "database": { "ok", "ms" }, "ai": { "configured", "providers" }, "trials": { "enabled" }, "demoStudio": { "enabled" } }, "version": "<commit>" }`; `503` with `"status": "degraded"` when the database is unreachable (3 s timeout). No secrets or config values
+
