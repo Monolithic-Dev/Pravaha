@@ -148,7 +148,7 @@ export function WatchView({ lectureId, publicId, title, durationS, startAt, sear
           )}
           {tab === "study" && pack ? (
             <div className="max-h-[60vh] overflow-y-auto lg:max-h-[calc(78vh-44px)]">
-              <StudyPanel pack={pack} publicId={publicId} onSeek={seek} />
+              <StudyPanel pack={pack} lectureId={lectureId} title={title} publicId={publicId} onSeek={seek} />
             </div>
           ) : tab === "chapters" ? (
             <ol className="max-h-[60vh] space-y-1 overflow-y-auto p-2 lg:max-h-[calc(78vh-44px)]">
