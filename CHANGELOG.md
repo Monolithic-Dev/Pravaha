@@ -15,6 +15,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/); versioning: [SemVer](ht
 - Cloudinary asset index: tags and contextual metadata on each session's asset, synced from the Studio and read back with the Search API (Phase 19)
 
 ### Fixed
+- `/search` (Find and Ask results) crashed with "Something went wrong" since the data saver release: `ResultCard` called a client hook without `"use client"`. Fixed, with a unit test that fails the build for any hook used outside a client file
 - Phone header: Studio, data saver and the theme switch were off-screen below ~560 px. Header, Studio and /try now fit 360 px (Phase 23)
 
 ## [1.0.0] — 2026-10-03

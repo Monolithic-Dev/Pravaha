@@ -28,6 +28,9 @@ Against the **deployed** `APP_URL`: home → search a known phrase → result op
 - `revision.spec.ts`: a wrong quiz answer appears under Weak spots with a revision reel and clears; study notes carry timestamp links and download as Markdown
 - `mobile.spec.ts`: at 360 px the header's Studio, data saver and theme controls are on screen and no page scrolls sideways
 
+### Client boundary guard
+`tests/unit/client-boundary.test.ts` fails if any file under `src` calls a React or Pravaha hook without `"use client"`. A hook in a Server Component crashes the page at request time and neither `tsc` nor ESLint notices (it broke `/search` in production once). After every deploy, also run the smoke spec: `APP_URL=<url> npx playwright test tests/e2e/smoke.spec.ts`.
+
 ## AI Eval (`pnpm eval:ask`)
 
 10 questions (7 answerable, 3 not) against the demo library; results recorded in `AI_EVALUATION.md`.
