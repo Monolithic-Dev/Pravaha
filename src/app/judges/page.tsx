@@ -20,6 +20,7 @@ const REQUIREMENTS: [string, string][] = [
   ["Upload, manage, transform, optimize, search, deliver", "Signed upload · tags and context · Search API · splice, crop, caption, preview transformations · f_auto/q_auto · HLS delivery."],
   ["A live working demo", "This site. Six real NPTEL sessions, no login for learners."],
   ["Public repo with setup instructions", "github.com/Monolithic-Dev/Pravaha, SETUP.md."],
+  ["It is monitored, and a real business", "/status shows live database, AI model and Cloudinary-credit health. The business case is in docs/BUSINESS.md and the README."],
   ["README: track, problem, Cloudinary usage, how to test", "Track 3 (Your Media-Savvy Startup); see the README."],
 ];
 

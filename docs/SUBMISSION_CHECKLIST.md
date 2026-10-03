@@ -15,6 +15,8 @@ Deadline: submit by **Oct 3, 2026**; code freeze **Oct 4, 00:15 IST**. Submit vi
 - [x] Learner flows (Watch, Find, Ask, Moments) work without login (Oct 2: Playwright smoke tests 12/12 against production, desktop and mobile)
 - [x] Demo library: 6 public sessions (NPTEL excerpts, CC BY-NC-SA, credited in the README), uploaded through the production pipeline on Oct 2
 - [x] Organizer and enterprise features merged and checked on Vercel previews (Oct 2–3): demo Studio, Insights charts and CSV export, LMS embed, Privacy and Terms, health endpoint
+- [x] Public status page `/status` shows live credits (warns at 80% and 95%), AI model health and database reachability (Phase 24)
+- [x] Business case for the Track 3 pitch: `docs/BUSINESS.md` and the README (Phase 24)
 - [ ] **Cloudinary credits:** the Admin API reported 14.1 of 25 used (56%) at its last update (Oct 2). Every new reel, Moment and Compare Reel spends some, so avoid regenerating them in bulk before judging, and re-check `api.usage()` on submission day
 - [ ] Trials decision after that: keep `/try` paused (`TRIALS_PER_DAY=0`) or re-enable (`TRIALS_PER_DAY=5`, then redeploy)
 

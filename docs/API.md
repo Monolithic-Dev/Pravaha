@@ -168,3 +168,10 @@ Retrieval now rewrites a question into the library's vocabulary when it is in an
 - **Query:** `format=md` returns Markdown (`text/markdown`); add `download=1` for a `Content-Disposition: attachment` `.md` file. Without `format`, JSON
 - **Response (JSON):** `{ title, speaker, durationS, watchUrl, summary[], concepts[{ name, t, label, url }], chapters[{ title, t, label, url }], quiz[{ question, answer, explanation, t, label, url }] }`; every `url` opens the session at that second
 - **Errors:** `404` the session isn't ready, doesn't exist, or has no summary, chapters or quiz yet
+
+## Phase 24 additions
+
+### `GET /api/status`
+- **Auth:** public, `Cache-Control: no-store`
+- **Response:** `{ level: "operational"|"degraded"|"outage", reasons[], version, checkedAt, database: { ok, ms }, ai: { providers[], models: [{ model, ok, ms, kind? }] | null, probedAt }, cloudinary: { used, limit, pct, level, transformations, storage, bandwidth, reportedOn } | null, library: { sessions, moments, studyPacks, questionsAsked } | null }`
+- `503` only when the database is unreachable. AI probes are cached 5 minutes and Cloudinary usage 10 minutes per server instance. `kind` is `quota`, `overloaded` or `error`, never a raw provider message. No secrets or config values

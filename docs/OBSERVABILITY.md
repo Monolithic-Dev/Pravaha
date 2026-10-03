@@ -24,6 +24,10 @@ Never logged: transcript text, questions verbatim (only length), IPs, secrets.
 - Ask status mix — a rising `fallback` or `not_found` share means a broken prompt or retrieval
 - `dropped` citations per answer — how often the model tried to cite something it wasn't given (should be ~0)
 
+## The public status page
+
+`/status` (and `GET /api/status`, `503` only when the database is unreachable) shows what the logs would tell you, live: database reachability, a real probe of every AI model (five tiny calls, cached 5 minutes per server instance), and Cloudinary credits with warnings at 80% and 95% (the usage report is cached 10 minutes). Failures show a category (quota, overloaded, error), never a raw provider message. An uptime monitor can watch `/api/status`.
+
 ## Error tracking, tracing, monitoring
 
 Vercel's function logs and analytics. No Sentry, no tracing backend — `lectureId` on every line is the trace at this scale. Considered and declined, not forgotten.

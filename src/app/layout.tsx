@@ -107,6 +107,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/terms" className="underline-offset-4 hover:text-fg hover:underline">
                   Terms
                 </Link>{" "}
+                ·{" "}
+                <Link href="/status" className="underline-offset-4 hover:text-fg hover:underline">
+                  Status
+                </Link>{" "}
                 · Built on <span className="text-fg">Cloudinary</span> · Team Code Blooded ·{" "}
                 <a href="https://github.com/Monolithic-Dev/Pravaha" className="underline-offset-4 hover:text-fg hover:underline">
                   GitHub

@@ -504,3 +504,11 @@ paths:
       responses:
         '200': { description: Notes as JSON, or Markdown with format=md, content: { application/json: { schema: { type: object } }, text/markdown: { schema: { type: string } } } }
         '404': { description: No notes for this session, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /status:
+    get:
+      summary: Live status, the database, every AI model, Cloudinary credits and library size
+      operationId: getStatus
+      security: [{}]
+      responses:
+        '200': { description: Operational or degraded, content: { application/json: { schema: { type: object } } } }
+        '503': { description: Outage, the database is unreachable, content: { application/json: { schema: { type: object } } } }

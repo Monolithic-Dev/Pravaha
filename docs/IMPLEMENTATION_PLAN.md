@@ -98,3 +98,4 @@ The core loop (Phases 01–09) is built and verified on real Cloudinary + Neon. 
 | 22 | Weak spots & study notes | Quiz mistakes become a personal revision reel; every session exports a timestamp-linked study sheet (Markdown / print) | ✅ done (Oct 3) |
 | 20 | Judges page & revision reel | `/judges` maps the brief to Cloudinary capabilities with live URLs; saved moments replay as one reel | ✅ done (Oct 3) |
 | 23 | Phone layout | Header, Studio and /try fit a 360 px phone; e2e guard | ✅ done (Oct 3) |
+| 24 | Status page & business case | Live health, AI probes and Cloudinary credits at `/status`; who pays, unit economics and pricing hypothesis; whole-system diagram | ✅ done (Oct 3) |
