@@ -82,6 +82,8 @@ Colleges, clubs and coaching institutes record hundreds of hours of lectures and
 | **Weak spots** | Quiz mistakes are remembered on your device and come back as **one Cloudinary reel of exactly the explanations you missed**, with the answer and the second to jump to. Get a question right and it leaves the list. |
 | **Study notes** | Every session has a study sheet at `/notes/[id]`: summary, key concepts, chapters and the quiz with answers, each point linked to its timestamp. Copy it as Markdown, download it, or save it as a PDF. |
 | **Revision reel** | On `/saved`, the latest saved moments from any sessions play as one labelled video: a revision reel for the night before an exam. |
+| **Voice** | Tap the microphone in the Ask bar and say the question, in English or Hindi. The browser turns speech into text, so no audio reaches Pravaha. |
+| **Installable** | Add Pravaha to a phone's home screen; it opens full-screen and shows a friendly page when offline. |
 | **Study Packs** | Every session gets a summary, key concepts, a quiz whose explanations **play the moment** the teacher explains it, and a "Session in 60 seconds" highlight reel. Pravaha generates them automatically from the transcript. |
 | **Moments** | One tap turns any cited clip into a vertical, AI-cropped, subtitled short for WhatsApp or Instagram, with its own share page and preview card. The short is just a Cloudinary URL; nothing is rendered. |
 | **Insights** | Organizers see what learners ask, the **knowledge gaps** the library can't answer yet (what to record next), and which Moments get shared. Every report downloads as CSV. Visitors can explore a read-only demo of the Studio. |
@@ -222,6 +224,8 @@ Open the live app at **[pravaha-cyan.vercel.app](https://pravaha-cyan.vercel.app
 7. Open **[Try it](https://pravaha-cyan.vercel.app/try)** and upload any short video with speech (up to 50 MB). Follow the live pipeline, then ask it "What is this video about?" on its page.
 8. Open **[Studio](https://pravaha-cyan.vercel.app/studio)**: a read-only demo of the organizer side, with every session's pipeline output and live Insights (knowledge gaps, most asked questions, answers rated helpful). Uploading to the main library and publishing need the organizer passcode at `/studio/sign-in`.
 9. Open **[Status](https://pravaha-cyan.vercel.app/status)**: live database health, every AI model, and the Cloudinary credits the media runs on.
+
+10. Tap the **microphone** in the Ask bar (Chrome or Safari) and ask by voice, or switch it to Hindi with the EN / हिं button.
 
 ## Quick start
 

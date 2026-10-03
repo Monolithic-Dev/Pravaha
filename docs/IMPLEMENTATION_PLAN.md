@@ -99,3 +99,4 @@ The core loop (Phases 01–09) is built and verified on real Cloudinary + Neon. 
 | 20 | Judges page & revision reel | `/judges` maps the brief to Cloudinary capabilities with live URLs; saved moments replay as one reel | ✅ done (Oct 3) |
 | 23 | Phone layout | Header, Studio and /try fit a 360 px phone; e2e guard | ✅ done (Oct 3) |
 | 24 | Status page & business case | Live health, AI probes and Cloudinary credits at `/status`; who pays, unit economics and pricing hypothesis; whole-system diagram | ✅ done (Oct 3) |
+| 25 | Answer reuse, voice questions, installable app | Identical questions reuse the stored answer (no AI call); ask by voice in English or Hindi; manifest, icons and an offline page; Hindi punctuation fix | ✅ done (Oct 3) |
