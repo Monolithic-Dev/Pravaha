@@ -93,6 +93,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   Privacy
                 </Link>{" "}
                 ·{" "}
+                <Link href="/judges" className="underline-offset-4 hover:text-fg hover:underline">
+                  For judges
+                </Link>{" "}
+                ·{" "}
                 <Link href="/terms" className="underline-offset-4 hover:text-fg hover:underline">
                   Terms
                 </Link>{" "}
