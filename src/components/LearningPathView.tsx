@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 
 import { MomentButton } from "@/components/MomentButton";
+import { ReelPlayer } from "@/components/ReelPlayer";
 import { formatTime } from "@/lib/format";
 import { thumbUrl } from "@/lib/media";
 import type { LearningPath } from "@/lib/paths";
@@ -29,7 +29,14 @@ export function LearningPathView({ path }: { path: LearningPath }) {
         ) : null}
       </p>
 
-      {path.reel && <CourseReel url={path.reel.url} steps={path.steps.length} durationS={path.reel.durationS} />}
+      {path.reel && (
+        <ReelPlayer
+          url={path.reel.url}
+          title="Play the whole course"
+          subtitle={`${path.steps.length} moments from different lectures, edited into one video by Cloudinary`}
+          durationS={path.reel.durationS}
+        />
+      )}
 
       <ol className="mt-6 space-y-4">
         {path.steps.map((step) => (
@@ -82,25 +89,5 @@ export function LearningPathView({ path }: { path: LearningPath }) {
         ))}
       </ol>
     </article>
-  );
-}
-
-function CourseReel({ url, steps, durationS }: { url: string; steps: number; durationS: number }) {
-  const [playing, setPlaying] = useState(false);
-  if (playing) return <video src={url} className="mt-5 aspect-video w-full rounded-2xl bg-black" controls autoPlay playsInline />;
-  return (
-    <button
-      type="button"
-      onClick={() => setPlaying(true)}
-      className="mt-5 flex w-full items-center gap-4 rounded-2xl border border-accent/40 bg-accent/10 p-4 text-left hover:bg-accent/15"
-    >
-      <span className="grid size-12 shrink-0 place-items-center rounded-full bg-accent text-accent-fg">▶</span>
-      <span>
-        <span className="block font-semibold">Play the whole course</span>
-        <span className="text-sm text-muted">
-          {steps} moments from different lectures, edited into one <span className="tabular">{formatTime(durationS)}</span> video by Cloudinary
-        </span>
-      </span>
-    </button>
   );
 }

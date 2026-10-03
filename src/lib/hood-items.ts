@@ -120,3 +120,27 @@ export function answerHoodItems(citations: Cited[], reel: { url: string; clips: 
   }
   return items;
 }
+
+type ConceptMoment = { publicId: string; speaker: string | null; title: string; startS: number; endS: number };
+
+export function conceptHoodItems(key: string, moments: ConceptMoment[]): HoodItem[] {
+  const label = (m: ConceptMoment, i: number) => `${i + 1} · ${(m.speaker ?? m.title).split(",")[0]}`;
+  const reel = reelUrl(moments.map((m, i) => ({ publicId: m.publicId, startS: m.startS, endS: m.endS, label: label(m, i) })));
+  const items: HoodItem[] = [];
+  if (reel && reel.clips > 1) {
+    items.push({
+      title: "Compare reel",
+      what: `${reel.clips} explanations of this concept, from different sessions, spliced into one video with fl_splice. Each clip is labelled with its speaker.`,
+      url: reel.url,
+    });
+  }
+  const first = moments[0];
+  if (first) {
+    items.push({
+      title: "Explanation thumbnail",
+      what: "The frame at that moment, cropped around the speaker by AI.",
+      url: thumbUrl(first.publicId, first.startS),
+    });
+  }
+  return items;
+}
