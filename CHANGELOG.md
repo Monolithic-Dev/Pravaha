@@ -4,10 +4,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/); versioning: [SemVer](ht
 
 ## [Unreleased]
 
+### Fixed
+- Phone header: Studio, data saver and the theme switch were off-screen below ~560 px. Header, Studio and /try now fit 360 px (Phase 23)
+
 ### Added
 - Weak spots on Saved: wrong quiz answers become a personal revision reel of the explanations you missed (Phase 22)
 - Study notes `/notes/[id]` and `GET /api/lectures/[id]/notes`: a timestamp-linked study sheet per session, as Markdown or PDF (Phase 22)
 - Data saver: a header switch (automatic on Save-Data and 2G/3G) that serves lighter Cloudinary renditions and the `sd` streaming ladder; 33–76% fewer bytes measured (Phase 21)
+- `/judges`: the submission requirements mapped to 14 Cloudinary capabilities, live URLs and a 90-second test; revision reel on `/saved` (Phase 20)
 - Concept Map `/concepts` and Compare view `/concepts/[key]`: the same concept from every teacher as one Compare Reel (Phase 19)
 - Cloudinary asset index: tags and contextual metadata on each session's asset, synced from the Studio and read back with the Search API (Phase 19)
 
