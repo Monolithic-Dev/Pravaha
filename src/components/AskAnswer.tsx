@@ -38,7 +38,11 @@ export type AskResponse =
   | { status: "answered"; answer: string; citations: Citation[]; reel: Reel; followUps?: string[]; answerId?: string | null }
   | { status: "not_found" | "fallback"; answer: null; citations: Citation[]; reel?: Reel; followUps?: string[]; answerId?: string | null };
 
-type Progress = { retrieved?: { moments: number; sessions: string[] }; writing?: boolean };
+type Progress = {
+  understanding?: boolean;
+  retrieved?: { moments: number; sessions: string[]; expanded?: boolean };
+  writing?: boolean;
+};
 
 type State =
   | { kind: "loading"; progress: Progress }
@@ -85,7 +89,9 @@ export function AskAnswer({
           buffer = buffer.slice(newline + 1);
           if (!line) continue;
           const event = JSON.parse(line);
-          if (event.type === "retrieved") {
+          if (event.type === "understanding") {
+            setState((s) => (s.kind === "loading" ? { kind: "loading", progress: { ...s.progress, understanding: true } } : s));
+          } else if (event.type === "retrieved") {
             setState((s) => (s.kind === "loading" ? { kind: "loading", progress: { ...s.progress, retrieved: event } } : s));
           } else if (event.type === "writing") {
             setState((s) => (s.kind === "loading" ? { kind: "loading", progress: { ...s.progress, writing: true } } : s));
@@ -118,15 +124,18 @@ export function AskAnswer({
 
 // The live "what is happening" list: every line reflects a real server step.
 function Steps({ progress, scoped }: { progress: Progress; scoped: boolean }) {
-  const { retrieved, writing } = progress;
+  const { understanding, retrieved, writing } = progress;
   const found = retrieved
     ? retrieved.moments
-      ? `Found ${retrieved.moments} moment${retrieved.moments === 1 ? "" : "s"} in ${retrieved.sessions.length} session${retrieved.sessions.length === 1 ? "" : "s"}`
+      ? `Found ${retrieved.moments} moment${retrieved.moments === 1 ? "" : "s"} in ${retrieved.sessions.length} session${retrieved.sessions.length === 1 ? "" : "s"}${retrieved.expanded ? ", including ones that explain it in other words" : ""}`
       : "No matching moments"
     : null;
   return (
     <div className="mt-4" aria-label="Finding the moments that answer this…">
       <ol className="space-y-2.5 text-sm">
+        {understanding && (
+          <Step done={!!retrieved} label="Rephrasing your question in the words lecturers use (and translating it if needed)…" />
+        )}
         <Step done={!!retrieved} label={found ?? (scoped ? "Searching this session for what was said…" : "Searching every session for what was said…")} />
         {retrieved && retrieved.sessions.length > 0 && (
           <li className="rise flex flex-wrap gap-1.5 pl-7">
@@ -217,6 +226,14 @@ export function AnswerBody({
         </ol>
       )}
       {data.followUps && data.followUps.length > 0 && <FollowUps questions={data.followUps} onAsk={onFollowUp} />}
+      {data.status === "answered" && (
+        <Link
+          href={`/learn?topic=${encodeURIComponent(question)}`}
+          className="rise mt-5 inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-medium hover:border-accent"
+        >
+          <span aria-hidden>🎓</span> Go deeper: turn this into a short course from every lecture
+        </Link>
+      )}
       {data.citations.length > 0 && (
         <UnderTheHood title="How Cloudinary built this answer" items={answerHoodItems(data.citations, data.reel)} />
       )}

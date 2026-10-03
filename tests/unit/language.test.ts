@@ -14,3 +14,13 @@ describe("needsTranslation", () => {
     expect(needsTranslation("overfitting kaise roke? (2024)")).toBe(false);
   });
 });
+
+describe("answerLanguage", () => {
+  it("names the language a question's script implies", async () => {
+    const { answerLanguage } = await import("@/lib/language");
+    expect(answerLanguage("ओवरफिटिंग क्या है?")).toBe("Hindi (Devanagari script)");
+    expect(answerLanguage("ஓவர்ஃபிட்டிங் என்றால் என்ன?")).toBe("Tamil");
+    expect(answerLanguage("What is overfitting?")).toBeNull();
+    expect(answerLanguage("overfitting kya hai?")).toBeNull(); // Hinglish in Latin script: answer as asked
+  });
+});

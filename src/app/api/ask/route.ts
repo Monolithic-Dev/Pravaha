@@ -11,10 +11,14 @@ import { getLecture } from "@/lib/lectures";
 import { log } from "@/lib/log";
 import { momentUrl, reelUrl } from "@/lib/media";
 import { clientIp, takeAskToken } from "@/lib/rate-limit";
+import { needsTranslation } from "@/lib/language";
+import { mergeHits, needsUnderstanding } from "@/lib/query-plan";
+import { understandQuestion } from "@/lib/query-understanding";
 import { retrieveForQuestion, sessionOverview, type Hit } from "@/lib/search";
-import { searchableQuestion } from "@/lib/translate";
 
 export const maxDuration = 30;
+// Leave headroom under maxDuration for validation, storing the answer and streaming the result.
+const ASK_DEADLINE_MS = 27_000;
 
 const Body = z.object({
   question: z.string().trim().min(3).max(300),
@@ -35,8 +39,22 @@ const reelFor = (hits: Hit[]) =>
 
 // Progress the client can show while it waits: real retrieval facts, then the model step.
 type Progress =
-  | { type: "retrieved"; moments: number; sessions: string[] }
+  | { type: "understanding" }
+  | { type: "retrieved"; moments: number; sessions: string[]; expanded: boolean }
   | { type: "writing" };
+
+// Keyword retrieval on the learner's own words, then — when the question is in another script or the
+// keywords found little — the same retrieval on the question rewritten into the library's vocabulary
+// (query-plan.ts). Keyword hits keep priority; the rewrite only adds moments.
+async function retrieve(question: string, lectureId: string | null, progress: (p: Progress) => void) {
+  const keyword = needsTranslation(question) ? [] : await retrieveForQuestion(question, { lectureId });
+  if (!needsUnderstanding(question, keyword.length)) return { hits: keyword, expanded: false };
+  progress({ type: "understanding" });
+  const understood = await understandQuestion(question);
+  if (!understood) return { hits: keyword, expanded: false };
+  const extra = await retrieveForQuestion(understood.search, { lectureId });
+  return { hits: mergeHits(keyword, extra), expanded: extra.length > 0 };
+}
 
 // One Ask, start to finish. `progress` lets the streaming response report each step as it happens;
 // the JSON response ignores it. Same retrieval, validation and fallback either way.
@@ -47,11 +65,11 @@ async function ask(question: string, lectureId: string | null, progress: (p: Pro
   const trial = lectureId ? Boolean((await getLecture(lectureId))?.trialExpiresAt) : false;
   const logged = (...args: Parameters<typeof logAsk>) => (trial ? Promise.resolve() : logAsk(...args));
   // A question in Hindi (or any non-Latin script) is searched in English; the answer stays in its language.
-  const matched = await retrieveForQuestion(await searchableQuestion(question), { lectureId });
+  const { hits: matched, expanded } = await retrieve(question, lectureId, progress);
   // In one session, a question with no keyword match ("What is this about?") is answered from moments across
   // the whole session; the model still refuses if they don't answer it.
   const hits = matched.length === 0 && lectureId ? await sessionOverview(lectureId) : matched;
-  progress({ type: "retrieved", moments: hits.length, sessions: [...new Set(hits.map((h) => h.title))].slice(0, 5) });
+  progress({ type: "retrieved", moments: hits.length, sessions: [...new Set(hits.map((h) => h.title))].slice(0, 5), expanded });
 
   if (hits.length === 0) {
     // Nothing in the library matches — no reason to call the model.
@@ -62,13 +80,15 @@ async function ask(question: string, lectureId: string | null, progress: (p: Pro
 
   try {
     progress({ type: "writing" });
-    const raw = await askGrounded(question, hits);
+    // Whatever question understanding used comes out of the answer's budget, so the request never outlives maxDuration.
+    const raw = await askGrounded(question, hits, { budgetMs: ASK_DEADLINE_MS - (Date.now() - started) });
     const result = validateAnswer(raw, hits);
     log("ask.done", {
       status: result.status,
       retrieved: hits.length,
       cited: result.citations.length,
       dropped: result.dropped,
+      expanded,
       ms: Date.now() - started,
     });
     after(() => logged(question, result.status, result.citations.map((c) => c.lectureId)));

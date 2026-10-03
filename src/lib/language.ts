@@ -11,3 +11,22 @@ export function needsTranslation(question: string): boolean {
 // with the label the player shows. The player loads `{public_id}.{code}.transcript` for each.
 export const SUBTITLE_LANGUAGES = [{ code: "hi-IN", label: "हिन्दी" }] as const;
 export type SubtitleLanguage = (typeof SUBTITLE_LANGUAGES)[number];
+
+// The language a question's script implies, for telling the model what to answer in. English lecture
+// excerpts pull replies into English unless the target language is named outright. null = Latin script.
+const SCRIPTS: [RegExp, string][] = [
+  [/\p{Script=Devanagari}/u, "Hindi (Devanagari script)"],
+  [/\p{Script=Tamil}/u, "Tamil"],
+  [/\p{Script=Telugu}/u, "Telugu"],
+  [/\p{Script=Kannada}/u, "Kannada"],
+  [/\p{Script=Malayalam}/u, "Malayalam"],
+  [/\p{Script=Bengali}/u, "Bengali"],
+  [/\p{Script=Gujarati}/u, "Gujarati"],
+  [/\p{Script=Gurmukhi}/u, "Punjabi (Gurmukhi script)"],
+  [/\p{Script=Arabic}/u, "Urdu"],
+];
+
+export function answerLanguage(question: string): string | null {
+  if (!needsTranslation(question)) return null;
+  return SCRIPTS.find(([re]) => re.test(question))?.[1] ?? "the same language and script as the question";
+}
