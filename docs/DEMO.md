@@ -28,6 +28,8 @@ Never show setup, code, dashboards or waiting. Every shot is the problem, the pr
 
 **Study shots (if there is time):** answer a quiz question wrong → `/saved` → **Play my weak-spot reel** ("What you get wrong comes back as video.") → a session’s **Study notes** → **Download .md** ("Every point links to the second the teacher said it.")
 
+**Proof shot (10 s):** open `/status`: "The product watches itself: database, every AI model and the Cloudinary credits it runs on."
+
 **Bonus shot (if there is time):** header → **Data saver** on → the same answer reel and thumbnails reload visibly lighter. Voice-over: "Built for India’s mobile data: one switch, and Cloudinary serves everything at a fraction of the bytes."
 ## Phase 18–20 scenes (Oct 3) — swap in for the 2:06–2:35 shots if time is tight
 
