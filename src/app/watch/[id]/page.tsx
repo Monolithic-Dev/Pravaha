@@ -84,6 +84,14 @@ export default async function WatchPage({ params, searchParams }: Props) {
           <p className="mt-1 text-muted">
             {lecture.speaker ?? "Unknown speaker"}
             {lecture.durationS ? <span className="tabular"> · {formatTime(lecture.durationS)}</span> : null}
+            {ready && segments.length > 0 && (
+              <>
+                {" · "}
+                <Link href={`/notes/${lecture.id}`} className="font-medium text-accent hover:underline">
+                  Study notes
+                </Link>
+              </>
+            )}
           </p>
         </header>
         {trialHoursLeft !== null && (

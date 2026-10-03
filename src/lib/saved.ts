@@ -2,6 +2,8 @@
 
 import { useMemo, useSyncExternalStore } from "react";
 
+import { applyQuizResult, WEAK_SPOT_LIMIT, type WeakSpot } from "@/lib/weak-spots";
+
 // The learner's own library, kept on this device only (no account, nothing sent anywhere): saved moments,
 // recent questions and where they stopped watching. Every read and write tolerates blocked storage
 // (private mode, disabled site data), in which case the features simply show nothing.
@@ -24,11 +26,12 @@ const KEYS = {
   moments: "pravaha-saved-moments",
   questions: "pravaha-recent-questions",
   progress: "pravaha-watch-progress",
+  weak: "pravaha-weak-spots",
 } as const;
 type Key = (typeof KEYS)[keyof typeof KEYS];
 
 const CHANGE = "pravaha-saved-change";
-const LIMITS: Record<Key, number> = { [KEYS.moments]: 100, [KEYS.questions]: 30, [KEYS.progress]: 12 };
+const LIMITS: Record<Key, number> = { [KEYS.moments]: 100, [KEYS.questions]: 30, [KEYS.progress]: 12, [KEYS.weak]: WEAK_SPOT_LIMIT };
 
 function readRaw(key: Key): string | null {
   try {
@@ -75,6 +78,16 @@ function useStored<T>(key: Key): T[] {
 export const useSavedMoments = () => useStored<SavedMoment>(KEYS.moments);
 export const useRecentQuestions = () => useStored<RecentQuestion>(KEYS.questions);
 export const useWatchProgress = () => useStored<WatchProgress>(KEYS.progress);
+export const useWeakSpots = () => useStored<WeakSpot>(KEYS.weak);
+
+// Quiz answers feed the weak spots: a wrong answer adds the question, a right one clears it.
+export function recordQuizResult(spot: WeakSpot, correct: boolean) {
+  write(KEYS.weak, applyQuizResult(parse<WeakSpot>(readRaw(KEYS.weak)), spot, correct));
+}
+
+export function removeWeakSpot(key: string) {
+  write(KEYS.weak, parse<WeakSpot>(readRaw(KEYS.weak)).filter((s) => s.key !== key));
+}
 
 export function toggleSavedMoment(moment: Omit<SavedMoment, "savedAt">): boolean {
   const items = parse<SavedMoment>(readRaw(KEYS.moments));

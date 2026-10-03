@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { WeakSpots } from "@/components/WeakSpots";
 import { useLiteUrl } from "@/lib/data-saver";
 import { formatTime } from "@/lib/format";
 import { thumbUrl } from "@/lib/media";
-import { clearSaved, toggleSavedMoment, useRecentQuestions, useSavedMoments, useWatchProgress } from "@/lib/saved";
+import { clearSaved, toggleSavedMoment, useRecentQuestions, useSavedMoments, useWatchProgress, useWeakSpots } from "@/lib/saved";
 
 // The learner's Saved page: everything here lives on this device (src/lib/saved.ts).
 export function SavedView() {
@@ -14,6 +15,7 @@ export function SavedView() {
   const moments = useSavedMoments();
   const questions = useRecentQuestions();
   const progress = useWatchProgress();
+  const weak = useWeakSpots();
 
   return (
     <div className="space-y-10">
@@ -23,6 +25,10 @@ export function SavedView() {
         ) : (
           <ContinueWatchingRow items={progress} />
         )}
+      </Section>
+
+      <Section title="Weak spots" count={weak.length} onClear={() => clearSaved("weak")}>
+        <WeakSpots />
       </Section>
 
       <Section title="Saved moments" count={moments.length} onClear={() => clearSaved("moments")}>

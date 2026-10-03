@@ -5,11 +5,13 @@ import { useState } from "react";
 import { useLiteUrl } from "@/lib/data-saver";
 import { formatTime } from "@/lib/format";
 import { reelUrl } from "@/lib/media";
+import { recordQuizResult } from "@/lib/saved";
+import { weakKey } from "@/lib/weak-spots";
 import type { StudyPack } from "@/lib/study-pack-schema";
 
-type Props = { pack: StudyPack; publicId: string; onSeek: (seconds: number) => void };
+type Props = { pack: StudyPack; lectureId: string; title: string; publicId: string; onSeek: (seconds: number) => void };
 
-export function StudyPanel({ pack, publicId, onSeek }: Props) {
+export function StudyPanel({ pack, lectureId, title, publicId, onSeek }: Props) {
   const reel = reelUrl(pack.highlights.map((h) => ({ publicId, startS: h.startS, endS: h.endS, label: h.label ?? undefined })));
 
   return (
@@ -54,7 +56,7 @@ export function StudyPanel({ pack, publicId, onSeek }: Props) {
         </section>
       )}
 
-      {pack.quiz.length > 0 && <Quiz quiz={pack.quiz} publicId={publicId} onSeek={onSeek} />}
+      {pack.quiz.length > 0 && <Quiz quiz={pack.quiz} lectureId={lectureId} title={title} publicId={publicId} onSeek={onSeek} />}
     </div>
   );
 }
@@ -79,7 +81,9 @@ function ReelButton({ url, title, subtitle }: { url: string; title: string; subt
   );
 }
 
-function Quiz({ quiz, publicId, onSeek }: { quiz: StudyPack["quiz"]; publicId: string; onSeek: (seconds: number) => void }) {
+type QuizProps = { quiz: StudyPack["quiz"]; lectureId: string; title: string; publicId: string; onSeek: (seconds: number) => void };
+
+function Quiz({ quiz, lectureId, title, publicId, onSeek }: QuizProps) {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   // Bumped on every retry so the "missed" reel remounts closed instead of replaying the old one.
   const [round, setRound] = useState(0);
@@ -125,7 +129,26 @@ function Quiz({ quiz, publicId, onSeek }: { quiz: StudyPack["quiz"]; publicId: s
                       key={option}
                       type="button"
                       disabled={done}
-                      onClick={() => setAnswers((a) => ({ ...a, [i]: j }))}
+                      onClick={() => {
+                        setAnswers((a) => ({ ...a, [i]: j }));
+                        // A wrong answer becomes a weak spot (shown on Saved); a right answer clears one.
+                        recordQuizResult(
+                          {
+                            key: weakKey(lectureId, q.question),
+                            lectureId,
+                            publicId,
+                            title,
+                            question: q.question,
+                            answer: q.options[q.correctIndex] ?? "",
+                            explanation: q.explanation,
+                            segmentId: q.segmentId,
+                            startS: q.startS,
+                            endS: q.endS,
+                            at: Date.now(),
+                          },
+                          j === q.correctIndex,
+                        );
+                      }}
                       className={`rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
                         state === "right"
                           ? "border-ready bg-ready/10"
@@ -167,7 +190,7 @@ function Quiz({ quiz, publicId, onSeek }: { quiz: StudyPack["quiz"]; publicId: s
           <p className="text-sm text-muted">
             {correct === quiz.length
               ? "All correct. You've got this session."
-              : `${missed.length} to review. The explanations are in the session itself.`}
+              : `${missed.length} to review. They are saved as weak spots, with a revision reel, on your Saved page.`}
           </p>
           {missedReel && (
             <div className="mt-3">
