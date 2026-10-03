@@ -112,3 +112,17 @@ export async function sessionOverview(lectureId: string, limit = 12): Promise<Hi
   );
   return rows.map(toHit);
 }
+
+// The given moments, in the order given, for published sessions only (the Concept Map's tagged moments).
+export async function momentsBySegmentIds(ids: number[]): Promise<Hit[]> {
+  if (!ids.length) return [];
+  const rows = await query<Row>(
+    `SELECT s.id, s.lecture_id, l.public_id, l.title, l.speaker, s.start_s, s.end_s, s.text, s.chapter_title,
+            l.duration_s, s.words, array_to_string((string_to_array(s.text, ' '))[1:28], ' ') AS snippet
+       FROM segments s JOIN lectures l ON l.id = s.lecture_id
+      WHERE s.id = ANY($1::bigint[]) AND l.status = 'ready' AND l.visibility = 'public' AND l.trial_expires_at IS NULL`,
+    [ids],
+  );
+  const order = new Map(ids.map((id, i) => [id, i]));
+  return rows.map(toHit).sort((a, b) => order.get(a.segmentId)! - order.get(b.segmentId)!);
+}

@@ -146,3 +146,17 @@ Adds `checks.aiLive.models[{ model, ok, ms, error? }]`, one tiny real call per m
 
 ### `POST /api/ask` (behaviour)
 Retrieval now rewrites a question into the library's vocabulary when it is in another script or keyword retrieval is thin. The stream gains an `{ "type": "understanding" }` event, and `retrieved` carries `expanded: boolean`.
+
+## Phase 19 additions
+
+### `GET /api/concepts`
+- **Auth:** public
+- **Response:** `[{ key, name, sessions }]`: every concept the published library teaches, most-taught first
+
+### `GET /api/concepts/[key]`
+- **Auth:** public
+- **Response:** `{ key, name, moments: [{ lectureId, title, speaker, startS, endS, text, related }] }` (up to 5, one per session; `related` is true for a session that teaches it without naming it a key concept) · `404` unknown key
+
+### `POST /api/organizer/index` · `GET /api/organizer/index`
+- **Auth:** organizer cookie (`401` otherwise) · `maxDuration` 60 s
+- `POST` writes tags and contextual metadata onto every session's Cloudinary asset, then returns `{ synced, skipped, assets }` read back with the Search API. `GET` returns just `{ assets: [{ publicId, tags, context }] }`

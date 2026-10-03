@@ -93,3 +93,4 @@ The core loop (Phases 01–09) is built and verified on real Cloudinary + Neon. 
 **PR policy (team lead, Oct 1):** a PR is opened only once a feature branch carries **at least 20 changed files**, so related phases ship together (`GIT_WORKFLOW.md`).
 
 | 18 | Query understanding, Learning Paths, AI reliability | Rewrite questions into the library's words (and translate them), honest near-miss answers, `/learn` micro-courses as one Cloudinary reel, circuit breaker + deep health | ✅ done (Oct 3) |
+| 19 | Concept Map & Cloudinary asset index | Same concept, every teacher, as one Compare Reel; tags + contextual metadata on Cloudinary assets, read back with the Search API | ✅ done (Oct 3) |
