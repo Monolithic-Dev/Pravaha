@@ -58,7 +58,7 @@ export function TryFlow({ seconds, ttlHours }: { seconds: number; ttlHours: numb
 function Progress({ step }: { step: 1 | 2 | 3 }) {
   const labels = ["Details", "Upload", "Processing"];
   return (
-    <ol className="mb-5 flex items-center gap-2 text-sm" aria-label={`Step ${step} of 3`}>
+    <ol className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm" aria-label={`Step ${step} of 3`}>
       {labels.map((label, i) => {
         const n = i + 1;
         const state = n < step ? "done" : n === step ? "current" : "todo";
@@ -72,7 +72,7 @@ function Progress({ step }: { step: 1 | 2 | 3 }) {
               {state === "done" ? "✓" : n}
             </span>
             <span className={state === "current" ? "font-medium" : "text-muted"}>{label}</span>
-            {n < 3 && <span aria-hidden className="mx-1 h-px w-6 bg-border sm:w-10" />}
+            {n < 3 && <span aria-hidden className="mx-0.5 h-px w-4 bg-border sm:mx-1 sm:w-10" />}
           </li>
         );
       })}

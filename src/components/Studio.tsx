@@ -74,7 +74,7 @@ export function Studio({ demo = false }: { demo?: boolean }) {
   }
 
   return (
-    <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
+    <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
       <div>
         {demo ? (
           <DemoCard />

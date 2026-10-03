@@ -46,35 +46,40 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <SiteChrome>
           <header className="sticky top-0 z-30 print:hidden border-b border-transparent bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/70">
-            <nav aria-label="Main" className="mx-auto flex max-w-280 items-center justify-between px-4 py-3">
+            {/* Phone: logo and the two switches on the first row, the page links on a second row that scrolls if it must.
+                From sm up: one row, links then switches. (At 360 px the single row needed 560 px, which pushed Studio,
+                data saver and the theme switch off-screen.) */}
+            <nav aria-label="Main" className="mx-auto flex max-w-280 flex-wrap items-center justify-between gap-x-1 px-4 py-2 sm:py-3">
               <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
                 <LogoMark />
                 Pravaha
               </Link>
-              <div className="flex items-center gap-1 text-sm">
-                <Link href="/#library" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
-                  Library
-                </Link>
-                <Link href="/learn" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
-                  Learn
-                </Link>
-                <Link href="/concepts" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
-                  Concepts
-                </Link>
-                <Link href="/saved" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
-                  Saved
-                </Link>
-                <Link href="/studio" className="rounded-lg px-3 py-2 text-muted hover:bg-surface hover:text-fg">
-                  Studio
-                </Link>
+              <div className="order-2 flex items-center gap-1 text-sm sm:order-3">
                 <Link
                   href="/try"
-                  className="ml-1 hidden rounded-lg bg-accent px-3 py-1.5 font-medium text-accent-fg hover:brightness-110 sm:inline-block"
+                  className="mr-1 hidden rounded-lg bg-accent px-3 py-1.5 font-medium text-accent-fg hover:brightness-110 sm:inline-block"
                 >
                   Try it
                 </Link>
                 <DataSaverToggle />
                 <ThemeToggle />
+              </div>
+              <div className="no-scrollbar order-3 -mx-1 flex w-full items-center gap-0.5 overflow-x-auto text-sm sm:order-2 sm:mx-0 sm:ml-auto sm:w-auto sm:gap-1">
+                <Link href="/#library" className="shrink-0 rounded-lg px-2 py-2 text-muted hover:bg-surface hover:text-fg sm:px-3">
+                  Library
+                </Link>
+                <Link href="/learn" className="shrink-0 rounded-lg px-2 py-2 text-muted hover:bg-surface hover:text-fg sm:px-3">
+                  Learn
+                </Link>
+                <Link href="/concepts" className="shrink-0 rounded-lg px-2 py-2 text-muted hover:bg-surface hover:text-fg sm:px-3">
+                  Concepts
+                </Link>
+                <Link href="/saved" className="shrink-0 rounded-lg px-2 py-2 text-muted hover:bg-surface hover:text-fg sm:px-3">
+                  Saved
+                </Link>
+                <Link href="/studio" className="shrink-0 rounded-lg px-2 py-2 text-muted hover:bg-surface hover:text-fg sm:px-3">
+                  Studio
+                </Link>
               </div>
             </nav>
           </header>

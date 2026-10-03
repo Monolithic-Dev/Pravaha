@@ -180,3 +180,11 @@ body {
   .playhead { width: 100%; }
   .lift, .lift:hover { transition: none; transform: none; }
 }
+
+/* A row that scrolls sideways without showing a scrollbar (the phone header's page links). */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
