@@ -1,7 +1,7 @@
 import { after, NextResponse } from "next/server";
 import { z } from "zod";
 
-import { saveAnswer } from "@/lib/answers";
+import { findCachedAnswer, saveAnswer } from "@/lib/answers";
 import { cleanFollowUps, validateAnswer } from "@/lib/citations";
 import { AiUnconfigured } from "@/lib/ai";
 import { askGrounded } from "@/lib/answer";
@@ -64,6 +64,17 @@ async function ask(question: string, lectureId: string | null, progress: (p: Pro
   // aren't stored as shareable links (they would outlive the video).
   const trial = lectureId ? Boolean((await getLecture(lectureId))?.trialExpiresAt) : false;
   const logged = (...args: Parameters<typeof logAsk>) => (trial ? Promise.resolve() : logAsk(...args));
+  // The same question was answered recently and nothing in the library has changed: reuse that answer. No retrieval,
+  // no AI call (so no quota, and instant), same citations and share link. Still counted in Insights.
+  const cachedAnswer = trial ? null : await findCachedAnswer(question, lectureId);
+  const cachedResult = cachedAnswer?.result as { citations?: { lectureId: string; title: string }[] } | undefined;
+  if (cachedAnswer && cachedResult?.citations?.length) {
+    const sessions = [...new Set(cachedResult.citations.map((c) => c.title))].slice(0, 5);
+    progress({ type: "retrieved", moments: cachedResult.citations.length, sessions, expanded: false });
+    log("ask.cache_hit", { cited: cachedResult.citations.length, ms: Date.now() - started });
+    after(() => logged(question, "answered", cachedResult.citations!.map((c) => c.lectureId)));
+    return { ...cachedAnswer.result, answerId: cachedAnswer.id, cached: true };
+  }
   // A question in Hindi (or any non-Latin script) is searched in English; the answer stays in its language.
   const { hits: matched, expanded } = await retrieve(question, lectureId, progress);
   // In one session, a question with no keyword match ("What is this about?") is answered from moments across
@@ -100,7 +111,7 @@ async function ask(question: string, lectureId: string | null, progress: (p: Pro
       followUps: result.status === "answered" ? cleanFollowUps(raw.follow_ups, question) : [],
     };
     // Stored as shown, so /a/[answerId] can be shared without re-running the model.
-    const answerId = result.status === "answered" && !trial ? await saveAnswer(question, body) : null;
+    const answerId = result.status === "answered" && !trial ? await saveAnswer(question, body, lectureId) : null;
     return { ...body, answerId };
   } catch (error) {
     // NFR4: the model failing never means an error page — show the most relevant moments instead.

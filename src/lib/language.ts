@@ -30,3 +30,10 @@ export function answerLanguage(question: string): string | null {
   if (!needsTranslation(question)) return null;
   return SCRIPTS.find(([re]) => re.test(question))?.[1] ?? "the same language and script as the question";
 }
+
+// Models sometimes end Indic sentences with the CJK full stop (。). Replace it with the script's own stop:
+// the danda (।) for Devanagari, Bengali and Gurmukhi, a plain full stop for the others.
+export function fixPunctuation(text: string, language: string | null): string {
+  if (!language || !text.includes("。")) return text;
+  return text.replaceAll("。", /Hindi|Bengali|Punjabi/.test(language) ? "।" : ".");
+}
