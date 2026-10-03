@@ -70,7 +70,7 @@ Skeletons, never bare spinners. 404 session → "This session isn't available." 
 
 ### Motion & shell (v3)
 - `rise` (staggered entrance), `word-in` (answer reveal), `lift` (hover), `spinner`; all disabled under `prefers-reduced-motion`
-- Sticky blurred header with the Pravaha mark (also the favicon, `app/icon.svg`), Library and Studio links, a skip link, and a footer
+- Sticky blurred header with the Pravaha mark (also the favicon, `app/icon.svg`), the page links (Library, Learn, Concepts, Saved, Studio) and the data saver and theme switches. On a phone the links drop to a second, sideways-scrolling row so nothing is pushed off-screen (Phase 23); a skip link, and a footer
 - Home: "How it works" in three steps under the Ask bar
 - `/` or Ctrl/⌘K focuses the Ask bar from anywhere
 

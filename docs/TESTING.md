@@ -22,6 +22,12 @@ Scope: the things that would embarrass the product in front of a judge or corrup
 
 Against the **deployed** `APP_URL`: home → search a known phrase → result opens `/watch/id?t=` at the right second → Ask a known question → ≥1 citation card → open Moment sheet. Run before recording the demo and before submitting.
 
+### More end-to-end specs (all run against the deployed `APP_URL`, `--project=desktop --project=mobile`)
+- `judges.spec.ts`: the judges page, the concept map with its compare reel, `/learn`
+- `data-saver.spec.ts`: the header switch makes Cloudinary thumbnails `w_320,q_auto:low`, is remembered, and a session streams the `sp_sd` ladder
+- `revision.spec.ts`: a wrong quiz answer appears under Weak spots with a revision reel and clears; study notes carry timestamp links and download as Markdown
+- `mobile.spec.ts`: at 360 px the header's Studio, data saver and theme controls are on screen and no page scrolls sideways
+
 ## AI Eval (`pnpm eval:ask`)
 
 10 questions (7 answerable, 3 not) against the demo library; results recorded in `AI_EVALUATION.md`.
