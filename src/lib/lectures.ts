@@ -173,3 +173,40 @@ export const getMoment = cache(async (segmentId: number): Promise<Moment | null>
     lecture: toLecture(r),
   };
 });
+
+// The words the library itself uses: published session titles and their AI chapter titles. Given to the
+// question-understanding step so it rewrites questions into terms the transcripts actually contain.
+export async function libraryVocabulary(limit = 80): Promise<string[]> {
+  const rows = await query<{ term: string }>(
+    `SELECT term FROM (
+       SELECT l.title AS term, 0 AS kind FROM lectures l
+        WHERE l.status = 'ready' AND l.visibility = 'public' AND l.trial_expires_at IS NULL
+       UNION
+       SELECT DISTINCT s.chapter_title, 1 FROM segments s JOIN lectures l ON l.id = s.lecture_id
+        WHERE l.status = 'ready' AND l.visibility = 'public' AND l.trial_expires_at IS NULL AND s.chapter_title IS NOT NULL
+     ) t ORDER BY kind, term LIMIT $1`,
+    [limit],
+  );
+  return rows.map((r) => r.term);
+}
+
+// Find by what a session is ABOUT, not only what was said: its title, speaker and chapter titles, any word
+// matching. "regularization" finds "Overfitting, Underfitting and Regularization" even if the clip never
+// says the word. Best match first.
+export async function findSessions(q: string, limit = 4): Promise<Lecture[]> {
+  const rows = await query<Row>(
+    `WITH q AS (SELECT to_tsquery('english', replace(plainto_tsquery('english', $1)::text, '&', '|')) AS q),
+     docs AS (
+       SELECT l.id, to_tsvector('english', l.title || ' ' || coalesce(l.speaker, '') || ' ' ||
+              coalesce((SELECT string_agg(DISTINCT s.chapter_title, ' ') FROM segments s WHERE s.lecture_id = l.id), '')) AS v
+         FROM lectures l
+        WHERE l.status = 'ready' AND l.visibility = 'public' AND l.trial_expires_at IS NULL
+     )
+     SELECT ${COLUMNS.split(", ").map((c) => `l.${c}`).join(", ")} FROM lectures l JOIN docs d ON d.id = l.id, q
+      WHERE d.v @@ q.q
+      ORDER BY ts_rank(d.v, q.q) DESC, l.created_at DESC
+      LIMIT $2`,
+    [q, limit],
+  );
+  return rows.map(toLecture);
+}

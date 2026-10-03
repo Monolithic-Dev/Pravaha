@@ -131,3 +131,18 @@ Every endpoint maps to an FR in `PRD.md`; there is no endpoint without one.
 - **Auth:** public, `Cache-Control: no-store`
 - **Response:** `200 { "status": "ok", "checks": { "database": { "ok", "ms" }, "ai": { "configured", "providers" }, "trials": { "enabled" }, "demoStudio": { "enabled" } }, "version": "<commit>" }`; `503` with `"status": "degraded"` when the database is unreachable (3 s timeout). No secrets or config values
 
+
+## Phase 18 additions
+
+### `POST /api/paths`
+- **Auth:** public, shares Ask's rate limit (`429` + `Retry-After`) · `maxDuration` 45 s
+- **Request:** `{ "topic": string(3–200) }`
+- **Response:** `{ "status": "built", "path": { id, topic, title, steps[{ n, stepTitle, why, segmentId, lectureId, title, speaker, startS, endS, … }], reel: { url, durationS, clips } } }` or `{ "status": "not_found" }` when the library can't support at least 3 on-topic steps
+- **Errors:** `400` · `429` · `502` AI failed · `503` no AI key
+- Courses are stored (`learning_paths`) and open at `/p/[id]`.
+
+### `GET /api/health?deep=1`
+Adds `checks.aiLive.models[{ model, ok, ms, error? }]`, one tiny real call per model. It spends tokens, so it shares Ask's rate limit.
+
+### `POST /api/ask` (behaviour)
+Retrieval now rewrites a question into the library's vocabulary when it is in another script or keyword retrieval is thin. The stream gains an `{ "type": "understanding" }` event, and `retrieved` carries `expanded: boolean`.

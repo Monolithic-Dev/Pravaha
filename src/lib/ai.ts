@@ -2,6 +2,7 @@ import "server-only";
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
+import { createBreaker } from "@/lib/ai-breaker";
 import { env } from "@/lib/env";
 import { log } from "@/lib/log";
 
@@ -72,36 +73,85 @@ function groqAttempts(apiKey: string, system: string, prompt: string, schema: un
   }));
 }
 
-// One structured call with a fallback chain (Gemini models, then Groq): the first model that answers with
-// schema-valid JSON wins. Either key alone is enough; with neither, callers degrade (AiUnconfigured).
-export async function generateJson<T extends z.ZodType>(
-  schema: T,
-  { system, prompt, timeoutMs = 12_000, task }: { system: string; prompt: string; timeoutMs?: number; task: string },
-): Promise<{ data: z.infer<T>; model: string }> {
+// Shared by every request this server instance handles (see ai-breaker.ts).
+const breaker = createBreaker();
+
+function attemptsFor(system: string, prompt: string, schema: z.ZodType): Attempt[] {
   const { GEMINI_API_KEY, GROQ_API_KEY } = env();
   if (!GEMINI_API_KEY && !GROQ_API_KEY) throw new AiUnconfigured("Neither GEMINI_API_KEY nor GROQ_API_KEY is set");
   const jsonSchema = jsonSchemaFor(schema);
-  const attempts = [
+  return [
     ...(GEMINI_API_KEY ? geminiAttempts(GEMINI_API_KEY, system, prompt, jsonSchema) : []),
     ...(GROQ_API_KEY ? groqAttempts(GROQ_API_KEY, system, prompt, jsonSchema) : []),
   ];
+}
 
+const MIN_ATTEMPT_MS = 1_500;
+
+// One structured call with a fallback chain (Gemini models, then Groq): the first model that answers with
+// schema-valid JSON wins. Either key alone is enough; with neither, callers degrade (AiUnconfigured).
+// `budgetMs` caps the WHOLE chain (each attempt gets min(timeoutMs, what's left)), so a slow provider can't
+// push a request past the route's maxDuration before the next provider is tried. Models whose circuit is
+// open (recent quota/auth/overload failure) are skipped, unless every model is, in which case all are tried.
+export async function generateJson<T extends z.ZodType>(
+  schema: T,
+  {
+    system,
+    prompt,
+    timeoutMs = 12_000,
+    budgetMs = 24_000,
+    task,
+  }: { system: string; prompt: string; timeoutMs?: number; budgetMs?: number; task: string },
+): Promise<{ data: z.infer<T>; model: string }> {
+  const all = attemptsFor(system, prompt, schema);
+  const healthy = all.filter((a) => !breaker.isOpen(a.model));
+  const attempts = healthy.length ? healthy : all;
+  if (healthy.length < all.length) log("ai.skipped_open_circuits", { task, skipped: all.length - healthy.length });
+
+  const deadline = Date.now() + budgetMs;
   let lastError: unknown;
   for (const { model, call } of attempts) {
+    const remaining = deadline - Date.now();
+    if (remaining < MIN_ATTEMPT_MS) break;
     const started = Date.now();
     try {
-      const data = schema.parse(JSON.parse(await call(AbortSignal.timeout(timeoutMs))));
+      const data = schema.parse(JSON.parse(await call(AbortSignal.timeout(Math.min(timeoutMs, remaining)))));
+      breaker.recordSuccess(model);
       log("ai.done", { task, model, ms: Date.now() - started });
       return { data, model };
     } catch (error) {
       lastError = error;
+      const cooldownMs = breaker.recordFailure(model, error);
       log("ai.model_failed", {
         task,
         model,
         ms: Date.now() - started,
+        cooldownMs,
         error: error instanceof Error ? error.message.slice(0, 160) : String(error),
       });
     }
   }
-  throw lastError ?? new Error("no model answered");
+  throw lastError ?? new Error(`no model answered within ${budgetMs} ms`);
+}
+
+const Probe = z.object({ ok: z.boolean() });
+
+export type ProbeResult = { model: string; ok: boolean; ms: number; error?: string };
+
+// Deep health: one tiny structured call per model (ignoring the breaker), so "is AI working in production?"
+// has an answer instead of a guess. Errors are shortened and never include keys.
+export async function probeModels(timeoutMs = 8_000): Promise<ProbeResult[]> {
+  const attempts = attemptsFor("Reply with {\"ok\": true}.", "ping", Probe);
+  return Promise.all(
+    attempts.map(async ({ model, call }) => {
+      const started = Date.now();
+      try {
+        Probe.parse(JSON.parse(await call(AbortSignal.timeout(timeoutMs))));
+        return { model, ok: true, ms: Date.now() - started };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        return { model, ok: false, ms: Date.now() - started, error: message.replace(/key=[^&\s]+/gi, "key=…").slice(0, 140) };
+      }
+    }),
+  );
 }
