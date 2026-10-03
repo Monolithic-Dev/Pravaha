@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <SiteChrome>
-          <header className="sticky top-0 z-30 border-b border-transparent bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/70">
+          <header className="sticky top-0 z-30 print:hidden border-b border-transparent bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/70">
             <nav aria-label="Main" className="mx-auto flex max-w-280 items-center justify-between px-4 py-3">
               <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
                 <LogoMark />
@@ -84,7 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <SiteChrome>
-          <footer className="border-t border-border">
+          <footer className="border-t border-border print:hidden">
             <div className="mx-auto flex max-w-280 flex-col gap-2 px-4 py-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
               <p className="flex items-center gap-2">
                 <LogoMark className="size-5" />
