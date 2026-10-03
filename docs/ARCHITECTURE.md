@@ -2,6 +2,56 @@
 
 Read `PRD.md`, `CLOUDINARY.md` and `TRD.md` first; these diagrams show those decisions in motion.
 
+## 0. Whole system (Oct 3)
+
+The current shape of the product, including Learning Paths, the Concept Map, study notes, data saver, the Cloudinary asset index and the status page. The diagrams below it are the original design views.
+
+```mermaid
+flowchart TB
+  subgraph Org["Organizer"]
+    O["Studio · upload · Insights"]
+  end
+  subgraph Learn["Learner · phone or laptop"]
+    L["Ask · Find · Watch · Concepts · Learn · Saved · Notes"]
+  end
+
+  subgraph Cloudinary["Cloudinary: the media plane"]
+    U["Signed upload preset"]
+    AI["auto_transcription · auto_chaptering · hi-IN translate"]
+    T["Transformations on demand: Moments · Reels · cards · previews · data saver"]
+    S["HLS streaming · f_auto · q_auto"]
+    X["Tags + context + Search API"]
+  end
+
+  subgraph App["Next.js 16 on Vercel: the knowledge plane"]
+    W["Signed webhook"]
+    R["Retrieval · question understanding"]
+    G["Grounded answer + citation validation"]
+    P["Study Packs · Learning Paths · Concept Map · Notes"]
+    ST["/status · /api/health"]
+  end
+
+  DB[("Neon Postgres: segments · full-text index · packs · insights")]
+  M["Gemini → Groq fallback chain · circuit breaker"]
+
+  O -- video bytes, signed --> U
+  U --> AI
+  AI -- webhook --> W
+  W -- time-coded segments --> DB
+  W -- study pack --> P
+  P -- tags and context --> X
+  L -- question --> R
+  R --> DB
+  R --> G
+  G <--> M
+  G -- validated citations + clip URLs --> L
+  T -- clips · reels · shorts --> L
+  S -- adaptive video --> L
+  ST -. checks .-> DB
+  ST -. checks .-> M
+  ST -. credits .-> Cloudinary
+```
+
 ## 1. System Context
 
 ```mermaid

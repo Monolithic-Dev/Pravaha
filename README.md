@@ -51,6 +51,7 @@ Hackathon project by Team Code Blooded - [hackindia-team:pixels-to-products-clou
 - [What Pravaha does](#what-pravaha-does)
 - [Screenshots](#screenshots)
 - [How Cloudinary powers it](#how-cloudinary-powers-it)
+- [Business case](#business-case)
 - [Architecture](#architecture)
 - [How to test it](#how-to-test-it)
 - [Quick start](#quick-start)
@@ -141,19 +142,62 @@ Every session page and answer has a **Cloudinary under the hood** panel that lis
 
 Full detail: [`docs/CLOUDINARY.md`](docs/CLOUDINARY.md).
 
+## Business case
+
+Track 3 asks for something you could pitch. Pravaha's pitch, in short (full version, with every number tagged actual, estimate or assumption: [`docs/BUSINESS.md`](docs/BUSINESS.md)):
+
+- **Who pays:** coaching institutes first (their recorded classes are their product, and doubts cost teacher time), then college departments, then companies with recorded trainings.
+- **Why it wins:** the answer is a clip of *their own teacher* saying it, never a chatbot's guess; it says "not covered" instead of bluffing, and that becomes a knowledge-gap report. Each institute's corpus and learner questions become a moat.
+- **Why Cloudinary's pricing fits:** no transcoding farm, no GPUs. Transcripts, chapters, streams, crops, reels and share cards are generated on demand and cached, so cost follows what is *watched*, not what is stored. Hosting one hour of content is about 28.8 Cloudinary credits if every rendition is generated, and Ask costs a fraction of a cent.
+- **Pricing hypothesis (to validate, nobody has paid yet):** a free pilot for one batch, then a one-time processing fee per content-hour plus a monthly fee per active learner.
+- **The binding constraint, shown live:** Cloudinary credits. [`/status`](https://pravaha-cyan.vercel.app/status) shows usage and warns at 80% and 95%.
+
 ## Architecture
 
 ```mermaid
-flowchart LR
-  O[Organizer · Studio] -- signed upload --> C[(Cloudinary)]
-  C -- signed webhook --> API[Next.js API on Vercel]
-  API -- segments + full-text index --> DB[(Neon Postgres)]
-  L[Learner] -- question --> API
-  API -- retrieve --> DB
-  API -- top segments --> G[Gemini · Groq backup]
-  G -- answer + citations --> API
-  API -- validated citations + clip URLs --> L
-  C -- HLS · Moments · Reels · thumbnails --> L
+flowchart TB
+  subgraph Org["Organizer"]
+    O["Studio · upload · Insights"]
+  end
+  subgraph Learn["Learner · phone or laptop"]
+    L["Ask · Find · Watch · Concepts · Learn · Saved · Notes"]
+  end
+
+  subgraph Cloudinary["Cloudinary: the media plane"]
+    U["Signed upload preset"]
+    AI["auto_transcription · auto_chaptering · hi-IN translate"]
+    T["Transformations on demand: Moments · Reels · cards · previews · data saver"]
+    S["HLS streaming · f_auto · q_auto"]
+    X["Tags + context + Search API"]
+  end
+
+  subgraph App["Next.js 16 on Vercel: the knowledge plane"]
+    W["Signed webhook"]
+    R["Retrieval · question understanding"]
+    G["Grounded answer + citation validation"]
+    P["Study Packs · Learning Paths · Concept Map · Notes"]
+    ST["/status · /api/health"]
+  end
+
+  DB[("Neon Postgres: segments · full-text index · packs · insights")]
+  M["Gemini → Groq fallback chain · circuit breaker"]
+
+  O -- video bytes, signed --> U
+  U --> AI
+  AI -- webhook --> W
+  W -- time-coded segments --> DB
+  W -- study pack --> P
+  P -- tags and context --> X
+  L -- question --> R
+  R --> DB
+  R --> G
+  G <--> M
+  G -- validated citations + clip URLs --> L
+  T -- clips · reels · shorts --> L
+  S -- adaptive video --> L
+  ST -. checks .-> DB
+  ST -. checks .-> M
+  ST -. credits .-> Cloudinary
 ```
 
 - **One Next.js 16 app** (App Router: frontend and API together), deployed on Vercel.
@@ -177,6 +221,7 @@ Open the live app at **[pravaha-cyan.vercel.app](https://pravaha-cyan.vercel.app
 6. Press `/` or `Ctrl/⌘ K` anywhere to jump to the Ask bar.
 7. Open **[Try it](https://pravaha-cyan.vercel.app/try)** and upload any short video with speech (up to 50 MB). Follow the live pipeline, then ask it "What is this video about?" on its page.
 8. Open **[Studio](https://pravaha-cyan.vercel.app/studio)**: a read-only demo of the organizer side, with every session's pipeline output and live Insights (knowledge gaps, most asked questions, answers rated helpful). Uploading to the main library and publishing need the organizer passcode at `/studio/sign-in`.
+9. Open **[Status](https://pravaha-cyan.vercel.app/status)**: live database health, every AI model, and the Cloudinary credits the media runs on.
 
 ## Quick start
 

@@ -17,4 +17,6 @@ Free tiers cover everything except Gemini beyond its free tier, whose worst case
 
 ## At Scale (pitch answer)
 
+The full unit-economics and pricing hypothesis are in [`BUSINESS.md`](BUSINESS.md); live credit use is at `/status`.
+
 Cost per institute scales with minutes uploaded (Cloudinary transcription + storage), minutes watched (delivery) and questions asked (Gemini) — all usage-priced, all passed through in a per-seat or per-hour-of-content plan (`VISION.md`).
