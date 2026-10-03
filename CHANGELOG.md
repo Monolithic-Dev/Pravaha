@@ -5,6 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/); versioning: [SemVer](ht
 ## [Unreleased]
 
 ### Added
+- Data saver: a header switch (automatic on Save-Data and 2G/3G) that serves lighter Cloudinary renditions and the `sd` streaming ladder; 33–76% fewer bytes measured (Phase 21)
 - Concept Map `/concepts` and Compare view `/concepts/[key]`: the same concept from every teacher as one Compare Reel (Phase 19)
 - Cloudinary asset index: tags and contextual metadata on each session's asset, synced from the Studio and read back with the Search API (Phase 19)
 

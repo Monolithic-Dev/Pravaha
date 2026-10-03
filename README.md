@@ -77,6 +77,7 @@ Colleges, clubs and coaching institutes record hundreds of hours of lectures and
 | **Answer Reels** | The moments an answer cites, from different speakers and sessions, stitched into one labelled video. |
 | **Concept Map** | `/concepts` lines up every concept your lectures teach and how many different teachers explain it. Open one and hear the same idea from each lecturer, back to back, as one Cloudinary-spliced video, until one explanation clicks. |
 | **Learning Paths** | `/learn`: type a topic and get a 3–5 step course, ordered basics first, drawn from moments across the library and edited into one video. |
+| **Data saver** | One switch (and automatic on Save-Data or 2G/3G) serves smaller, lower-quality Cloudinary renditions: thumbnails 76% lighter, clips and reels 38–41%, and a streaming ladder that tops out at 0.9 Mbps instead of 3.4. Built for India’s mobile data. |
 | **Study Packs** | Every session gets a summary, key concepts, a quiz whose explanations **play the moment** the teacher explains it, and a "Session in 60 seconds" highlight reel. Pravaha generates them automatically from the transcript. |
 | **Moments** | One tap turns any cited clip into a vertical, AI-cropped, subtitled short for WhatsApp or Instagram, with its own share page and preview card. The short is just a Cloudinary URL; nothing is rendered. |
 | **Insights** | Organizers see what learners ask, the **knowledge gaps** the library can't answer yet (what to record next), and which Moments get shared. Every report downloads as CSV. Visitors can explore a read-only demo of the Studio. |
@@ -121,6 +122,7 @@ Cloudinary isn't just storage here; the product depends on it.
 | `e_preview:duration_6` | **AI hover previews** on library cards: the session's most interesting moments in 6 silent seconds |
 | `so_`/`eo_` + `c_fill,ar_9:16,g_auto` + timed `l_text` captions + `f_auto,q_auto` | **Moments**: trimmed, subject-tracked, subtitled vertical clips |
 | `g_auto` thumbnails and poster frames | Content-aware library cards, results and social preview cards |
+| `q_auto:low`, `c_limit`/`w_` sizing, `sp_sd` streaming profile | **Data saver**: every video, reel, thumbnail and the HLS ladder re-requested lighter for slow or metered connections |
 | `l_video:…,fl_splice` + timed `l_text` labels | **Answer Reels** and **Session in 60 seconds**: moments from one or more sessions stitched into one video |
 | Webhooks (`notification_url`, signature-verified) | Upload → transcribed → `ready` with no polling |
 | Incoming transformation `eo_60` on a second signed preset | **Try it** uploads: Cloudinary keeps only the first 60 seconds, so a public upload can't cost more |
