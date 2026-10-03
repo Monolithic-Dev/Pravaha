@@ -4,6 +4,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/); versioning: [SemVer](ht
 
 ## [Unreleased]
 
+### Added
+- Concept Map `/concepts` and Compare view `/concepts/[key]`: the same concept from every teacher as one Compare Reel (Phase 19)
+- Cloudinary asset index: tags and contextual metadata on each session's asset, synced from the Studio and read back with the Search API (Phase 19)
+
 ## [1.0.0] — 2026-10-03
 
 The hackathon submission. Live at https://pravaha-cyan.vercel.app; PR numbers refer to `Monolithic-Dev/Pravaha`.

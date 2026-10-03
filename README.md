@@ -75,6 +75,8 @@ Colleges, clubs and coaching institutes record hundreds of hours of lectures and
 | **Find** | Search every session for what was *said* and land on the exact second. |
 | **Ask** | Ask a question in plain language. The answer comes **only** from your recordings, and every claim links to a **playable clip** of the moment it came from. Progress streams live while it works, and the answer suggests follow-up questions. If the library doesn't cover a question, Pravaha says so instead of guessing. |
 | **Answer Reels** | The moments an answer cites, from different speakers and sessions, stitched into one labelled video. |
+| **Concept Map** | `/concepts` lines up every concept your lectures teach and how many different teachers explain it. Open one and hear the same idea from each lecturer, back to back, as one Cloudinary-spliced video, until one explanation clicks. |
+| **Learning Paths** | `/learn`: type a topic and get a 3–5 step course, ordered basics first, drawn from moments across the library and edited into one video. |
 | **Study Packs** | Every session gets a summary, key concepts, a quiz whose explanations **play the moment** the teacher explains it, and a "Session in 60 seconds" highlight reel. Pravaha generates them automatically from the transcript. |
 | **Moments** | One tap turns any cited clip into a vertical, AI-cropped, subtitled short for WhatsApp or Instagram, with its own share page and preview card. The short is just a Cloudinary URL; nothing is rendered. |
 | **Insights** | Organizers see what learners ask, the **knowledge gaps** the library can't answer yet (what to record next), and which Moments get shared. Every report downloads as CSV. Visitors can explore a read-only demo of the Studio. |

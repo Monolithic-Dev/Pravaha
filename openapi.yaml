@@ -460,3 +460,35 @@ paths:
         '200': { description: 'CSV with a UTF-8 byte-order mark, as an attachment', content: { text/csv: { schema: { type: string } } } }
         '400': { description: Unknown report, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
         '401': { description: Not an organizer and the demo Studio is off }
+  /concepts:
+    get:
+      summary: The concept map, every concept the published library teaches
+      operationId: listConcepts
+      security: [{}]
+      responses:
+        '200': { description: Concepts, most-taught first, content: { application/json: { schema: { type: array, items: { type: object, properties: { key: { type: string }, name: { type: string }, sessions: { type: integer } } } } } } }
+  /concepts/{key}:
+    get:
+      summary: One concept and the moments, across sessions, that explain it
+      operationId: getConcept
+      security: [{}]
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string, pattern: '^[a-z0-9-]{1,80}$' } }
+      responses:
+        '200': { description: The concept and up to 5 moments, content: { application/json: { schema: { type: object } } } }
+        '404': { description: No such concept, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /organizer/index:
+    post:
+      summary: Tag every session's Cloudinary asset and read the tags back with the Search API
+      operationId: syncCloudinaryIndex
+      security: [{ organizerCookie: [] }]
+      responses:
+        '200': { description: Sync result, content: { application/json: { schema: { type: object } } } }
+        '401': { description: Not an organizer }
+    get:
+      summary: The tagged assets, from Cloudinary's Search API
+      operationId: listCloudinaryIndex
+      security: [{ organizerCookie: [] }]
+      responses:
+        '200': { description: Assets with tags and contextual metadata, content: { application/json: { schema: { type: object } } } }
+        '401': { description: Not an organizer }
