@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { ReelPlayer } from "@/components/ReelPlayer";
 import { formatTime } from "@/lib/format";
-import { thumbUrl } from "@/lib/media";
+import { reelUrl, thumbUrl } from "@/lib/media";
 import { clearSaved, toggleSavedMoment, useRecentQuestions, useSavedMoments, useWatchProgress } from "@/lib/saved";
 
 // The learner's Saved page: everything here lives on this device (src/lib/saved.ts).
@@ -12,6 +13,8 @@ export function SavedView() {
   const moments = useSavedMoments();
   const questions = useRecentQuestions();
   const progress = useWatchProgress();
+  // Revise before an exam: the latest saved moments (any sessions) as one labelled video.
+  const revision = moments.length > 1 ? reelUrl(moments.slice(0, 5).map((m, i) => ({ publicId: m.publicId, startS: m.startS, endS: m.endS, label: `${i + 1} · ${m.title.slice(0, 40)}` }))) : null;
 
   return (
     <div className="space-y-10">
@@ -27,7 +30,16 @@ export function SavedView() {
         {moments.length === 0 ? (
           <Empty>Tap Save on any answer clip or search result to keep the moment here.</Empty>
         ) : (
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <>
+          {revision && (
+            <ReelPlayer
+              url={revision.url}
+              title="Play my revision reel"
+              subtitle={`Your ${revision.clips} latest saved moments, edited into one video by Cloudinary`}
+              durationS={revision.durationS}
+            />
+          )}
+          <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {moments.map((m, i) => (
               <li key={m.segmentId} className="rise lift rounded-2xl border border-border bg-surface p-3" style={{ animationDelay: `${Math.min(i, 8) * 50}ms` }}>
                 <Link href={`/watch/${m.lectureId}?t=${Math.floor(m.startS)}`} className="group block">
@@ -45,6 +57,7 @@ export function SavedView() {
               </li>
             ))}
           </ul>
+          </>
         )}
       </Section>
 
