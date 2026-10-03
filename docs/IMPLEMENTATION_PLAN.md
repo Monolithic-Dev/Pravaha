@@ -95,3 +95,4 @@ The core loop (Phases 01–09) is built and verified on real Cloudinary + Neon. 
 | 18 | Query understanding, Learning Paths, AI reliability | Rewrite questions into the library's words (and translate them), honest near-miss answers, `/learn` micro-courses as one Cloudinary reel, circuit breaker + deep health | ✅ done (Oct 3) |
 | 19 | Concept Map & Cloudinary asset index | Same concept, every teacher, as one Compare Reel; tags + contextual metadata on Cloudinary assets, read back with the Search API | ✅ done (Oct 3) |
 | 21 | Data saver | Light Cloudinary renditions (35–76% fewer bytes, sd streaming ladder) for slow or metered connections; follows Save-Data and 2G/3G automatically | ✅ done (Oct 3) |
+| 22 | Weak spots & study notes | Quiz mistakes become a personal revision reel; every session exports a timestamp-linked study sheet (Markdown / print) | ✅ done (Oct 3) |

@@ -160,3 +160,11 @@ Retrieval now rewrites a question into the library's vocabulary when it is in an
 ### `POST /api/organizer/index` · `GET /api/organizer/index`
 - **Auth:** organizer cookie (`401` otherwise) · `maxDuration` 60 s
 - `POST` writes tags and contextual metadata onto every session's Cloudinary asset, then returns `{ synced, skipped, assets }` read back with the Search API. `GET` returns just `{ assets: [{ publicId, tags, context }] }`
+
+## Phase 22 additions
+
+### `GET /api/lectures/[id]/notes`
+- **Auth:** public (the unguessable session id is the access, like the Watch page)
+- **Query:** `format=md` returns Markdown (`text/markdown`); add `download=1` for a `Content-Disposition: attachment` `.md` file. Without `format`, JSON
+- **Response (JSON):** `{ title, speaker, durationS, watchUrl, summary[], concepts[{ name, t, label, url }], chapters[{ title, t, label, url }], quiz[{ question, answer, explanation, t, label, url }] }`; every `url` opens the session at that second
+- **Errors:** `404` the session isn't ready, doesn't exist, or has no summary, chapters or quiz yet

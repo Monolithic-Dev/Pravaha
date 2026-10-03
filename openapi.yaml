@@ -492,3 +492,15 @@ paths:
       responses:
         '200': { description: Assets with tags and contextual metadata, content: { application/json: { schema: { type: object } } } }
         '401': { description: Not an organizer }
+  /lectures/{id}/notes:
+    get:
+      summary: A session's study notes, every point linked to its timestamp
+      operationId: getStudyNotes
+      security: [{}]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: format, in: query, required: false, schema: { type: string, enum: [md] }, description: 'md returns Markdown instead of JSON' }
+        - { name: download, in: query, required: false, schema: { type: string }, description: 'With format=md, send as an attachment' }
+      responses:
+        '200': { description: Notes as JSON, or Markdown with format=md, content: { application/json: { schema: { type: object } }, text/markdown: { schema: { type: string } } } }
+        '404': { description: No notes for this session, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
