@@ -1,6 +1,7 @@
 import "server-only";
 
 import { generateJson } from "@/lib/ai";
+import { syncAssetMetadata } from "@/lib/cloudinary-index";
 import { query } from "@/lib/db";
 import { formatTime } from "@/lib/format";
 import { getSegments, type Lecture } from "@/lib/lectures";
@@ -36,6 +37,7 @@ export async function generateStudyPack(lecture: Lecture): Promise<StudyPack | n
     [lecture.id, JSON.stringify(pack), model],
   );
   log("study_pack.done", { lectureId: lecture.id, model, concepts: pack.concepts.length, quiz: pack.quiz.length, highlights: pack.highlights.length });
+  await syncAssetMetadata(lecture, pack);
   return pack;
 }
 

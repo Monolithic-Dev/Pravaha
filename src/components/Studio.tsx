@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { CloudinaryIndex } from "@/components/CloudinaryIndex";
 import { EmbedCode } from "@/components/EmbedCode";
 import { InsightsPanel } from "@/components/InsightsPanel";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -114,6 +115,7 @@ export function Studio({ demo = false }: { demo?: boolean }) {
         ) : (
           <>
             <LibraryStats sessions={sessions} />
+            {!demo && <CloudinaryIndex />}
             <div className="mt-3 flex justify-end">
               <button
                 type="button"
