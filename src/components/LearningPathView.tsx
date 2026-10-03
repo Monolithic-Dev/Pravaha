@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { MomentButton } from "@/components/MomentButton";
 import { ReelPlayer } from "@/components/ReelPlayer";
+import { useLiteUrl } from "@/lib/data-saver";
 import { formatTime } from "@/lib/format";
 import { thumbUrl } from "@/lib/media";
 import type { LearningPath } from "@/lib/paths";
@@ -12,6 +13,7 @@ import type { LearningPath } from "@/lib/paths";
 // A Learning Path: the whole course as one Cloudinary-stitched video, then each step as a card that explains
 // why it comes next and opens the full session at that second.
 export function LearningPathView({ path }: { path: LearningPath }) {
+  const lt = useLiteUrl();
   const sessions = new Set(path.steps.map((s) => s.lectureId)).size;
   const speakers = [...new Set(path.steps.map((s) => s.speaker).filter(Boolean))];
 
@@ -51,7 +53,7 @@ export function LearningPathView({ path }: { path: LearningPath }) {
               <div className="mt-3 flex gap-3 rounded-2xl border border-border bg-bg p-3">
                 <Link href={`/watch/${step.lectureId}?t=${Math.floor(step.startS)}`} className="relative block w-28 shrink-0 overflow-hidden rounded-xl sm:w-36">
                   <Image
-                    src={thumbUrl(step.publicId, step.startS)}
+                    src={lt(thumbUrl(step.publicId, step.startS))}
                     alt={`${step.title}, at ${formatTime(step.startS)}`}
                     width={288}
                     height={162}

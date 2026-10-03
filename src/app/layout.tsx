@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 
+import { DataSaverToggle } from "@/components/DataSaverToggle";
 import { LogoMark } from "@/components/Logo";
 import { SearchShortcut } from "@/components/SearchShortcut";
 import { SiteChrome } from "@/components/SiteChrome";
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 >
                   Try it
                 </Link>
+                <DataSaverToggle />
                 <ThemeToggle />
               </div>
             </nav>

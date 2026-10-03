@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useLiteUrl } from "@/lib/data-saver";
 import { formatTime } from "@/lib/format";
 import { reelUrl } from "@/lib/media";
 import type { StudyPack } from "@/lib/study-pack-schema";
@@ -61,7 +62,8 @@ export function StudyPanel({ pack, publicId, onSeek }: Props) {
 // A Cloudinary-stitched reel behind a play button; the video loads only when asked for.
 function ReelButton({ url, title, subtitle }: { url: string; title: string; subtitle: string }) {
   const [playing, setPlaying] = useState(false);
-  if (playing) return <video src={url} className="aspect-video w-full rounded-xl bg-black" controls autoPlay playsInline />;
+  const lt = useLiteUrl();
+  if (playing) return <video src={lt(url)} className="aspect-video w-full rounded-xl bg-black" controls autoPlay playsInline />;
   return (
     <button
       type="button"

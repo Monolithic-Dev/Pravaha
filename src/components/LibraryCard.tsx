@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { formatTime } from "@/lib/format";
 import type { Lecture } from "@/lib/lectures";
+import { useDataSaver, useLiteUrl } from "@/lib/data-saver";
 import { posterTime, previewUrl, thumbUrl } from "@/lib/media";
 
 // A library card that plays Cloudinary's AI preview of the session while hovered or focused. The video is
@@ -15,9 +16,11 @@ export function LibraryCard({ lecture, index }: { lecture: Lecture; index: numbe
   const [active, setActive] = useState(false);
   const [shown, setShown] = useState(false);
   const [failed, setFailed] = useState(false);
+  const lt = useLiteUrl();
+  const lite = useDataSaver();
 
   function start() {
-    if (failed || !previewsAllowed()) return;
+    if (failed || lite || !previewsAllowed()) return;
     setActive(true);
   }
   function stop() {
@@ -37,14 +40,14 @@ export function LibraryCard({ lecture, index }: { lecture: Lecture; index: numbe
       >
         <div className="lift relative overflow-hidden rounded-2xl bg-border">
           <Image
-            src={thumbUrl(lecture.publicId, posterTime(lecture.durationS))}
+            src={lt(thumbUrl(lecture.publicId, posterTime(lecture.durationS)))}
             alt=""
             width={640}
             height={360}
             unoptimized // Cloudinary already serves f_auto,q_auto
             className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           />
-          {active && (
+          {active && !lite && (
             <video
               src={previewUrl(lecture.publicId)}
               muted

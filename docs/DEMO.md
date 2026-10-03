@@ -26,6 +26,8 @@ Never show setup, code, dashboards or waiting. Every shot is the problem, the pr
 | 2:24–2:35 | **Cloudinary under the hood** panel on the answer: each URL step explained | "Every clip, reel and short is a Cloudinary transformation, and Pravaha shows exactly which." |
 | 2:35–2:45 | Architecture strip: Cloudinary (transcription · chaptering · streaming · g_auto · e_preview · transformations) + Pravaha (retrieval · grounded Ask · Moments · Insights) · team | "Cloudinary turns video into data. Pravaha turns data into answers you can watch. Code Blooded, Track 3." |
 
+**Bonus shot (if there is time):** header → **Data saver** on → the same answer reel and thumbnails reload visibly lighter. Voice-over: "Built for India’s mobile data: one switch, and Cloudinary serves everything at a fraction of the bytes."
+
 ## Pre-Recording Checklist
 
 - **Cloudinary credits first** (free plan: 25 a month). Check usage before recording. New uploads, new answer clips, reels and Moments cost credits; already-generated URLs don't. If usage is near the limit, upgrade first. If you can't, film the upload shot from an existing recording, and ask only questions that have been asked before (their clips are cached).

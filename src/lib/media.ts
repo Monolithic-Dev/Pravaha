@@ -172,6 +172,8 @@ export function reelUrl(clips: ReelClip[], cloud = CLOUD): { url: string; durati
 // What the Cloudinary Video Player requests for a session, as plain URLs, for "Cloudinary under the hood".
 // They mirror the player's own requests (src/components/Player.tsx); the player builds the real ones.
 export const STREAMING_PROFILE = "hd_lean";
+// Data saver ladder: tops out at 931 kbps (hd_lean: 3.4 Mbps), measured from the master playlists.
+export const STREAMING_PROFILE_LITE = "sd";
 
 export function playerUrls(publicId: string, cloud = CLOUD) {
   const raw = `https://res.cloudinary.com/${cloud}/raw/upload/${publicId}`;
@@ -188,4 +190,25 @@ export function playerUrls(publicId: string, cloud = CLOUD) {
     transcript: `${raw}.transcript`,
     chapters: `${raw}-chapters.vtt`,
   };
+}
+
+// Data saver (src/lib/data-saver.ts): the same Cloudinary URL asked for at half the pixels and lower quality.
+// One rewrite, next to the builders whose constants it mirrors, so every video, reel, thumbnail and preview
+// shrinks the same way. Burned-in captions and labels shrink with the frame so they stay in proportion.
+// Measured on real output: thumbnails ~76% smaller, clips ~41%, reels ~38%, Moments ~35%, hover previews ~33%.
+export const LITE_FRAME = { reel: "w_640,h_360,c_fill", vertical: "w_360", thumb: "w_320", clip: "c_limit,w_640" } as const;
+
+export function liteUrl(url: string): string {
+  if (!url.startsWith("https://res.cloudinary.com/") || !url.includes("/video/upload/")) return url;
+  return url
+    .replaceAll(REEL_FRAME, LITE_FRAME.reel)
+    .replaceAll("c_fill,ar_9:16,w_720,g_auto", `c_fill,ar_9:16,${LITE_FRAME.vertical},g_auto`)
+    .replaceAll("ar_16:9,w_640", `ar_16:9,${LITE_FRAME.thumb}`)
+    .replaceAll("arial_46_bold", "arial_24_bold")
+    .replaceAll("w_660,c_fit", "w_330,c_fit")
+    .replaceAll("g_south,y_220", "g_south,y_110")
+    .replaceAll("arial_34_bold", "arial_20_bold")
+    .replaceAll("g_north_west,x_40,y_40", "g_north_west,x_20,y_20")
+    .replace(/(\/upload\/so_[\d.]+,eo_[\d.]+)\/(f_auto:video)/, `$1/${LITE_FRAME.clip}/$2`)
+    .replace(/(^|[,/])q_auto(?=[,/.])/g, "$1q_auto:low");
 }

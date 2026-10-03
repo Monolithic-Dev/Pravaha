@@ -20,6 +20,7 @@ Learner (browser) ◀── HLS adaptive stream · Moment clips · g_auto thumbn
 |---|---|---|
 | Ingest | Signed direct upload (Upload Widget) | Large-file upload handling + object storage |
 | Watch | `auto_transcription` | A speech-to-text pipeline (Whisper on GPUs) |
+| Watch | `sp_sd` streaming profile, `q_auto:low`, `w_`/`c_limit` sizing | A second, lower-bitrate encode of the whole library and a client-side switch between them |
 | Watch | `auto_chaptering` | A chaptering model |
 | Watch | Video Player: HLS adaptive streaming, chapters, subtitles | An encoding ladder (FFmpeg) + HLS packaging + a player |
 | Find / Ask | The transcript is the corpus both pillars search | Our own STT output |
