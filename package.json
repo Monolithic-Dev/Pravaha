@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "eval:ask": "node scripts/eval-ask.mjs",
+    "prewarm": "node scripts/prewarm.mjs",
     "db:migrate": "node scripts/migrate.mjs",
     "spike": "node scripts/spike.mjs",
     "e2e:local": "node scripts/e2e-local.mjs",

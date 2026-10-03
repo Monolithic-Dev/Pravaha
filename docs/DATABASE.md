@@ -82,6 +82,7 @@ Transcripts can identify people. Logs reference `lectureId`, never transcript te
 | `003_study_packs_insights.sql` | `study_packs` (one validated pack per session), `ask_log` (question text + outcome, **no identity**), `moment_events` (anonymous open/share counts) |
 | `005_trials.sql` | `lectures.trial_expires_at`, `lectures.trial_ip_hash` (salted hash, rate limiting only) and a check that trials stay `unlisted`: public trial sessions from `/try`, deleted with their Cloudinary assets after expiry (`src/lib/trials.ts`) |
 | `004_shared_answers.sql` | `answers`: each answered Ask stored as shown (random 10-character id, question, result JSONB) for the share page `/a/[id]`, plus anonymous `helpful` / `unhelpful` counters. **No identity** |
+| `007_answer_cache.sql` | `answers.question_key` (the normalised question) and `answers.lecture_id` (the session an Ask was scoped to, NULL for the whole library) plus an index, so an identical recent question can reuse its stored answer. Older rows have NULLs and are never matched |
 
 Applied with `pnpm db:migrate` (tracked in `schema_migrations`, each file once, in a transaction).
 

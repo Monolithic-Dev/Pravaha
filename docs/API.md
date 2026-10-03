@@ -175,3 +175,8 @@ Retrieval now rewrites a question into the library's vocabulary when it is in an
 - **Auth:** public, `Cache-Control: no-store`
 - **Response:** `{ level: "operational"|"degraded"|"outage", reasons[], version, checkedAt, database: { ok, ms }, ai: { providers[], models: [{ model, ok, ms, kind? }] | null, probedAt }, cloudinary: { used, limit, pct, level, transformations, storage, bandwidth, reportedOn } | null, library: { sessions, moments, studyPacks, questionsAsked } | null }`
 - `503` only when the database is unreachable. AI probes are cached 5 minutes and Cloudinary usage 10 minutes per server instance. `kind` is `quota`, `overloaded` or `error`, never a raw provider message. No secrets or config values
+
+## Phase 25 additions
+
+### `POST /api/ask` (answer reuse)
+An identical question (normalised: case, whitespace and trailing punctuation ignored) in the same scope (the whole library, or the same `lectureId`) is answered from the stored answer when it is under 24 hours old and no session has been added, published or changed since. The response is the stored one plus `"cached": true`, with the same `answerId`. No AI call is made and the rate limit still applies.

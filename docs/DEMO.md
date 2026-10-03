@@ -28,6 +28,10 @@ Never show setup, code, dashboards or waiting. Every shot is the problem, the pr
 
 **Study shots (if there is time):** answer a quiz question wrong → `/saved` → **Play my weak-spot reel** ("What you get wrong comes back as video.") → a session’s **Study notes** → **Download .md** ("Every point links to the second the teacher said it.")
 
+**Before recording:** run `APP_URL=https://pravaha-cyan.vercel.app pnpm prewarm` so every demo question answers instantly and every reel is already generated.
+
+**Voice shot (10 s):** tap the microphone and ask in Hindi ("The question is spoken, the answer comes back in Hindi.")
+
 **Proof shot (10 s):** open `/status`: "The product watches itself: database, every AI model and the Cloudinary credits it runs on."
 
 **Bonus shot (if there is time):** header → **Data saver** on → the same answer reel and thumbnails reload visibly lighter. Voice-over: "Built for India’s mobile data: one switch, and Cloudinary serves everything at a fraction of the bytes."

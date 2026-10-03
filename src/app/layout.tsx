@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { DataSaverToggle } from "@/components/DataSaverToggle";
 import { LogoMark } from "@/components/Logo";
+import { ServiceWorker } from "@/components/ServiceWorker";
 import { SearchShortcut } from "@/components/SearchShortcut";
 import { SiteChrome } from "@/components/SiteChrome";
 import { THEME_INIT_SCRIPT, ThemeToggle } from "@/components/ThemeToggle";
@@ -23,6 +24,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: "Pravaha — ask your recordings, watch the answer",
   description,
+  applicationName: "Pravaha",
+  appleWebApp: { capable: true, title: "Pravaha", statusBarStyle: "default" },
+  icons: { apple: "/pwa-icon/192" },
   openGraph: { siteName: "Pravaha", type: "website", title: "Pravaha — ask your recordings, watch the answer", description },
 };
 
@@ -44,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-fg">
           Skip to content
         </a>
+        <ServiceWorker />
         <SiteChrome>
           <header className="sticky top-0 z-30 print:hidden border-b border-transparent bg-bg/80 backdrop-blur supports-[backdrop-filter]:bg-bg/70">
             {/* Phone: logo and the two switches on the first row, the page links on a second row that scrolls if it must.

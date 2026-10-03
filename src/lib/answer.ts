@@ -4,7 +4,7 @@ import { z } from "zod";
 import { generateJson } from "@/lib/ai";
 import type { RawAnswer } from "@/lib/citations";
 import { formatTime } from "@/lib/format";
-import { answerLanguage } from "@/lib/language";
+import { answerLanguage, fixPunctuation } from "@/lib/language";
 import type { Hit } from "@/lib/search";
 
 const Answer = z.object({
@@ -48,5 +48,5 @@ export async function askGrounded(question: string, hits: Hit[], { budgetMs }: {
       : SYSTEM,
     prompt: `${excerpts(hits)}\n\nQuestion: ${question}`,
   });
-  return data;
+  return language ? { ...data, answer: fixPunctuation(data.answer, language), follow_ups: data.follow_ups.map((f) => fixPunctuation(f, language)) } : data;
 }

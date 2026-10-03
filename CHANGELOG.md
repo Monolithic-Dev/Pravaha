@@ -5,6 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/); versioning: [SemVer](ht
 ## [Unreleased]
 
 ### Added
+- Answer reuse: an identical question returns the stored answer (no AI call, about 1 s) until a session changes or 24 hours pass; `pnpm prewarm` warms the demo (Phase 25)
+- Voice question: a microphone in the Ask bar, English or Hindi, using the browser's speech recognition (Phase 25)
+- Installable app: web app manifest, icons, shortcuts and an offline page (Phase 25)
 - Public status page `/status` and `GET /api/status`: live database, every AI model and Cloudinary credits, with warnings at 80% and 95% (Phase 24)
 - Business case (`docs/BUSINESS.md`, README) and one whole-system architecture diagram (Phase 24)
 - Weak spots on Saved: wrong quiz answers become a personal revision reel of the explanations you missed (Phase 22)
@@ -15,6 +18,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/); versioning: [SemVer](ht
 - Cloudinary asset index: tags and contextual metadata on each session's asset, synced from the Studio and read back with the Search API (Phase 19)
 
 ### Fixed
+- The `Permissions-Policy` header blocked the microphone on every page; it now allows it for Pravaha's own pages (Phase 25)
+- Hindi answers ended sentences with the Chinese full stop (。) instead of the danda (।)
+- Smoke tests: the anonymous-upload check sends well-formed params, and the Ask check tolerates two "Source 1" buttons on mobile
 - `/search` (Find and Ask results) crashed with "Something went wrong" since the data saver release: `ResultCard` called a client hook without `"use client"`. Fixed, with a unit test that fails the build for any hook used outside a client file
 - Phone header: Studio, data saver and the theme switch were off-screen below ~560 px. Header, Studio and /try now fit 360 px (Phase 23)
 

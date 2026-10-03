@@ -7,7 +7,8 @@ const baseHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  // microphone=(self): only Pravaha's own pages may ask for it, which the voice question needs (components/VoiceButton.tsx).
+  { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=(), payment=(), usb=()" },
 ];
 const policy = (ancestors: string) => `frame-ancestors ${ancestors}; base-uri 'self'; form-action 'self'; object-src 'none'`;
 
@@ -29,6 +30,14 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Content-Security-Policy", value: policy("'none'") },
+        ],
+      },
+      // The service worker must always be re-fetched, so a fix to it reaches every device on the next visit.
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Service-Worker-Allowed", value: "/" },
         ],
       },
       { source: "/embed/:path*", headers: [{ key: "Content-Security-Policy", value: policy(embedAncestors) }] },
