@@ -77,6 +77,7 @@ Colleges, clubs and coaching institutes record hundreds of hours of lectures and
 | **Answer Reels** | The moments an answer cites, from different speakers and sessions, stitched into one labelled video. |
 | **Concept Map** | `/concepts` lines up every concept your lectures teach and how many different teachers explain it. Open one and hear the same idea from each lecturer, back to back, as one Cloudinary-spliced video, until one explanation clicks. |
 | **Learning Paths** | `/learn`: type a topic and get a 3–5 step course, ordered basics first, drawn from moments across the library and edited into one video. |
+| **Revision reel** | On `/saved`, the latest saved moments from any sessions play as one labelled video: a revision reel for the night before an exam. |
 | **Study Packs** | Every session gets a summary, key concepts, a quiz whose explanations **play the moment** the teacher explains it, and a "Session in 60 seconds" highlight reel. Pravaha generates them automatically from the transcript. |
 | **Moments** | One tap turns any cited clip into a vertical, AI-cropped, subtitled short for WhatsApp or Instagram, with its own share page and preview card. The short is just a Cloudinary URL; nothing is rendered. |
 | **Insights** | Organizers see what learners ask, the **knowledge gaps** the library can't answer yet (what to record next), and which Moments get shared. Every report downloads as CSV. Visitors can explore a read-only demo of the Studio. |
@@ -159,6 +160,8 @@ flowchart LR
 Diagrams and reasoning: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/TRD.md`](docs/TRD.md).
 
 ## How to test it
+
+> **Judges:** [`/judges`](https://pravaha-cyan.vercel.app/judges) maps the submission requirements to the Cloudinary features, with live URLs and a 90-second test.
 
 Open the live app at **[pravaha-cyan.vercel.app](https://pravaha-cyan.vercel.app)**. Learners need no login.
 

@@ -26,6 +26,16 @@ Never show setup, code, dashboards or waiting. Every shot is the problem, the pr
 | 2:24–2:35 | **Cloudinary under the hood** panel on the answer: each URL step explained | "Every clip, reel and short is a Cloudinary transformation, and Pravaha shows exactly which." |
 | 2:35–2:45 | Architecture strip: Cloudinary (transcription · chaptering · streaming · g_auto · e_preview · transformations) + Pravaha (retrieval · grounded Ask · Moments · Insights) · team | "Cloudinary turns video into data. Pravaha turns data into answers you can watch. Code Blooded, Track 3." |
 
+## Phase 18–20 scenes (Oct 3) — swap in for the 2:06–2:35 shots if time is tight
+
+| Shot | Voice-over |
+|---|---|
+| Ask "What is the bias-variance trade-off?" → the answer says honestly the lecturer never uses that phrase, then explains the related ideas with clips | "It doesn’t bluff. If the lecturer never said it, Pravaha says so and teaches the closest ideas." |
+| Ask the same in Hindi: "ओवरफिटिंग क्या है?" → Hindi answer citing English lectures | "Ask in Hindi, answer from English lectures." |
+| `/concepts/overfitting` → play the Compare Reel: three professors, labelled | "Same idea, three teachers, one video, until one explanation clicks." |
+| `/learn` → "Choosing a learning rate" → 4-step course video | "Any topic becomes a short course, ordered basics first, edited by Cloudinary." |
+| `/judges` → capability list → Studio → Cloudinary asset index (Search API) | "Every capability is listed with live URLs. Even our tags are read back from Cloudinary’s Search API." |
+
 ## Pre-Recording Checklist
 
 - **Cloudinary credits first** (free plan: 25 a month). Check usage before recording. New uploads, new answer clips, reels and Moments cost credits; already-generated URLs don't. If usage is near the limit, upgrade first. If you can't, film the upload shot from an existing recording, and ask only questions that have been asked before (their clips are cached).
