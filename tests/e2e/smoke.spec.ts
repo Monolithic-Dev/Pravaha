@@ -24,7 +24,7 @@ test("Find lands on the exact second", async ({ page }) => {
 test("Ask answers with at least one playable citation", async ({ page }) => {
   await page.goto(`/search?q=${encodeURIComponent(QUESTION)}`);
   const answer = page.getByRole("region", { name: /Answer from your library/i });
-  await expect(answer.getByRole("button", { name: "Source 1" })).toBeVisible({ timeout: 30_000 });
+  await expect(answer.getByRole("button", { name: "Source 1" }).first()).toBeVisible({ timeout: 30_000 });
   await expect(answer.getByRole("link", { name: "Open full session" }).first()).toBeVisible();
 });
 
@@ -34,7 +34,18 @@ test("Ask refuses questions the library doesn't cover", async ({ page }) => {
 });
 
 test("organizer API rejects anonymous uploads", async ({ request }) => {
-  const res = await request.post("/api/upload-signature", { data: { paramsToSign: {} } });
+  // Well-formed organizer-preset params (the route validates the shape first and answers 400 to malformed ones),
+  // from someone with no organizer cookie: it must refuse to sign.
+  const res = await request.post("/api/upload-signature", {
+    data: {
+      paramsToSign: {
+        timestamp: Math.floor(Date.now() / 1000),
+        upload_preset: "pravaha_signed",
+        public_id: "pravaha/6f1c2a52-8d4b-4c7e-9f21-0a5b3c1d2e4f",
+        source: "uw",
+      },
+    },
+  });
   expect(res.status()).toBe(401);
 });
 
