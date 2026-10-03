@@ -3,12 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { useLiteUrl } from "@/lib/data-saver";
 import { formatTime } from "@/lib/format";
 import { thumbUrl } from "@/lib/media";
 import { clearSaved, toggleSavedMoment, useRecentQuestions, useSavedMoments, useWatchProgress } from "@/lib/saved";
 
 // The learner's Saved page: everything here lives on this device (src/lib/saved.ts).
 export function SavedView() {
+  const lt = useLiteUrl();
   const moments = useSavedMoments();
   const questions = useRecentQuestions();
   const progress = useWatchProgress();
@@ -32,7 +34,7 @@ export function SavedView() {
               <li key={m.segmentId} className="rise lift rounded-2xl border border-border bg-surface p-3" style={{ animationDelay: `${Math.min(i, 8) * 50}ms` }}>
                 <Link href={`/watch/${m.lectureId}?t=${Math.floor(m.startS)}`} className="group block">
                   <div className="relative overflow-hidden rounded-xl bg-border">
-                    <Image src={thumbUrl(m.publicId, m.startS)} alt="" width={640} height={360} unoptimized className="aspect-video w-full object-cover" />
+                    <Image src={lt(thumbUrl(m.publicId, m.startS))} alt="" width={640} height={360} unoptimized className="aspect-video w-full object-cover" />
                     <span className="tabular absolute right-2 bottom-2 rounded-md bg-black/75 px-1.5 py-0.5 text-xs text-white">{formatTime(m.startS)}</span>
                   </div>
                   <p className="mt-2.5 font-medium group-hover:text-accent">{m.title}</p>
@@ -71,13 +73,14 @@ export function SavedView() {
 }
 
 export function ContinueWatchingRow({ items }: { items: ReturnType<typeof useWatchProgress> }) {
+  const lt = useLiteUrl();
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((p, i) => (
         <li key={p.lectureId} className="rise" style={{ animationDelay: `${Math.min(i, 8) * 50}ms` }}>
           <Link href={`/watch/${p.lectureId}?t=${Math.floor(p.t)}`} className="group block">
             <div className="lift relative overflow-hidden rounded-2xl bg-border">
-              <Image src={thumbUrl(p.publicId, p.t)} alt="" width={640} height={360} unoptimized className="aspect-video w-full object-cover" />
+              <Image src={lt(thumbUrl(p.publicId, p.t))} alt="" width={640} height={360} unoptimized className="aspect-video w-full object-cover" />
               <span className="absolute inset-x-0 bottom-0 h-1 bg-black/40">
                 <span className="block h-full bg-accent" style={{ width: `${Math.min(100, (p.t / p.durationS) * 100)}%` }} />
               </span>

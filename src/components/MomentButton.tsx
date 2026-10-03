@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 
 import { MomentClip } from "@/components/MomentClip";
+import { useLiteUrl } from "@/lib/data-saver";
 import { formatTime } from "@/lib/format";
 import { momentUrl } from "@/lib/media";
 import { shareMoment, trackMoment } from "@/lib/moment-share";
@@ -28,7 +29,8 @@ export function MomentButton({ publicId, lectureId, title, startS, endS, segment
   const dialog = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const url = momentUrl(publicId, startS, endS, { durationS, words });
+  const lt = useLiteUrl();
+  const url = lt(momentUrl(publicId, startS, endS, { durationS, words }));
 
   function show() {
     trackMoment(segmentId, "open");

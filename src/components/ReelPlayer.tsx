@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 
+import { useLiteUrl } from "@/lib/data-saver";
 import { formatTime } from "@/lib/format";
 
 // A Cloudinary-stitched reel behind a play button: the video loads only when the learner asks for it.
 export function ReelPlayer({ url, title, subtitle, durationS }: { url: string; title: string; subtitle: string; durationS: number }) {
   const [playing, setPlaying] = useState(false);
-  if (playing) return <video src={url} className="mt-5 aspect-video w-full rounded-2xl bg-black" controls autoPlay playsInline />;
+  const lt = useLiteUrl();
+  if (playing) return <video src={lt(url)} className="mt-5 aspect-video w-full rounded-2xl bg-black" controls autoPlay playsInline />;
   return (
     <button
       type="button"

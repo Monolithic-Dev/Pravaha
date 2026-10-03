@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { useLiteUrl } from "@/lib/data-saver";
 import { formatTime } from "@/lib/format";
 import type { SnippetPart } from "@/lib/highlight";
 import { thumbUrl } from "@/lib/media";
@@ -32,12 +33,13 @@ export function Snippet({ parts }: { parts: SnippetPart[] }) {
 }
 
 export function ResultCard({ hit, children }: { hit: ResultCardData; children?: React.ReactNode }) {
+  const lt = useLiteUrl();
   const href = `/watch/${hit.lectureId}?t=${Math.floor(hit.startS)}`;
   return (
     <article className="lift flex gap-4 rounded-2xl border border-border bg-surface p-3 sm:p-4">
       <Link href={href} className="relative block w-32 shrink-0 overflow-hidden rounded-xl sm:w-44">
         <Image
-          src={thumbUrl(hit.publicId, hit.startS)}
+          src={lt(thumbUrl(hit.publicId, hit.startS))}
           alt={`${hit.title}, at ${formatTime(hit.startS)}`}
           width={320}
           height={180}

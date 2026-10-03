@@ -8,6 +8,7 @@ import { MomentButton } from "@/components/MomentButton";
 import { UnderTheHood } from "@/components/UnderTheHood";
 import { Snippet } from "@/components/ResultCard";
 import { SaveButton } from "@/components/SaveButton";
+import { useLiteUrl } from "@/lib/data-saver";
 import { formatTime } from "@/lib/format";
 import type { SnippetPart } from "@/lib/highlight";
 import type { TimedWord } from "@/lib/segments";
@@ -245,6 +246,7 @@ const VOTE_KEY = (id: string) => `pravaha-vote-${id}`;
 
 // Perplexity-style action bar under an answer: what it was built from, then Share, Copy and 👍/👎.
 function AnswerActions({ data, question }: { data: Extract<AskResponse, { status: "answered" }>; question: string }) {
+  const lt = useLiteUrl();
   const [copied, setCopied] = useState<"link" | "text" | null>(null);
   const [vote, setVote] = useState<"up" | "down" | null>(null);
   const answerId = data.answerId ?? null;
@@ -310,7 +312,7 @@ function AnswerActions({ data, question }: { data: Extract<AskResponse, { status
           {data.citations.slice(0, 3).map((c) => (
             <Image
               key={c.segmentId}
-              src={thumbUrl(c.publicId, c.startS)}
+              src={lt(thumbUrl(c.publicId, c.startS))}
               alt=""
               width={48}
               height={48}
@@ -411,8 +413,9 @@ function FollowUps({ questions, onAsk }: { questions: string[]; onAsk?: (questio
 // The cited moments stitched into one video by Cloudinary — watch the whole answer, across sessions.
 function AnswerReel({ reel }: { reel: NonNullable<Reel> }) {
   const [playing, setPlaying] = useState(false);
+  const lt = useLiteUrl();
   if (playing) {
-    return <video src={reel.url} className="rise mt-5 aspect-video w-full rounded-2xl bg-black" controls autoPlay playsInline />;
+    return <video src={lt(reel.url)} className="rise mt-5 aspect-video w-full rounded-2xl bg-black" controls autoPlay playsInline />;
   }
   return (
     <button
@@ -499,15 +502,16 @@ function AnswerText({ text, citations }: { text: string; citations: Citation[] }
 
 function CitationCard({ c }: { c: CitationGroup<Citation> }) {
   const [playing, setPlaying] = useState(false);
+  const lt = useLiteUrl();
   return (
     <article className="lift h-full rounded-2xl border border-border bg-bg p-3">
       <div className="relative overflow-hidden rounded-xl bg-black">
         {playing ? (
-          <video src={clipUrl(c.publicId, c.startS, c.endS)} className="aspect-video w-full" controls autoPlay playsInline />
+          <video src={lt(clipUrl(c.publicId, c.startS, c.endS))} className="aspect-video w-full" controls autoPlay playsInline />
         ) : (
           <button type="button" onClick={() => setPlaying(true)} className="group block w-full" aria-label={`Play ${c.title} at ${formatTime(c.startS)}`}>
             <Image
-              src={thumbUrl(c.publicId, c.startS)}
+              src={lt(thumbUrl(c.publicId, c.startS))}
               alt=""
               width={640}
               height={360}

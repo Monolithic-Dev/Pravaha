@@ -3,10 +3,11 @@
 import "next-cloudinary/dist/cld-video-player.css";
 
 import { CldVideoPlayer } from "next-cloudinary";
-import { useRef } from "react";
+import { useRef, useSyncExternalStore } from "react";
 
 import type { SubtitleLanguage } from "@/lib/language";
-import { STREAMING_PROFILE } from "@/lib/media";
+import { useDataSaver } from "@/lib/data-saver";
+import { STREAMING_PROFILE, STREAMING_PROFILE_LITE } from "@/lib/media";
 
 type Props = {
   publicId: string;
@@ -20,6 +21,15 @@ type Props = {
 export function Player({ publicId, startAt, searchable, subtitles = [], onTime, videoRef }: Props) {
   const ownRef = useRef<HTMLVideoElement | null>(null);
   const ref = videoRef ?? ownRef;
+  const lite = useDataSaver();
+  // false on the server and during hydration: the player is created only once data saver is known, so a slow
+  // connection never starts by requesting the full-quality ladder.
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  if (!mounted) return <div className="aspect-video overflow-hidden rounded-2xl bg-black" />;
 
   return (
     <div className="overflow-hidden rounded-2xl bg-black">
@@ -35,9 +45,10 @@ export function Player({ publicId, startAt, searchable, subtitles = [], onTime, 
         // sp_auto combined with a quality ("sp_auto transformation is not allowed"). hd_lean is still an
         // adaptive ladder (720p, 360p, 180p) and costs about half of full_hd's six renditions in
         // transformation credits; 720p is plenty for lectures and slides (docs/COST.md).
-        transformation={{ streaming_profile: STREAMING_PROFILE }}
+        transformation={{ streaming_profile: lite ? STREAMING_PROFILE_LITE : STREAMING_PROFILE }}
         colors={{ accent: "#2dd4bf", base: "#0e1112", text: "#ecedea" }}
-        seekThumbnails
+        // Data saver skips the seek-bar sprite and the highlights graph: two extra downloads.
+        seekThumbnails={!lite}
         // Chapters and subtitles come from Cloudinary's auto_chaptering / auto_transcription outputs.
         // `chapters: true` makes the player load {public_id}-chapters.vtt (written by auto_chaptering, verified in Phase 01);
         // the option is typed as object in the SDK, hence the cast.
@@ -45,7 +56,7 @@ export function Player({ publicId, startAt, searchable, subtitles = [], onTime, 
           ? {
               chapters: true as unknown as object,
               chaptersButton: true,
-              aiHighlightsGraph: true,
+              aiHighlightsGraph: !lite,
               // English from auto_transcription, plus any translated tracks Cloudinary produced (src/lib/subtitles.ts).
               textTracks: {
                 subtitles: [

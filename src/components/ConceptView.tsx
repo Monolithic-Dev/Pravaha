@@ -6,6 +6,7 @@ import Link from "next/link";
 import { MomentButton } from "@/components/MomentButton";
 import { ReelPlayer } from "@/components/ReelPlayer";
 import type { ConceptView as Concept } from "@/lib/concepts";
+import { useLiteUrl } from "@/lib/data-saver";
 import { formatTime } from "@/lib/format";
 import { reelUrl, thumbUrl } from "@/lib/media";
 
@@ -15,6 +16,7 @@ const firstName = (speaker: string | null, title: string) => (speaker ?? title).
 // video (each clip labelled with who is speaking) and as cards that open the full session.
 export function ConceptView({ concept }: { concept: Concept }) {
   const { moments } = concept;
+  const lt = useLiteUrl();
   const reel = reelUrl(moments.map((m, i) => ({ publicId: m.publicId, startS: m.startS, endS: m.endS, label: `${i + 1} · ${firstName(m.speaker, m.title)}` })));
   const teachers = new Set(moments.map((m) => m.speaker ?? m.lectureId)).size;
 
@@ -33,7 +35,7 @@ export function ConceptView({ concept }: { concept: Concept }) {
           <li key={m.segmentId} className="flex flex-col rounded-2xl border border-border bg-surface p-3">
             <Link href={`/watch/${m.lectureId}?t=${Math.floor(m.startS)}`} className="relative block overflow-hidden rounded-xl">
               <Image
-                src={thumbUrl(m.publicId, m.startS)}
+                src={lt(thumbUrl(m.publicId, m.startS))}
                 alt={`${m.title}, at ${formatTime(m.startS)}`}
                 width={640}
                 height={360}
